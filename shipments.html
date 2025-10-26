@@ -102,7 +102,7 @@
                     </div>
                 </article>
 
-                <button class="metric-card status-card" type="button" data-status="prepared" aria-pressed="false" onclick="filterByStatus('prepared')">
+                <button class="metric-card status-card" type="button" data-status="prepared" aria-pressed="false" data-action="filter-status">
                     <span class="material-icons-outlined metric-icon" aria-hidden="true">assignment_turned_in</span>
                     <div class="metric-content">
                         <p class="metric-label">Prepared</p>
@@ -111,7 +111,7 @@
                     </div>
                 </button>
 
-                <button class="metric-card status-card" type="button" data-status="sent" aria-pressed="false" onclick="filterByStatus('sent')">
+                <button class="metric-card status-card" type="button" data-status="sent" aria-pressed="false" data-action="filter-status">
                     <span class="material-icons-outlined metric-icon" aria-hidden="true">local_shipping</span>
                     <div class="metric-content">
                         <p class="metric-label">Sent</p>
@@ -120,7 +120,7 @@
                     </div>
                 </button>
 
-                <button class="metric-card status-card" type="button" data-status="recalled" aria-pressed="false" onclick="filterByStatus('recalled')">
+                <button class="metric-card status-card" type="button" data-status="recalled" aria-pressed="false" data-action="filter-status">
                     <span class="material-icons-outlined metric-icon" aria-hidden="true">undo</span>
                     <div class="metric-content">
                         <p class="metric-label">Recalled</p>
@@ -203,7 +203,7 @@
                     <span class="material-icons-outlined" aria-hidden="true">add_box</span>
                     <h3 id="createShipmentTitle">Neues Shipment anlegen</h3>
                 </div>
-                <button class="modal-close" type="button" onclick="closeCreateShipmentModal()" aria-label="Schließen">
+                <button class="modal-close" type="button" data-action="close-create-modal" aria-label="Schließen">
                     <span class="material-icons-outlined" aria-hidden="true">close</span>
                 </button>
             </div>
@@ -228,7 +228,7 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" onclick="closeCreateShipmentModal()">
+                    <button type="button" class="btn btn-secondary" data-action="close-create-modal">
                         <span class="material-icons-outlined" aria-hidden="true">close</span>
                         <span>Abbrechen</span>
                     </button>
@@ -249,7 +249,7 @@
                     <span class="material-icons-outlined" aria-hidden="true">inventory_2</span>
                     <h3 id="addBoxesTitle">Boxen zum Shipment hinzufügen: <span id="currentShipmentRef"></span></h3>
                 </div>
-                <button class="modal-close" type="button" onclick="closeAddBoxesModal()" aria-label="Schließen">
+                <button class="modal-close" type="button" data-action="close-add-boxes" aria-label="Schließen">
                     <span class="material-icons-outlined" aria-hidden="true">close</span>
                 </button>
             </div>
@@ -315,11 +315,11 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" onclick="closeAddBoxesModal()">
+                <button type="button" class="btn btn-secondary" data-action="close-add-boxes">
                     <span class="material-icons-outlined" aria-hidden="true">close</span>
                     <span>Schließen</span>
                 </button>
-                <button type="button" class="btn btn-primary" id="proceedToSendBtn" onclick="proceedToSend()">
+                <button type="button" class="btn btn-primary" id="proceedToSendBtn" data-action="proceed-to-send">
                     <span class="material-icons-outlined" aria-hidden="true">arrow_forward</span>
                     <span class="btn-label">Prüfen &amp; senden</span>
                 </button>
@@ -335,7 +335,7 @@
                     <span class="material-icons-outlined" aria-hidden="true">local_shipping</span>
                     <h3 id="confirmShipmentTitle">Shipment senden bestätigen</h3>
                 </div>
-                <button class="modal-close" type="button" onclick="closeSendShipmentModal()" aria-label="Schließen">
+                <button class="modal-close" type="button" data-action="close-send-shipment" aria-label="Schließen">
                     <span class="material-icons-outlined" aria-hidden="true">close</span>
                 </button>
             </div>
@@ -373,11 +373,11 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" onclick="closeSendShipmentModal()">
+                <button type="button" class="btn btn-secondary" data-action="close-send-shipment">
                     <span class="material-icons-outlined" aria-hidden="true">arrow_back</span>
                     <span>Zurück</span>
                 </button>
-                <button type="button" class="btn btn-primary" id="confirmSendBtn" onclick="confirmSendShipment()">
+                <button type="button" class="btn btn-primary" id="confirmSendBtn" data-action="confirm-send-shipment">
                     <span class="material-icons-outlined" aria-hidden="true">local_shipping</span>
                     <span class="btn-label">Shipment senden</span>
                 </button>
@@ -393,7 +393,7 @@
                     <span class="material-icons-outlined" aria-hidden="true">assignment</span>
                     <h3 id="shipmentDetailsTitle">Shipment Details</h3>
                 </div>
-                <button class="modal-close" type="button" onclick="closeDetailsModal()" aria-label="Schließen">
+                <button class="modal-close" type="button" data-action="close-details" aria-label="Schließen">
                     <span class="material-icons-outlined" aria-hidden="true">close</span>
                 </button>
             </div>
@@ -401,7 +401,7 @@
                 <div class="loading">Loading shipment details...</div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" onclick="closeDetailsModal()">
+                <button type="button" class="btn btn-secondary" data-action="close-details">
                     <span class="material-icons-outlined" aria-hidden="true">close</span>
                     <span>Schließen</span>
                 </button>
@@ -417,7 +417,7 @@
                     <span class="material-icons-outlined" aria-hidden="true">undo</span>
                     <h3 id="recallShipmentTitle">Shipment zurückrufen</h3>
                 </div>
-                <button class="modal-close" type="button" onclick="closeRecallModal()" aria-label="Schließen">
+                <button class="modal-close" type="button" data-action="close-recall" aria-label="Schließen">
                     <span class="material-icons-outlined" aria-hidden="true">close</span>
                 </button>
             </div>
@@ -444,11 +444,11 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" onclick="closeRecallModal()">
+                <button type="button" class="btn btn-secondary" data-action="close-recall">
                     <span class="material-icons-outlined" aria-hidden="true">close</span>
                     <span>Abbrechen</span>
                 </button>
-                <button type="button" class="btn btn-danger" onclick="confirmRecall()">
+                <button type="button" class="btn btn-danger" data-action="confirm-recall">
                     <span class="material-icons-outlined" aria-hidden="true">undo</span>
                     <span>Shipment zurückrufen</span>
                 </button>

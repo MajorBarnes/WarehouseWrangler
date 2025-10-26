@@ -7,8 +7,8 @@ const API_BASE = './api';
 let currentShipments = [];
 let currentFilters = {
     status: '',
-    from_date: '',
-    to_date: ''
+    from: '',
+    to: ''
 };
 
 // Current shipment being created/edited
@@ -18,6 +18,22 @@ let availableCartons = [];
 
 // Shipment to recall
 let shipmentToRecall = null;
+
+// ---------------------------------------
+// Helpers
+// ---------------------------------------
+function escapeHtml(s) {
+    return String(s ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
+
+function isValidDateInput(v) {
+    return typeof v === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(v);
+}
 
 // Get token
 function getToken() {
@@ -41,6 +57,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     loadShipments();
+
+    document.addEventListener('click', handleGlobalActionClick);
 });
 
 function initializeHeader() {
@@ -110,19 +128,39 @@ function setTableLoading(isLoading) {
     }
 }
 
-async function loadShipments() {
+async function loadShipments(status = currentFilters.status, fromDate = currentFilters.from, toDate = currentFilters.to) {
     setTableLoading(true);
 
     try {
-        const params = new URLSearchParams();
-        if (currentFilters.status) params.append('status', currentFilters.status);
-        if (currentFilters.from_date) params.append('from_date', currentFilters.from_date);
-        if (currentFilters.to_date) params.append('to_date', currentFilters.to_date);
+        currentFilters.status = status || '';
+        currentFilters.from = fromDate || '';
+        currentFilters.to = toDate || '';
 
-        const queryString = params.toString() ? '?' + params.toString() : '';
-        const response = await fetch(`${API_BASE}/shipments/get_shipments.php${queryString}`, {
-            headers: { 'Authorization': `Bearer ${getToken()}` }
+        const token = getToken() || '';
+        const params = new URLSearchParams();
+
+        const normalizedStatus = (currentFilters.status || '').toLowerCase();
+        if (normalizedStatus && normalizedStatus !== 'alle status' && normalizedStatus !== 'all' && normalizedStatus !== 'all status') {
+            params.set('status', currentFilters.status);
+        }
+        if (isValidDateInput(currentFilters.from)) {
+            params.set('from', currentFilters.from);
+        }
+        if (isValidDateInput(currentFilters.to)) {
+            params.set('to', currentFilters.to);
+        }
+
+        const queryString = params.toString();
+        const url = `${API_BASE}/shipments/get_shipments.php${queryString ? `?${queryString}` : ''}`;
+
+        const response = await fetch(url, {
+            headers: { 'Authorization': `Bearer ${token}` }
         });
+
+        if (!response.ok) {
+            const text = await response.text().catch(() => '');
+            throw new Error(`Shipments fetch failed: HTTP ${response.status} — ${text.slice(0, 300)}`);
+        }
 
         const data = await response.json();
 
@@ -384,9 +422,10 @@ function renderShipmentActions(shipment) {
         <button
             class="btn btn-surface icon-button"
             type="button"
-            data-tooltip="Details ansehen"
+            title="Details ansehen"
             aria-label="Details ansehen"
-            onclick="viewShipmentDetails(${shipment.shipment_id})"
+            data-action="view-shipment"
+            data-shipment-id="${shipment.shipment_id}"
         >
             <span class="material-icons-outlined" aria-hidden="true">visibility</span>
         </button>
@@ -397,9 +436,10 @@ function renderShipmentActions(shipment) {
             <button
                 class="btn btn-positive icon-button"
                 type="button"
-                data-tooltip="Shipment fortsetzen"
                 aria-label="Shipment fortsetzen"
-                onclick="continueShipment(${shipment.shipment_id})"
+                title="Shipment fortsetzen"
+                data-action="continue-shipment"
+                data-shipment-id="${shipment.shipment_id}"
             >
                 <span class="material-icons-outlined" aria-hidden="true">play_circle</span>
             </button>
@@ -411,9 +451,11 @@ function renderShipmentActions(shipment) {
             <button
                 class="btn btn-danger icon-button"
                 type="button"
-                data-tooltip="Shipment zurückrufen"
                 aria-label="Shipment zurückrufen"
-                onclick="openRecallModal(${shipment.shipment_id}, ${JSON.stringify(shipment.shipment_reference || '')})"
+                title="Shipment zurückrufen"
+                data-action="recall"
+                data-shipment-id="${shipment.shipment_id}"
+                data-shipment-ref="${escapeHtml(shipment.shipment_reference || '')}"
             >
                 <span class="material-icons-outlined" aria-hidden="true">undo</span>
             </button>
@@ -522,7 +564,7 @@ function renderAvailableCartons() {
             <div class="carton-info">
                 ${carton.product_count} Produkte • ${carton.total_boxes_current} Boxen verfügbar
             </div>
-            <button class="btn btn-primary btn-small" type="button" onclick="selectBoxesFromCarton(${carton.carton_id})">
+            <button class="btn btn-primary btn-small" type="button" data-action="select-carton" data-carton-id="${carton.carton_id}">
                 <span class="material-icons-outlined" aria-hidden="true">add_box</span>
                 <span>Boxen auswählen</span>
             </button>
@@ -568,11 +610,11 @@ function showBoxSelectionDialog(carton, contents) {
                 </div>
             `).join('')}
             <div class="dialog-actions">
-                <button class="btn btn-secondary" type="button" onclick="closeBoxSelectionDialog()">
+                <button class="btn btn-secondary" type="button" data-action="cancel-box-selection">
                     <span class="material-icons-outlined" aria-hidden="true">close</span>
                     <span>Abbrechen</span>
                 </button>
-                <button class="btn btn-primary" type="button" onclick="confirmBoxSelection()">
+                <button class="btn btn-primary" type="button" data-action="confirm-box-selection">
                     <span class="material-icons-outlined" aria-hidden="true">add_circle</span>
                     <span>Zum Shipment hinzufügen</span>
                 </button>
@@ -700,7 +742,7 @@ function renderSelectedBoxesList() {
             <td class="text-center"><strong>${box.boxes_to_send}</strong></td>
             <td class="text-center">${box.boxes_to_send * box.pairs_per_box}</td>
             <td>
-                <button class="btn btn-danger btn-small" type="button" onclick="removeSelectedBox(${index})">
+                <button class="btn btn-danger btn-small" type="button" data-action="remove-selected-box" data-index="${index}">
                     <span class="material-icons-outlined" aria-hidden="true">delete</span>
                     <span>Entfernen</span>
                 </button>
@@ -1070,15 +1112,15 @@ async function confirmRecall() {
 
 function applyFilters() {
     currentFilters.status = document.getElementById('statusFilter').value;
-    currentFilters.from_date = document.getElementById('fromDateFilter').value;
-    currentFilters.to_date = document.getElementById('toDateFilter').value;
+    currentFilters.from = document.getElementById('fromDateFilter').value;
+    currentFilters.to = document.getElementById('toDateFilter').value;
 
     syncStatusCardsWithFilter();
     loadShipments();
 }
 
 function clearFilters() {
-    currentFilters = { status: '', from_date: '', to_date: '' };
+    currentFilters = { status: '', from: '', to: '' };
     document.getElementById('statusFilter').value = '';
     document.getElementById('fromDateFilter').value = '';
     document.getElementById('toDateFilter').value = '';
@@ -1090,9 +1132,129 @@ function clearFilters() {
 function filterByStatus(status) {
     document.getElementById('statusFilter').value = status;
     currentFilters.status = status;
-    loadShipments();
+    loadShipments(status);
 
     syncStatusCardsWithFilter();
+}
+
+function handleGlobalActionClick(event) {
+    const target = event.target.closest('[data-action]');
+    if (!target || target.disabled) {
+        return;
+    }
+
+    const action = target.dataset.action;
+
+    switch (action) {
+        case 'filter-status': {
+            event.preventDefault();
+            filterByStatus(target.dataset.status || '');
+            break;
+        }
+        case 'close-create-modal': {
+            event.preventDefault();
+            closeCreateShipmentModal();
+            break;
+        }
+        case 'close-add-boxes': {
+            event.preventDefault();
+            closeAddBoxesModal();
+            break;
+        }
+        case 'proceed-to-send': {
+            event.preventDefault();
+            proceedToSend();
+            break;
+        }
+        case 'close-send-shipment': {
+            event.preventDefault();
+            closeSendShipmentModal();
+            break;
+        }
+        case 'confirm-send-shipment': {
+            event.preventDefault();
+            confirmSendShipment();
+            break;
+        }
+        case 'view-shipment': {
+            event.preventDefault();
+            {
+                const shipmentId = Number(target.dataset.shipmentId);
+                if (!Number.isNaN(shipmentId)) {
+                    viewShipmentDetails(shipmentId);
+                }
+            }
+            break;
+        }
+        case 'continue-shipment': {
+            event.preventDefault();
+            {
+                const shipmentId = Number(target.dataset.shipmentId);
+                if (!Number.isNaN(shipmentId)) {
+                    continueShipment(shipmentId);
+                }
+            }
+            break;
+        }
+        case 'recall': {
+            event.preventDefault();
+            {
+                const id = Number(target.dataset.shipmentId);
+                const ref = target.dataset.shipmentRef || '';
+                if (!Number.isNaN(id)) {
+                    openRecallModal(id, ref);
+                }
+            }
+            break;
+        }
+        case 'close-details': {
+            event.preventDefault();
+            closeDetailsModal();
+            break;
+        }
+        case 'close-recall': {
+            event.preventDefault();
+            closeRecallModal();
+            break;
+        }
+        case 'confirm-recall': {
+            event.preventDefault();
+            confirmRecall();
+            break;
+        }
+        case 'select-carton': {
+            event.preventDefault();
+            {
+                const cartonId = Number(target.dataset.cartonId);
+                if (!Number.isNaN(cartonId)) {
+                    selectBoxesFromCarton(cartonId);
+                }
+            }
+            break;
+        }
+        case 'cancel-box-selection': {
+            event.preventDefault();
+            closeBoxSelectionDialog();
+            break;
+        }
+        case 'confirm-box-selection': {
+            event.preventDefault();
+            confirmBoxSelection();
+            break;
+        }
+        case 'remove-selected-box': {
+            event.preventDefault();
+            {
+                const index = Number(target.dataset.index);
+                if (!Number.isNaN(index)) {
+                    removeSelectedBox(index);
+                }
+            }
+            break;
+        }
+        default:
+            break;
+    }
 }
 
 function resetStatusCards() {
@@ -1123,13 +1285,6 @@ function showSuccess(message) {
 
 function showError(message) {
     alert('Fehler: ' + message);
-}
-
-function escapeHtml(text) {
-    if (!text) return '';
-    const div = document.createElement('div');
-    div.textContent = text;
-    return div.innerHTML;
 }
 
 function formatDate(dateString) {
