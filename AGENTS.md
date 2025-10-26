@@ -1,60 +1,53 @@
-Always follow this style guide and try to make the most elegant way to achieve this
+# ⚙️ WarehouseWrangler AI Style Guide
 
-## **⚙️ WarehouseWrangler AI Style Guide**
+> **Core Principle:** Move *all* styling to dedicated CSS files. Avoid inline styles unless absolutely necessary. Replace ASCII icons/emoticons with **Material Symbols/Icons**.
 
-This guide compiles all our decisions into a set of structured rules for an AI agent to follow when implementing the UI/UX design.
+---
 
-## CORE PRINCIPLE
-Style should always be moved to a dedicated css file
-Styling within the tag is to be avoided if not absolutely necessary
-Keyboard- or Text-emoticons must be replaced with appropriate embedded material design icons 
-The header of each html should be consistent and link to each of the html files
+## 0. Collaboration Contract
 
-### **1\. Core Identity & Philosophy**
+* Every PR must: (1) link to the rule(s) it implements/changes, (2) include screenshots (desktop + narrow), and (3) pass the **UI Acceptance Checklist** at the end of this file.
+* Do not regress headers, navigation links, or authentication UI.
 
-| Property | Value |
-| :---- | :---- |
-| **Project Name** | WarehouseWrangler |
-| **Overall Tone** | Professional, high-clarity, action-oriented, secure. |
-| **Design Goal** | Maximize data readability and minimize data-entry errors. |
+---
 
-### **2\. Logo Rules**
+## 1. Core Identity
 
-| Rule Name | Description | Required Element |
-| :---- | :---- | :---- |
-| **Primary Logo** | The Dynamic Arrow. A thick-lined box with a thick arrow cutting through, angled up-right. | **Action**, **Movement**, **Efficiency** |
-| **Logo Color** | Must use the **Primary Accent** color only. | \#0056B3 (Cobalt Blue) |
-| **Scalability** | Must remain legible and bold at 16px (favicon size). | **Minimalist**, **Geometric** |
+| Property        | Value                                                 |
+| --------------- | ----------------------------------------------------- |
+| **Project**     | WarehouseWrangler                                     |
+| **Tone**        | Professional, high-clarity, action-oriented, secure   |
+| **Design Goal** | Maximize data readability, minimize data-entry errors |
 
-### **3\. Color Palette Definitions**
+---
 
-This palette is based on high-contrast requirements for data-heavy applications.
+## 2. Logo Rules
 
-| Color Name | Hex Code | Purpose in UI |
-| :---- | :---- | :---- |
-| **Primary Accent** | \#0056B3 (Cobalt Blue) | Action buttons, active links, primary navigation, logo. **Trust and Action.** |
-| **Neutral Base** | \#F7F7F7 (Off-White) | Main backgrounds, sidebars, large content panels. **Eye-comfort.** |
-| **Text Contrast** | \#333333 (Near-Black) | Primary text, data in tables, headings. **Maximum Legibility.** |
-| **Subtle Separator** | \#DDDDDD (Light Grey) | Borders, dividing lines, table separators. **Non-distracting delineation.** |
+* **Primary Logo:** Dynamic Arrow (thick-lined box with up-right arrow) — conveys **Action, Movement, Efficiency**.
+* **Logo Color:** `#0056B3` (Primary Accent) only.
+* **Must** remain legible at 16px (favicon).
 
-### **4\. Status & Feedback Colors (Critical)**
+---
 
-| Status Name | Hex Code | Usage |
-| :---- | :---- | :---- |
-| **Success** | \#28A745 (Green) | **In Stock** status, successful file upload, form validation pass. |
-| **Warning** | \#FFC107 (Amber) | **Incoming** or **In-Transit** status, reconciliation variance alerts. |
-| **Danger** | \#DC3545 (Red) | **Archive** (Sent to AMZ), severe discrepancies, failed validation/error messages. |
+## 3. Color System (CSS variables)
 
-### **5\. Typography Rules**
+> Define once in `main.css :root`; reference everywhere via `var()`.
 
-The fonts prioritize legibility and clear separation between regular UI text and critical inventory data.
+```css
+:root {
+  --accent: #0056B3;        /* Primary Accent */
+  --base:   #F7F7F7;        /* Neutral Base */
+  --text:   #333333;        /* Text Contrast */
+  --sep:    #DDDDDD;        /* Subtle Separator */
+  --success:#28A745;        /* Status: Success */
+  --warn:   #FFC107;        /* Status: Warning */
+  --danger: #DC3545;        /* Status: Danger */
+}
+```
 
-| Font Use | Recommended Font | Role in UI | Rationale |
-| :---- | :---- | :---- | :---- |
-| **UI / Prose Font** | **Inter** (or **Roboto**) | Titles, buttons, instructions, and general paragraph text. | Modern, clean sans-serif for high readability on screens. |
-| **Data / Code Font** | **Inconsolata** (or **Fira Mono**) | **FNSKUs**, **Carton IDs**, **Tracking Numbers**, and other coded data. | Monospace to visually distinguish critical data and ensure perfect alignment in tables. |
+**Usage:** Primary actions/links/logo use `--accent`; content panels on `--base`; body text `--text`; borders/row separators `--sep`.
 
-### **6\. General Styling Elements**
+---
 
 | Element | Rule/Implementation |
 | :---- | :---- |
