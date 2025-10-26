@@ -6,6 +6,10 @@
     gap: 2rem;
 }
 
+.app-main.products-page {
+    max-width: 1520px;
+}
+
 .page-header {
     display: flex;
     align-items: center;
@@ -48,7 +52,29 @@
 }
 
 .table-card {
-    overflow-x: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.table-scroll {
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    overflow: auto;
+    max-height: 70vh;
+    background: var(--color-surface);
+}
+
+.table-sticky thead th {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    background: var(--color-surface);
+    box-shadow: 0 1px 0 var(--color-border), 0 6px 12px rgba(12, 28, 53, 0.08);
+}
+
+.table-sticky thead th:first-child {
+    z-index: 3;
 }
 
 .search-panel {
@@ -96,6 +122,7 @@
 
 .products-table {
     width: 100%;
+    min-width: 1280px;
     border-collapse: collapse;
 }
 
@@ -109,6 +136,47 @@
     text-align: left;
     border-bottom: 1px solid var(--color-border);
     vertical-align: top;
+}
+
+.products-table th:nth-child(1),
+.products-table td:nth-child(1) {
+    min-width: 260px;
+}
+
+.products-table th:nth-child(2),
+.products-table td:nth-child(2) {
+    min-width: 160px;
+}
+
+.products-table th:nth-child(3),
+.products-table td:nth-child(3),
+.products-table th:nth-child(4),
+.products-table td:nth-child(4),
+.products-table th:nth-child(5),
+.products-table td:nth-child(5),
+.products-table th:nth-child(6),
+.products-table td:nth-child(6) {
+    min-width: 150px;
+}
+
+.products-table th:nth-child(7),
+.products-table td:nth-child(7) {
+    min-width: 120px;
+}
+
+.products-table th:nth-child(8),
+.products-table td:nth-child(8) {
+    min-width: 140px;
+}
+
+.products-table th:nth-child(9),
+.products-table td:nth-child(9) {
+    min-width: 200px;
+}
+
+.products-table th:nth-child(10),
+.products-table td:nth-child(10) {
+    min-width: 140px;
 }
 
 .products-table th small {
@@ -231,10 +299,64 @@
     display: flex;
     gap: 0.6rem;
     justify-content: flex-end;
+    align-items: center;
 }
 
-.actions .btn {
+.icon-button {
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    border-radius: 50%;
+    justify-content: center;
+    gap: 0;
+    position: relative;
+}
+
+.icon-button .material-icons-outlined {
+    font-size: 22px;
+}
+
+.icon-button[data-tooltip]::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: calc(100% + 10px);
+    left: 50%;
+    transform: translate(-50%, 4px);
+    background: var(--color-text);
+    color: var(--color-surface);
+    padding: 0.35rem 0.6rem;
+    border-radius: var(--radius-sm);
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.18s ease, transform 0.18s ease;
     white-space: nowrap;
+}
+
+.icon-button[data-tooltip]::before {
+    content: '';
+    position: absolute;
+    bottom: calc(100% + 4px);
+    left: 50%;
+    transform: translateX(-50%);
+    border-width: 6px 6px 0 6px;
+    border-style: solid;
+    border-color: var(--color-text) transparent transparent transparent;
+    opacity: 0;
+    transition: opacity 0.18s ease;
+}
+
+.icon-button:focus-visible[data-tooltip]::after,
+.icon-button:hover[data-tooltip]::after {
+    opacity: 1;
+    transform: translate(-50%, 0);
+}
+
+.icon-button:focus-visible[data-tooltip]::before,
+.icon-button:hover[data-tooltip]::before {
+    opacity: 1;
 }
 
 .btn-compact {

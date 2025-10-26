@@ -18,9 +18,11 @@ let currentProductForFactors = null;
 // ============================================================================
 
 document.addEventListener('DOMContentLoaded', function() {
+    initializeHeader();
+
     // Load products
     loadProducts();
-    
+
     // Setup search
     document.getElementById('searchInput').addEventListener('keyup', filterProducts);
     
@@ -28,6 +30,37 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('productForm').addEventListener('submit', handleProductSubmit);
     document.getElementById('factorsForm').addEventListener('submit', handleFactorsSubmit);
 });
+
+function initializeHeader() {
+    const userDisplay = document.getElementById('userDisplay');
+    const userDataStr = localStorage.getItem('ww_user_data');
+
+    if (userDisplay) {
+        userDisplay.textContent = 'Benutzer';
+
+        if (userDataStr) {
+            try {
+                const userData = JSON.parse(userDataStr);
+                if (userData && userData.username) {
+                    userDisplay.textContent = userData.username;
+                }
+            } catch (error) {
+                console.error('Error parsing user data:', error);
+            }
+        }
+    }
+
+    const logoutBtn = document.getElementById('logoutBtn');
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', function() {
+            if (confirm('Are you sure you want to logout?')) {
+                localStorage.removeItem('ww_auth_token');
+                localStorage.removeItem('ww_user_data');
+                window.location.href = 'login.html';
+            }
+        });
+    }
+}
 
 // ============================================================================
 // UTILITY FUNCTIONS
@@ -198,15 +231,22 @@ function renderProducts() {
     const tbody = document.getElementById('productsTableBody');
     const table = document.getElementById('productsTable');
     const noResults = document.getElementById('noResults');
+    const tableContainer = document.querySelector('.table-scroll');
 
     if (filteredProducts.length === 0) {
         table.classList.add('is-hidden');
+        if (tableContainer) {
+            tableContainer.classList.add('is-hidden');
+        }
         noResults.classList.remove('is-hidden');
         tbody.innerHTML = '';
         return;
     }
 
     table.classList.remove('is-hidden');
+    if (tableContainer) {
+        tableContainer.classList.remove('is-hidden');
+    }
     noResults.classList.add('is-hidden');
 
     tbody.innerHTML = filteredProducts.map(product => {
@@ -236,13 +276,23 @@ function renderProducts() {
                 </button>
             </td>
             <td class="actions">
-                <button type="button" class="btn btn-secondary btn-compact" onclick="openEditProductModal(${product.product_id})">
+                <button
+                    type="button"
+                    class="btn btn-secondary icon-button"
+                    data-tooltip="Bearbeiten"
+                    aria-label="Produkt ${productLabel} bearbeiten"
+                    onclick="openEditProductModal(${product.product_id})"
+                >
                     <span class="material-icons-outlined" aria-hidden="true">edit</span>
-                    <span>Bearbeiten</span>
                 </button>
-                <button type="button" class="btn btn-destructive btn-compact" onclick="handleDeleteProduct(${product.product_id})">
+                <button
+                    type="button"
+                    class="btn btn-destructive icon-button"
+                    data-tooltip="Löschen"
+                    aria-label="Produkt ${productLabel} löschen"
+                    onclick="handleDeleteProduct(${product.product_id})"
+                >
                     <span class="material-icons-outlined" aria-hidden="true">delete</span>
-                    <span>Löschen</span>
                 </button>
             </td>
         </tr>

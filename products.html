@@ -106,24 +106,25 @@
         <section class="surface-card table-card" aria-label="Products table">
             <div id="loadingIndicator" class="loading-indicator">Loading products…</div>
 
-            <table id="productsTable" class="products-table is-hidden">
-                <thead>
-                    <tr>
-                        <th scope="col">Produkt (Gruppe)<br><small>Artikel</small></th>
-                        <th scope="col">Artikel</th>
-                        <th scope="col">FNSKU</th>
-                        <th scope="col">ASIN</th>
-                        <th scope="col">SKU</th>
-                        <th scope="col">EAN</th>
-                        <th scope="col" class="numeric">Paare/Box</th>
-                        <th scope="col">Farbe</th>
-                        <th scope="col">Saisonalität</th>
-                        <th scope="col" class="actions-col">Aktionen</th>
-                    </tr>
-                </thead>
-                <tbody id="productsTableBody"></tbody>
-            </table>
-
+            <div class="table-scroll" role="region" aria-live="polite" aria-label="Produktliste">
+                <table id="productsTable" class="products-table table-sticky is-hidden">
+                    <thead>
+                        <tr>
+                            <th scope="col">Produkt (Gruppe)<br><small>Artikel</small></th>
+                            <th scope="col">Artikel</th>
+                            <th scope="col">FNSKU</th>
+                            <th scope="col">ASIN</th>
+                            <th scope="col">SKU</th>
+                            <th scope="col">EAN</th>
+                            <th scope="col" class="numeric">Paare/Box</th>
+                            <th scope="col">Farbe</th>
+                            <th scope="col">Saisonalität</th>
+                            <th scope="col" class="actions-col">Aktionen</th>
+                        </tr>
+                    </thead>
+                    <tbody id="productsTableBody"></tbody>
+                </table>
+            </div>
             <div id="noResults" class="empty-state is-hidden">
                 <span class="material-icons-outlined" aria-hidden="true">search_off</span>
                 <p>Keine Artikel gefunden</p>
