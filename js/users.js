@@ -23,7 +23,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Setup header
     const userData = getCurrentUser();
     if (userData) {
-        document.getElementById('userDisplay').textContent = `👤 ${userData.username}`;
+        document.getElementById('userDisplay').textContent = userData.username;
     }
 
     // Setup logout
@@ -41,6 +41,21 @@ document.addEventListener('DOMContentLoaded', function() {
     // Setup forms
     document.getElementById('userForm').addEventListener('submit', handleUserSubmit);
     document.getElementById('passwordForm').addEventListener('submit', handlePasswordSubmit);
+
+    // Modal close buttons
+    document.querySelectorAll('[data-modal-close]').forEach((button) => {
+        button.addEventListener('click', () => {
+            const target = button.getAttribute('data-modal-close');
+            if (target === 'user') {
+                closeUserModal();
+            } else if (target === 'password') {
+                closePasswordModal();
+            }
+        });
+    });
+
+    // Table action delegation
+    document.getElementById('usersTableBody').addEventListener('click', handleTableClick);
 
     // Load users
     loadUsers();
@@ -119,7 +134,7 @@ async function changePassword(userId, currentPassword, newPassword) {
 
         // Only include current password if user is changing their own
         const currentUser = getCurrentUser();
-        if (currentUser.id === userId) {
+        if (currentUser && currentUser.id === userId) {
             payload.current_password = currentPassword;
         }
 
@@ -146,40 +161,53 @@ async function changePassword(userId, currentPassword, newPassword) {
 
 function renderUsersTable(users) {
     const tbody = document.getElementById('usersTableBody');
-    
+
     if (users.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="6" class="loading">No users found</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="6" class="table-loading">No users found</td></tr>';
         return;
     }
 
-    tbody.innerHTML = users.map(user => `
-        <tr>
-            <td><strong>${escapeHtml(user.username)}</strong></td>
-            <td>${escapeHtml(user.email)}</td>
-            <td><span class="role-badge role-${user.role}">${user.role}</span></td>
-            <td><span class="status-badge status-${user.is_active ? 'active' : 'inactive'}">
-                ${user.is_active ? 'Active' : 'Inactive'}
-            </span></td>
-            <td>${user.last_login ? formatDate(user.last_login) : 'Never'}</td>
-            <td>
-                ${user.username === 'admin' ? 
-                    '<em style="color: #999;">Protected account</em>' : 
-                    `<div class="action-buttons">
-                        <button class="btn-primary btn-small" onclick="openEditUserModal(${user.user_id})">
-                            Edit
-                        </button>
-                        <button class="btn-secondary btn-small" onclick="openChangePasswordModal(${user.user_id})">
-                            Password
-                        </button>
-                        ${user.is_active ? 
-                            `<button class="btn-danger btn-small" onclick="toggleUserStatus(${user.user_id}, false)">Deactivate</button>` :
-                            `<button class="btn-success btn-small" onclick="toggleUserStatus(${user.user_id}, true)">Activate</button>`
-                        }
-                    </div>`
-                }
-            </td>
-        </tr>
-    `).join('');
+    tbody.innerHTML = users.map(user => {
+        const status = user.is_active ? 'active' : 'inactive';
+        const lastLogin = user.last_login ? formatDate(user.last_login) : 'Never';
+
+        let actionsMarkup = '<span class="protected-account">Protected account</span>';
+
+        if (user.username !== 'admin') {
+            const toggleAction = user.is_active ? 'deactivate' : 'activate';
+            const toggleIcon = user.is_active ? 'block' : 'check_circle';
+            const toggleLabel = user.is_active ? 'Deactivate user' : 'Activate user';
+            const toggleClass = user.is_active ? 'danger' : 'success';
+
+            actionsMarkup = `
+                <div class="action-toolbar">
+                    <button type="button" class="table-action" data-action="edit" data-user-id="${user.user_id}" title="Edit user">
+                        <span class="material-icons-outlined" aria-hidden="true">edit</span>
+                        <span class="visually-hidden">Edit user</span>
+                    </button>
+                    <button type="button" class="table-action" data-action="password" data-user-id="${user.user_id}" title="Change password">
+                        <span class="material-icons-outlined" aria-hidden="true">lock_reset</span>
+                        <span class="visually-hidden">Change password</span>
+                    </button>
+                    <button type="button" class="table-action ${toggleClass}" data-action="${toggleAction}" data-user-id="${user.user_id}" title="${toggleLabel}">
+                        <span class="material-icons-outlined" aria-hidden="true">${toggleIcon}</span>
+                        <span class="visually-hidden">${toggleLabel}</span>
+                    </button>
+                </div>
+            `;
+        }
+
+        return `
+            <tr>
+                <td><strong>${escapeHtml(user.username)}</strong></td>
+                <td>${escapeHtml(user.email)}</td>
+                <td><span class="role-badge role-${user.role}">${user.role}</span></td>
+                <td><span class="status-badge status-${status}">${user.is_active ? 'Active' : 'Inactive'}</span></td>
+                <td>${lastLogin}</td>
+                <td>${actionsMarkup}</td>
+            </tr>
+        `;
+    }).join('');
 }
 
 // ============================================================================
@@ -193,7 +221,7 @@ function openAddUserModal() {
     document.getElementById('userId').value = '';
     document.getElementById('username').disabled = false;
     document.getElementById('password').required = true;
-    document.getElementById('passwordGroup').style.display = 'block';
+    document.getElementById('passwordGroup').classList.remove('hidden');
     document.getElementById('userModal').classList.remove('hidden');
 }
 
@@ -210,7 +238,7 @@ function openEditUserModal(userId) {
     document.getElementById('role').value = user.role;
     document.getElementById('isActive').checked = user.is_active == 1;
     document.getElementById('password').required = false;
-    document.getElementById('passwordGroup').style.display = 'none';
+    document.getElementById('passwordGroup').classList.add('hidden');
     document.getElementById('userModal').classList.remove('hidden');
 }
 
@@ -223,13 +251,14 @@ function closeUserModal() {
 function openChangePasswordModal(userId) {
     document.getElementById('passwordUserId').value = userId;
     document.getElementById('passwordForm').reset();
-    
+
     // Show/hide current password field based on whether user is changing own password
     const currentUser = getCurrentUser();
-    const isOwnPassword = (currentUser.id === userId);
-    document.getElementById('currentPasswordGroup').style.display = isOwnPassword ? 'block' : 'none';
+    const isOwnPassword = currentUser && currentUser.id === userId;
+    const currentPasswordGroup = document.getElementById('currentPasswordGroup');
+    currentPasswordGroup.classList.toggle('hidden', !isOwnPassword);
     document.getElementById('currentPassword').required = isOwnPassword;
-    
+
     document.getElementById('passwordModal').classList.remove('hidden');
 }
 
@@ -282,7 +311,7 @@ async function handleUserSubmit(e) {
 async function handlePasswordSubmit(e) {
     e.preventDefault();
 
-    const userId = parseInt(document.getElementById('passwordUserId').value);
+    const userId = parseInt(document.getElementById('passwordUserId').value, 10);
     const currentPassword = document.getElementById('currentPassword').value;
     const newPassword = document.getElementById('newPassword').value;
     const confirmPassword = document.getElementById('confirmPassword').value;
@@ -327,11 +356,11 @@ async function toggleUserStatus(userId, activate) {
 // ============================================================================
 
 function showSuccess(message) {
-    alert('✅ ' + message);
+    alert('Success: ' + message);
 }
 
 function showError(message) {
-    alert('❌ ' + message);
+    alert('Error: ' + message);
 }
 
 function escapeHtml(text) {
@@ -349,4 +378,35 @@ function formatDate(dateString) {
         hour: '2-digit',
         minute: '2-digit'
     });
+}
+
+function handleTableClick(event) {
+    const actionButton = event.target.closest('[data-action]');
+    if (!actionButton) {
+        return;
+    }
+
+    const userId = parseInt(actionButton.dataset.userId, 10);
+    const action = actionButton.dataset.action;
+
+    if (!Number.isInteger(userId)) {
+        return;
+    }
+
+    switch (action) {
+        case 'edit':
+            openEditUserModal(userId);
+            break;
+        case 'password':
+            openChangePasswordModal(userId);
+            break;
+        case 'activate':
+            toggleUserStatus(userId, true);
+            break;
+        case 'deactivate':
+            toggleUserStatus(userId, false);
+            break;
+        default:
+            break;
+    }
 }

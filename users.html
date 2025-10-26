@@ -76,44 +76,64 @@
     </header>
 
     <!-- Main Content -->
-    <main class="app-main">
-        <div class="page-header">
-            <h2>👥 User Management</h2>
-            <button id="addUserBtn" class="btn-primary">+ Add User</button>
-        </div>
+    <main class="app-main users-page">
+        <section class="page-header">
+            <div class="page-title">
+                <span class="material-icons-outlined" aria-hidden="true">group</span>
+                <div class="page-title-copy">
+                    <h1>User Management</h1>
+                    <p>Control roles, activation status, and credentials for WarehouseWrangler accounts.</p>
+                </div>
+            </div>
+            <button id="addUserBtn" class="btn btn-primary" type="button">
+                <span class="material-icons-outlined" aria-hidden="true">person_add</span>
+                <span>Add User</span>
+            </button>
+        </section>
 
         <!-- Users Table -->
-        <div class="table-container">
-            <table class="users-table">
-                <thead>
-                    <tr>
-                        <th>Username</th>
-                        <th>Email</th>
-                        <th>Role</th>
-                        <th>Status</th>
-                        <th>Last Login</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody id="usersTableBody">
-                    <tr>
-                        <td colspan="6" class="loading">Loading users...</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
+        <section class="surface-card user-directory" aria-labelledby="userDirectoryTitle">
+            <header class="section-header">
+                <div class="section-header-copy">
+                    <h2 id="userDirectoryTitle">Active Accounts</h2>
+                    <p>Review account access, recent sign-ins, and change permissions instantly.</p>
+                </div>
+            </header>
+            <div class="table-scroll" role="region" aria-live="polite" aria-label="User directory">
+                <table class="users-table table-sticky">
+                    <thead>
+                        <tr>
+                            <th scope="col">Username</th>
+                            <th scope="col">Email</th>
+                            <th scope="col">Role</th>
+                            <th scope="col">Status</th>
+                            <th scope="col">Last Login</th>
+                            <th scope="col" class="actions-column">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="usersTableBody">
+                        <tr class="table-loading-row">
+                            <td colspan="6" class="table-loading">Loading users…</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
     </main>
 
     <!-- Add/Edit User Modal -->
-    <div id="userModal" class="modal hidden">
+    <div id="userModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
         <div class="modal-content">
             <div class="modal-header">
                 <h3 id="modalTitle">Add New User</h3>
-                <button class="modal-close" onclick="closeUserModal()">&times;</button>
+                <button type="button" class="modal-close" data-modal-close="user" title="Close">
+                    <span class="material-icons-outlined" aria-hidden="true">close</span>
+                    <span class="visually-hidden">Close</span>
+                </button>
             </div>
             <form id="userForm">
                 <input type="hidden" id="userId" name="user_id">
-                
+
                 <div class="form-group">
                     <label for="username">Username *</label>
                     <input type="text" id="username" name="username" required minlength="3">
@@ -139,30 +159,33 @@
                 </div>
 
                 <div class="form-group">
-                    <label class="checkbox-label">
+                    <label class="checkbox-label" for="isActive">
                         <input type="checkbox" id="isActive" name="is_active" checked>
                         <span>Active</span>
                     </label>
                 </div>
 
                 <div class="modal-footer">
-                    <button type="button" class="btn-secondary" onclick="closeUserModal()">Cancel</button>
-                    <button type="submit" class="btn-primary">Save User</button>
+                    <button type="button" class="btn btn-secondary" data-modal-close="user">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save User</button>
                 </div>
             </form>
         </div>
     </div>
 
     <!-- Change Password Modal -->
-    <div id="passwordModal" class="modal hidden">
+    <div id="passwordModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="passwordModalTitle">
         <div class="modal-content">
             <div class="modal-header">
-                <h3>Change Password</h3>
-                <button class="modal-close" onclick="closePasswordModal()">&times;</button>
+                <h3 id="passwordModalTitle">Change Password</h3>
+                <button type="button" class="modal-close" data-modal-close="password" title="Close">
+                    <span class="material-icons-outlined" aria-hidden="true">close</span>
+                    <span class="visually-hidden">Close</span>
+                </button>
             </div>
             <form id="passwordForm">
                 <input type="hidden" id="passwordUserId">
-                
+
                 <div class="form-group" id="currentPasswordGroup">
                     <label for="currentPassword">Current Password *</label>
                     <input type="password" id="currentPassword" required>
@@ -180,8 +203,8 @@
                 </div>
 
                 <div class="modal-footer">
-                    <button type="button" class="btn-secondary" onclick="closePasswordModal()">Cancel</button>
-                    <button type="submit" class="btn-primary">Change Password</button>
+                    <button type="button" class="btn btn-secondary" data-modal-close="password">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Change Password</button>
                 </div>
             </form>
         </div>
