@@ -70,114 +70,142 @@
         </div>
     </header>
 
-    <!-- Main Content -->
-    <main class="app-main">
-        <!-- Page Header -->
-        <div class="page-header">
-            <h2>🚢 Amazon Shipments</h2>
-            <div class="header-actions">
-                <button id="refreshBtn" class="btn-secondary">🔄 Refresh</button>
-                <button id="createShipmentBtn" class="btn-primary">📤 Create Shipment</button>
-            </div>
-        </div>
-
-        <!-- Summary Cards -->
-        <div class="summary-cards">
-            <div class="summary-card">
-                <div class="card-icon">📊</div>
-                <div class="card-content">
-                    <h3>Total Shipments</h3>
-                    <div class="card-value" id="totalShipments">0</div>
-                    <div class="card-detail">All time</div>
+    <main class="app-main shipments-page">
+        <section class="page-header">
+            <div class="page-title">
+                <span class="material-icons-outlined" aria-hidden="true">local_shipping</span>
+                <div class="page-title-copy">
+                    <h2>Amazon Shipments</h2>
+                    <p>Coordinate outbound shipments, track carton allocations, and manage recall workflows.</p>
                 </div>
             </div>
+            <div class="page-header-actions">
+                <button id="refreshBtn" class="btn btn-secondary" type="button">
+                    <span class="material-icons-outlined" aria-hidden="true">refresh</span>
+                    <span>Aktualisieren</span>
+                </button>
+                <button id="createShipmentBtn" class="btn btn-primary" type="button">
+                    <span class="material-icons-outlined" aria-hidden="true">add_circle</span>
+                    <span>Shipment anlegen</span>
+                </button>
+            </div>
+        </section>
 
-            <div class="summary-card clickable" data-status="prepared" onclick="filterByStatus('prepared')">
-                <div class="card-icon">📝</div>
-                <div class="card-content">
-                    <h3>Prepared</h3>
-                    <div class="card-value" id="preparedShipments">0</div>
-                    <div class="card-detail">Ready to send</div>
+        <section class="surface-card metrics-panel" aria-label="Shipment overview">
+            <div class="metrics-grid">
+                <article class="metric-card">
+                    <span class="material-icons-outlined metric-icon" aria-hidden="true">insights</span>
+                    <div class="metric-content">
+                        <p class="metric-label">Total Shipments</p>
+                        <p class="metric-value" id="totalShipments">0</p>
+                        <p class="metric-subtext">Gesamter Zeitraum</p>
+                    </div>
+                </article>
+
+                <button class="metric-card status-card" type="button" data-status="prepared" aria-pressed="false" onclick="filterByStatus('prepared')">
+                    <span class="material-icons-outlined metric-icon" aria-hidden="true">assignment_turned_in</span>
+                    <div class="metric-content">
+                        <p class="metric-label">Prepared</p>
+                        <p class="metric-value" id="preparedShipments">0</p>
+                        <p class="metric-subtext">Bereit zum Versand</p>
+                    </div>
+                </button>
+
+                <button class="metric-card status-card" type="button" data-status="sent" aria-pressed="false" onclick="filterByStatus('sent')">
+                    <span class="material-icons-outlined metric-icon" aria-hidden="true">local_shipping</span>
+                    <div class="metric-content">
+                        <p class="metric-label">Sent</p>
+                        <p class="metric-value" id="sentShipments">0</p>
+                        <p class="metric-subtext">An Amazon übergeben</p>
+                    </div>
+                </button>
+
+                <button class="metric-card status-card" type="button" data-status="recalled" aria-pressed="false" onclick="filterByStatus('recalled')">
+                    <span class="material-icons-outlined metric-icon" aria-hidden="true">undo</span>
+                    <div class="metric-content">
+                        <p class="metric-label">Recalled</p>
+                        <p class="metric-value" id="recalledShipments">0</p>
+                        <p class="metric-subtext">Zurückgerufen</p>
+                    </div>
+                </button>
+            </div>
+        </section>
+
+        <section class="surface-card filters-panel" aria-label="Shipments filter">
+            <form class="filters-form">
+                <div class="filters-grid">
+                    <label class="filter-field" for="statusFilter">
+                        <span class="filter-label">Status</span>
+                        <select id="statusFilter" name="status">
+                            <option value="">Alle Status</option>
+                            <option value="prepared">Prepared</option>
+                            <option value="sent">Sent</option>
+                            <option value="recalled">Recalled</option>
+                        </select>
+                    </label>
+
+                    <label class="filter-field" for="fromDateFilter">
+                        <span class="filter-label">Von</span>
+                        <input type="date" id="fromDateFilter" name="from_date">
+                    </label>
+
+                    <label class="filter-field" for="toDateFilter">
+                        <span class="filter-label">Bis</span>
+                        <input type="date" id="toDateFilter" name="to_date">
+                    </label>
                 </div>
-            </div>
-
-            <div class="summary-card clickable" data-status="sent" onclick="filterByStatus('sent')">
-                <div class="card-icon">✅</div>
-                <div class="card-content">
-                    <h3>Sent</h3>
-                    <div class="card-value" id="sentShipments">0</div>
-                    <div class="card-detail">Boxes sent</div>
+                <div class="filters-actions">
+                    <button id="applyFiltersBtn" class="btn btn-primary" type="button">
+                        <span class="material-icons-outlined" aria-hidden="true">filter_alt</span>
+                        <span>Filter anwenden</span>
+                    </button>
+                    <button id="clearFiltersBtn" class="btn btn-secondary" type="button">
+                        <span class="material-icons-outlined" aria-hidden="true">restart_alt</span>
+                        <span>Zurücksetzen</span>
+                    </button>
                 </div>
+            </form>
+        </section>
+
+        <section class="surface-card table-card" aria-label="Shipments table">
+            <div id="shipmentsLoading" class="loading-indicator">Shipments werden geladen…</div>
+
+            <div class="table-scroll" role="region" aria-live="polite" aria-label="Shipment Tabelle">
+                <table id="shipmentsTable" class="shipments-table table-sticky is-hidden">
+                    <thead>
+                        <tr>
+                            <th scope="col">Reference</th>
+                            <th scope="col">Datum</th>
+                            <th scope="col">Status</th>
+                            <th scope="col" class="numeric">Cartons</th>
+                            <th scope="col" class="numeric">Produkte</th>
+                            <th scope="col" class="numeric">Gesamtboxen</th>
+                            <th scope="col">Erstellt von</th>
+                            <th scope="col" class="actions-col">Aktionen</th>
+                        </tr>
+                    </thead>
+                    <tbody id="shipmentsTableBody"></tbody>
+                </table>
             </div>
 
-            <div class="summary-card clickable" data-status="recalled" onclick="filterByStatus('recalled')">
-                <div class="card-icon">↩️</div>
-                <div class="card-content">
-                    <h3>Recalled</h3>
-                    <div class="card-value" id="recalledShipments">0</div>
-                    <div class="card-detail">Reversed</div>
-                </div>
+            <div id="shipmentsEmpty" class="empty-state is-hidden">
+                <span class="material-icons-outlined" aria-hidden="true">inventory_2</span>
+                <p>Keine Shipments gefunden. Passe die Filter an oder lege ein neues Shipment an.</p>
             </div>
-        </div>
-
-        <!-- Filters -->
-        <div class="filters-section">
-            <div class="filter-group">
-                <label for="statusFilter">Status:</label>
-                <select id="statusFilter">
-                    <option value="">All Status</option>
-                    <option value="prepared">Prepared</option>
-                    <option value="sent">Sent</option>
-                    <option value="recalled">Recalled</option>
-                </select>
-            </div>
-
-            <div class="filter-group">
-                <label for="fromDateFilter">From Date:</label>
-                <input type="date" id="fromDateFilter">
-            </div>
-
-            <div class="filter-group">
-                <label for="toDateFilter">To Date:</label>
-                <input type="date" id="toDateFilter">
-            </div>
-
-            <div class="filter-actions">
-                <button id="applyFiltersBtn" class="btn-primary">Apply Filters</button>
-                <button id="clearFiltersBtn" class="btn-secondary">Clear All</button>
-            </div>
-        </div>
-
-        <!-- Shipments Table -->
-        <div class="table-container">
-            <table class="shipments-table">
-                <thead>
-                    <tr>
-                        <th>Reference</th>
-                        <th>Date</th>
-                        <th>Status</th>
-                        <th>Cartons</th>
-                        <th>Products</th>
-                        <th>Total Boxes</th>
-                        <th>Created By</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody id="shipmentsTableBody">
-                    <tr>
-                        <td colspan="8" class="loading">Loading shipments...</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
+        </section>
     </main>
 
     <!-- Create/Edit Shipment Modal (Step 1: Basic Info) -->
-    <div id="createShipmentModal" class="modal hidden">
+    <div id="createShipmentModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="createShipmentTitle">
         <div class="modal-content">
             <div class="modal-header">
-                <h3>📤 Create New Shipment</h3>
-                <button class="modal-close" onclick="closeCreateShipmentModal()">&times;</button>
+                <div class="modal-title-group">
+                    <span class="material-icons-outlined" aria-hidden="true">add_box</span>
+                    <h3 id="createShipmentTitle">Neues Shipment anlegen</h3>
+                </div>
+                <button class="modal-close" type="button" onclick="closeCreateShipmentModal()" aria-label="Schließen">
+                    <span class="material-icons-outlined" aria-hidden="true">close</span>
+                </button>
             </div>
             <form id="createShipmentForm">
                 <div class="modal-body">
@@ -200,19 +228,30 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn-secondary" onclick="closeCreateShipmentModal()">Cancel</button>
-                    <button type="submit" class="btn-primary">Create & Add Boxes</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeCreateShipmentModal()">
+                        <span class="material-icons-outlined" aria-hidden="true">close</span>
+                        <span>Abbrechen</span>
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        <span class="material-icons-outlined" aria-hidden="true">inventory_2</span>
+                        <span>Anlegen &amp; Boxen hinzufügen</span>
+                    </button>
                 </div>
             </form>
         </div>
     </div>
 
     <!-- Add Boxes Modal (Step 2: Select Boxes) -->
-    <div id="addBoxesModal" class="modal hidden">
+    <div id="addBoxesModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="addBoxesTitle">
         <div class="modal-content modal-large">
             <div class="modal-header">
-                <h3>📦 Add Boxes to Shipment: <span id="currentShipmentRef"></span></h3>
-                <button class="modal-close" onclick="closeAddBoxesModal()">&times;</button>
+                <div class="modal-title-group">
+                    <span class="material-icons-outlined" aria-hidden="true">inventory_2</span>
+                    <h3 id="addBoxesTitle">Boxen zum Shipment hinzufügen: <span id="currentShipmentRef"></span></h3>
+                </div>
+                <button class="modal-close" type="button" onclick="closeAddBoxesModal()" aria-label="Schließen">
+                    <span class="material-icons-outlined" aria-hidden="true">close</span>
+                </button>
             </div>
             <div class="modal-body">
                 <div class="shipment-progress">
@@ -276,30 +315,43 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn-secondary" onclick="closeAddBoxesModal()">Close</button>
-                <button type="button" class="btn-primary" id="proceedToSendBtn" onclick="proceedToSend()">
-                    Review & Send →
+                <button type="button" class="btn btn-secondary" onclick="closeAddBoxesModal()">
+                    <span class="material-icons-outlined" aria-hidden="true">close</span>
+                    <span>Schließen</span>
+                </button>
+                <button type="button" class="btn btn-primary" id="proceedToSendBtn" onclick="proceedToSend()">
+                    <span class="material-icons-outlined" aria-hidden="true">arrow_forward</span>
+                    <span class="btn-label">Prüfen &amp; senden</span>
                 </button>
             </div>
         </div>
     </div>
 
     <!-- Send Shipment Confirmation Modal (Step 3) -->
-    <div id="sendShipmentModal" class="modal hidden">
+    <div id="sendShipmentModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="confirmShipmentTitle">
         <div class="modal-content">
             <div class="modal-header">
-                <h3>✅ Confirm Send Shipment</h3>
-                <button class="modal-close" onclick="closeSendShipmentModal()">&times;</button>
+                <div class="modal-title-group">
+                    <span class="material-icons-outlined" aria-hidden="true">local_shipping</span>
+                    <h3 id="confirmShipmentTitle">Shipment senden bestätigen</h3>
+                </div>
+                <button class="modal-close" type="button" onclick="closeSendShipmentModal()" aria-label="Schließen">
+                    <span class="material-icons-outlined" aria-hidden="true">close</span>
+                </button>
             </div>
             <div class="modal-body">
                 <div class="shipment-progress">
                     <div class="progress-step completed">
-                        <div class="step-number">✓</div>
+                        <div class="step-number" aria-hidden="true">
+                            <span class="material-icons-outlined">task_alt</span>
+                        </div>
                         <div class="step-label">Created</div>
                     </div>
                     <div class="progress-line completed"></div>
                     <div class="progress-step completed">
-                        <div class="step-number">✓</div>
+                        <div class="step-number" aria-hidden="true">
+                            <span class="material-icons-outlined">task_alt</span>
+                        </div>
                         <div class="step-label">Boxes Added</div>
                     </div>
                     <div class="progress-line"></div>
@@ -314,52 +366,75 @@
                 </div>
 
                 <div class="warning-box">
-                    <strong>⚠️ Important:</strong> This will update your inventory. Boxes will be deducted from cartons and marked as sent to Amazon. This action can be reversed using the "Recall" function if needed.
+                    <span class="material-icons-outlined" aria-hidden="true">warning</span>
+                    <div>
+                        <strong>Wichtig:</strong> Diese Aktion aktualisiert den Bestand. Boxen werden den Kartons entnommen und als an Amazon gesendet markiert. Du kannst den Vorgang über "Recall" rückgängig machen.
+                    </div>
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn-secondary" onclick="closeSendShipmentModal()">← Back</button>
-                <button type="button" class="btn-primary" id="confirmSendBtn" onclick="confirmSendShipment()">
-                    🚀 Send Shipment
+                <button type="button" class="btn btn-secondary" onclick="closeSendShipmentModal()">
+                    <span class="material-icons-outlined" aria-hidden="true">arrow_back</span>
+                    <span>Zurück</span>
+                </button>
+                <button type="button" class="btn btn-primary" id="confirmSendBtn" onclick="confirmSendShipment()">
+                    <span class="material-icons-outlined" aria-hidden="true">local_shipping</span>
+                    <span class="btn-label">Shipment senden</span>
                 </button>
             </div>
         </div>
     </div>
 
     <!-- Shipment Details Modal -->
-    <div id="shipmentDetailsModal" class="modal hidden">
+    <div id="shipmentDetailsModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="shipmentDetailsTitle">
         <div class="modal-content modal-large">
             <div class="modal-header">
-                <h3>🚢 Shipment Details</h3>
-                <button class="modal-close" onclick="closeDetailsModal()">&times;</button>
+                <div class="modal-title-group">
+                    <span class="material-icons-outlined" aria-hidden="true">assignment</span>
+                    <h3 id="shipmentDetailsTitle">Shipment Details</h3>
+                </div>
+                <button class="modal-close" type="button" onclick="closeDetailsModal()" aria-label="Schließen">
+                    <span class="material-icons-outlined" aria-hidden="true">close</span>
+                </button>
             </div>
             <div class="modal-body" id="shipmentDetailsBody">
                 <div class="loading">Loading shipment details...</div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn-secondary" onclick="closeDetailsModal()">Close</button>
+                <button type="button" class="btn btn-secondary" onclick="closeDetailsModal()">
+                    <span class="material-icons-outlined" aria-hidden="true">close</span>
+                    <span>Schließen</span>
+                </button>
             </div>
         </div>
     </div>
 
     <!-- Recall Confirmation Modal -->
-    <div id="recallModal" class="modal hidden">
+    <div id="recallModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="recallShipmentTitle">
         <div class="modal-content">
             <div class="modal-header">
-                <h3>↩️ Recall Shipment</h3>
-                <button class="modal-close" onclick="closeRecallModal()">&times;</button>
+                <div class="modal-title-group">
+                    <span class="material-icons-outlined" aria-hidden="true">undo</span>
+                    <h3 id="recallShipmentTitle">Shipment zurückrufen</h3>
+                </div>
+                <button class="modal-close" type="button" onclick="closeRecallModal()" aria-label="Schließen">
+                    <span class="material-icons-outlined" aria-hidden="true">close</span>
+                </button>
             </div>
             <div class="modal-body">
                 <p>Are you sure you want to recall shipment <strong id="recallShipmentRef"></strong>?</p>
-                
+
                 <div class="warning-box">
-                    <strong>⚠️ This will:</strong>
-                    <ul>
-                        <li>Return all boxes back to their original cartons</li>
-                        <li>Update carton inventory (increase boxes_current)</li>
-                        <li>Mark the shipment as "recalled"</li>
-                        <li>Log the recall in movement history</li>
-                    </ul>
+                    <span class="material-icons-outlined" aria-hidden="true">warning</span>
+                    <div>
+                        <strong>Folgende Schritte werden durchgeführt:</strong>
+                        <ul>
+                            <li>Alle Boxen werden in ihre ursprünglichen Kartons zurückgebucht.</li>
+                            <li>Der Kartonbestand wird aktualisiert (boxes_current erhöht sich).</li>
+                            <li>Das Shipment wird als "recalled" markiert.</li>
+                            <li>Die Rückholung wird in der Bewegungshistorie protokolliert.</li>
+                        </ul>
+                    </div>
                 </div>
 
                 <div class="form-group">
@@ -369,8 +444,14 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn-secondary" onclick="closeRecallModal()">Cancel</button>
-                <button type="button" class="btn-danger" onclick="confirmRecall()">Recall Shipment</button>
+                <button type="button" class="btn btn-secondary" onclick="closeRecallModal()">
+                    <span class="material-icons-outlined" aria-hidden="true">close</span>
+                    <span>Abbrechen</span>
+                </button>
+                <button type="button" class="btn btn-danger" onclick="confirmRecall()">
+                    <span class="material-icons-outlined" aria-hidden="true">undo</span>
+                    <span>Shipment zurückrufen</span>
+                </button>
             </div>
         </div>
     </div>
