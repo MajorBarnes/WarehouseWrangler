@@ -2,7 +2,6 @@
  * WarehouseWrangler - Carton Management JavaScript
  */
 
-// Configuration
 const API_BASE = './api';
 let currentCartons = [];
 let currentFilters = {
@@ -12,64 +11,224 @@ let currentFilters = {
 };
 let selectedCarton = null;
 
-// Get token
+// ---------------------------------------
+// Helpers
+// ---------------------------------------
+function escapeHtml(value) {
+    return String(value ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
+
 function getToken() {
     return localStorage.getItem('ww_auth_token');
 }
 
-// Get current user data
 function getCurrentUser() {
     const data = localStorage.getItem('ww_user_data');
-    return data ? JSON.parse(data) : null;
+    if (!data) return null;
+
+    try {
+        return JSON.parse(data);
+    } catch (error) {
+        console.error('Failed to parse user data', error);
+        return null;
+    }
 }
 
-// Initialize page
-document.addEventListener('DOMContentLoaded', function() {
-    // Setup header
-    const userData = getCurrentUser();
-    if (userData) {
-        document.getElementById('userDisplay').textContent = `👤 ${userData.username}`;
+function formatDateTime(dateString) {
+    if (!dateString) return 'N/A';
+    const date = new Date(dateString);
+    if (Number.isNaN(date.getTime())) return 'N/A';
+
+    return date.toLocaleString('de-DE', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+    });
+}
+
+function formatStatusLabel(status) {
+    if (!status) return '';
+    return status
+        .split(' ')
+        .map((segment) => segment.charAt(0).toUpperCase() + segment.slice(1))
+        .join(' ');
+}
+
+function toStatusSlug(status) {
+    return String(status || '')
+        .trim()
+        .toLowerCase()
+        .replace(/\s+/g, '-');
+}
+
+function getLocationIconName(location) {
+    const map = {
+        Incoming: 'move_to_inbox',
+        WML: 'factory',
+        GMR: 'storefront'
+    };
+    return map[location] || 'inventory_2';
+}
+
+function getMovementIconName(type) {
+    const map = {
+        received: 'download',
+        sent_to_amazon: 'local_shipping',
+        recalled: 'undo',
+        adjusted: 'settings',
+        damaged: 'warning',
+        sold: 'point_of_sale'
+    };
+    return map[type] || 'history';
+}
+
+function formatMovementType(type) {
+    const map = {
+        received: 'Received',
+        sent_to_amazon: 'Sent to Amazon',
+        recalled: 'Recalled',
+        adjusted: 'Adjusted',
+        damaged: 'Damaged',
+        sold: 'Sold'
+    };
+    return map[type] || type;
+}
+
+function setTableState({ isLoading = false, isEmpty = false }) {
+    const loading = document.getElementById('cartonsLoading');
+    const table = document.getElementById('cartonsTable');
+    const empty = document.getElementById('cartonsEmpty');
+
+    if (loading) {
+        loading.classList.toggle('is-hidden', !isLoading);
     }
 
-    // Setup logout
-    document.getElementById('logoutBtn').addEventListener('click', function() {
-        if (confirm('Are you sure you want to logout?')) {
-            localStorage.removeItem('ww_auth_token');
-            localStorage.removeItem('ww_user_data');
-            window.location.href = 'login.html';
-        }
-    });
+    if (table) {
+        table.classList.toggle('is-hidden', isLoading || isEmpty);
+    }
 
-    // Setup filter buttons
-    document.getElementById('refreshBtn').addEventListener('click', () => loadCartons());
-    document.getElementById('applyFiltersBtn').addEventListener('click', applyFilters);
-    document.getElementById('clearFiltersBtn').addEventListener('click', clearFilters);
-    document.getElementById('clearSearchBtn').addEventListener('click', clearSearch);
+    if (empty) {
+        empty.classList.toggle('is-hidden', !isEmpty);
+    }
+}
 
-    // Setup search input (Enter key)
-    document.getElementById('searchInput').addEventListener('keyup', function(e) {
-        if (e.key === 'Enter') {
-            applyFilters();
-        }
-    });
+function showSuccess(message) {
+    window.alert(`Erfolg: ${message}`);
+}
 
-    // Load initial data
+function showError(message) {
+    window.alert(`Fehler: ${message}`);
+}
+
+// ---------------------------------------
+// Initialization
+// ---------------------------------------
+
+document.addEventListener('DOMContentLoaded', () => {
+    initializeHeader();
+    bindCartonControls();
+
     loadLocationsSummary();
     loadCartons();
+
+    document.addEventListener('click', handleGlobalActionClick);
 });
 
-// ============================================================================
-// API CALLS
-// ============================================================================
+function initializeHeader() {
+    const userDisplay = document.getElementById('userDisplay');
+    const user = getCurrentUser();
+
+    if (userDisplay) {
+        userDisplay.textContent = user?.username || 'Benutzer';
+    }
+
+    const logoutBtn = document.getElementById('logoutBtn');
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', () => {
+            if (confirm('Are you sure you want to logout?')) {
+                localStorage.removeItem('ww_auth_token');
+                localStorage.removeItem('ww_user_data');
+                window.location.href = 'login.html';
+            }
+        });
+    }
+}
+
+function bindCartonControls() {
+    document.getElementById('refreshBtn')?.addEventListener('click', () => loadCartons());
+    document.getElementById('applyFiltersBtn')?.addEventListener('click', applyFilters);
+    document.getElementById('clearFiltersBtn')?.addEventListener('click', clearFilters);
+
+    const searchInput = document.getElementById('searchInput');
+    if (searchInput) {
+        searchInput.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                applyFilters();
+            }
+        });
+    }
+}
+
+// ---------------------------------------
+// Event Delegation
+// ---------------------------------------
+
+function handleGlobalActionClick(event) {
+    const actionElement = event.target.closest('[data-action]');
+    if (!actionElement) {
+        return;
+    }
+
+    const action = actionElement.dataset.action;
+
+    switch (action) {
+        case 'filter-location':
+            filterByLocation(actionElement.dataset.location || '');
+            break;
+        case 'clear-search':
+            clearSearch();
+            break;
+        case 'view-carton':
+            viewCartonDetails(Number(actionElement.dataset.cartonId));
+            break;
+        case 'open-move-modal':
+            openMoveModal(
+                Number(actionElement.dataset.cartonId),
+                actionElement.dataset.cartonNumber || '',
+                actionElement.dataset.cartonLocation || ''
+            );
+            break;
+        case 'close-move-modal':
+            closeMoveModal();
+            break;
+        case 'confirm-move':
+            confirmMoveCarton();
+            break;
+        case 'close-details-modal':
+            closeDetailsModal();
+            break;
+        default:
+            break;
+    }
+}
+
+// ---------------------------------------
+// API Calls
+// ---------------------------------------
 
 async function loadLocationsSummary() {
     try {
         const response = await fetch(`${API_BASE}/cartons/get_locations_summary.php`, {
-            headers: {
-                'Authorization': `Bearer ${getToken()}`
-            }
+            headers: { 'Authorization': `Bearer ${getToken() || ''}` }
         });
-
         const data = await response.json();
 
         if (data.success) {
@@ -83,52 +242,60 @@ async function loadLocationsSummary() {
 }
 
 async function loadCartons() {
+    setTableState({ isLoading: true, isEmpty: false });
+
     try {
-        // Build query string
         const params = new URLSearchParams();
         if (currentFilters.location) params.append('location', currentFilters.location);
         if (currentFilters.status) params.append('status', currentFilters.status);
         if (currentFilters.search) params.append('search', currentFilters.search);
 
-        const queryString = params.toString() ? '?' + params.toString() : '';
+        const queryString = params.toString() ? `?${params.toString()}` : '';
         const response = await fetch(`${API_BASE}/cartons/get_cartons.php${queryString}`, {
-            headers: {
-                'Authorization': `Bearer ${getToken()}`
-            }
+            headers: { 'Authorization': `Bearer ${getToken() || ''}` }
         });
-
         const data = await response.json();
 
         if (data.success) {
             currentCartons = data.cartons;
             renderCartonsTable(data.cartons);
-            // Update summary cards with filtered data
+
             if (currentFilters.location || currentFilters.status || currentFilters.search) {
                 updateSummaryCards(data.summary);
             }
         } else {
-            showError('Failed to load cartons: ' + data.error);
+            showError(`Failed to load cartons: ${data.error}`);
+            renderCartonsTable([]);
         }
     } catch (error) {
         console.error('Load cartons error:', error);
         showError('Connection error. Please try again.');
+        renderCartonsTable([]);
+    } finally {
+        setTableState({ isLoading: false, isEmpty: currentCartons.length === 0 });
     }
 }
 
 async function loadCartonDetails(cartonId) {
+    if (!cartonId) return;
+
+    const modal = document.getElementById('cartonDetailsModal');
+    const body = document.getElementById('cartonDetailsBody');
+    if (modal && body) {
+        modal.classList.remove('hidden');
+        body.innerHTML = '<div class="loading-indicator">Details werden geladen…</div>';
+    }
+
     try {
         const response = await fetch(`${API_BASE}/cartons/get_carton_details.php?carton_id=${cartonId}`, {
-            headers: {
-                'Authorization': `Bearer ${getToken()}`
-            }
+            headers: { 'Authorization': `Bearer ${getToken() || ''}` }
         });
-
         const data = await response.json();
 
         if (data.success) {
             showCartonDetailsModal(data);
         } else {
-            showError('Failed to load carton details: ' + data.error);
+            showError(`Failed to load carton details: ${data.error}`);
         }
     } catch (error) {
         console.error('Load carton details error:', error);
@@ -137,98 +304,122 @@ async function loadCartonDetails(cartonId) {
 }
 
 async function moveCarton(cartonId, newLocation, notes) {
-    try {
-        const response = await fetch(`${API_BASE}/cartons/move_carton.php`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${getToken()}`
-            },
-            body: JSON.stringify({
-                carton_id: cartonId,
-                location: newLocation,
-                notes: notes || ''
-            })
-        });
+    const response = await fetch(`${API_BASE}/cartons/move_carton.php`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${getToken() || ''}`
+        },
+        body: JSON.stringify({
+            carton_id: cartonId,
+            location: newLocation,
+            notes: notes || ''
+        })
+    });
 
-        const data = await response.json();
-        return data;
-    } catch (error) {
-        console.error('Move carton error:', error);
-        throw error;
-    }
+    return response.json();
 }
 
-// ============================================================================
-// UI RENDERING
-// ============================================================================
+// ---------------------------------------
+// Rendering
+// ---------------------------------------
 
 function updateSummaryCards(summary, totals = null) {
     if (totals) {
-        document.getElementById('totalCartons').textContent = totals.total_cartons;
-        document.getElementById('totalBoxes').textContent = totals.total_boxes_current;
-        document.getElementById('totalPairs').textContent = totals.total_pairs_current;
+        const totalCartonsEl = document.getElementById('totalCartons');
+        const totalBoxesEl = document.getElementById('totalBoxes');
+        const totalPairsEl = document.getElementById('totalPairs');
+
+        if (totalCartonsEl) totalCartonsEl.textContent = totals.total_cartons ?? 0;
+        if (totalBoxesEl) totalBoxesEl.textContent = totals.total_boxes_current ?? 0;
+        if (totalPairsEl) totalPairsEl.textContent = totals.total_pairs_current ?? 0;
     }
 
-    if (summary) {
-        // Incoming
-        document.getElementById('incomingCartons').textContent = summary.Incoming?.in_stock_cartons || 0;
-        document.getElementById('incomingBoxes').textContent = summary.Incoming?.total_boxes_current || 0;
+    if (!summary) return;
 
-        // WML
-        document.getElementById('wmlCartons').textContent = summary.WML?.in_stock_cartons || 0;
-        document.getElementById('wmlBoxes').textContent = summary.WML?.total_boxes_current || 0;
+    const incomingCartonsEl = document.getElementById('incomingCartons');
+    const incomingBoxesEl = document.getElementById('incomingBoxes');
+    const wmlCartonsEl = document.getElementById('wmlCartons');
+    const wmlBoxesEl = document.getElementById('wmlBoxes');
+    const gmrCartonsEl = document.getElementById('gmrCartons');
+    const gmrBoxesEl = document.getElementById('gmrBoxes');
 
-        // GMR
-        document.getElementById('gmrCartons').textContent = summary.GMR?.in_stock_cartons || 0;
-        document.getElementById('gmrBoxes').textContent = summary.GMR?.total_boxes_current || 0;
-    }
+    if (incomingCartonsEl) incomingCartonsEl.textContent = summary.Incoming?.in_stock_cartons ?? 0;
+    if (incomingBoxesEl) incomingBoxesEl.textContent = summary.Incoming?.total_boxes_current ?? 0;
+    if (wmlCartonsEl) wmlCartonsEl.textContent = summary.WML?.in_stock_cartons ?? 0;
+    if (wmlBoxesEl) wmlBoxesEl.textContent = summary.WML?.total_boxes_current ?? 0;
+    if (gmrCartonsEl) gmrCartonsEl.textContent = summary.GMR?.in_stock_cartons ?? 0;
+    if (gmrBoxesEl) gmrBoxesEl.textContent = summary.GMR?.total_boxes_current ?? 0;
 }
 
 function renderCartonsTable(cartons) {
     const tbody = document.getElementById('cartonsTableBody');
-    
-    if (cartons.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="9" class="loading">No cartons found</td></tr>';
+    if (!tbody) return;
+
+    if (!Array.isArray(cartons) || cartons.length === 0) {
+        tbody.innerHTML = '';
+        currentCartons = [];
+        setTableState({ isLoading: false, isEmpty: true });
         return;
     }
 
-    tbody.innerHTML = cartons.map(carton => {
-        const statusClass = carton.status.replace(' ', '-');
-        const locationClass = carton.location.toLowerCase();
-        
+    const rows = cartons.map((carton) => {
+        const statusSlug = toStatusSlug(carton.status || '');
+        const locationIcon = getLocationIconName(carton.location);
+        const referenceMarkup = carton.carton_reference
+            ? `<code>${escapeHtml(carton.carton_reference)}</code>`
+            : '';
+
         return `
             <tr data-carton-id="${carton.carton_id}">
                 <td>
-                    <strong>${escapeHtml(carton.carton_number)}</strong>
+                    <div class="carton-identifier">
+                        <strong>${escapeHtml(carton.carton_number)}</strong>
+                        ${referenceMarkup}
+                    </div>
                 </td>
                 <td>
-                    <span class="location-badge location-${locationClass}">
-                        ${getLocationIcon(carton.location)} ${carton.location}
+                    <span class="badge location-badge">
+                        <span class="material-icons-outlined" aria-hidden="true">${locationIcon}</span>
+                        <span>${escapeHtml(carton.location)}</span>
                     </span>
                 </td>
                 <td>
-                    <span class="status-badge status-${statusClass}">${carton.status}</span>
+                    <span class="badge status-badge" data-status="${statusSlug}">
+                        ${escapeHtml(formatStatusLabel(carton.status))}
+                    </span>
                 </td>
-                <td class="text-center">${carton.product_count || 0}</td>
-                <td class="text-center">
-                    <strong>${carton.total_boxes_current || 0}</strong>
-                </td>
-                <td class="text-center text-muted">${carton.total_boxes_initial || 0}</td>
-                <td class="text-center text-muted">${carton.total_boxes_sent || 0}</td>
-                <td class="text-muted">${formatDateTime(carton.updated_at)}</td>
+                <td class="numeric">${carton.product_count ?? 0}</td>
+                <td class="numeric"><strong>${carton.total_boxes_current ?? 0}</strong></td>
+                <td class="numeric">${carton.total_boxes_initial ?? 0}</td>
+                <td class="numeric">${carton.total_boxes_sent ?? 0}</td>
+                <td>${escapeHtml(formatDateTime(carton.updated_at))}</td>
                 <td>
                     <div class="action-buttons">
-                        <button class="btn-primary btn-small" onclick="viewCartonDetails(${carton.carton_id})" title="View Details">
-                            👁️ View
+                        <button class="icon-button" type="button"
+                            data-action="view-carton"
+                            data-carton-id="${carton.carton_id}"
+                            aria-label="Details anzeigen"
+                            title="Details anzeigen"
+                            data-tooltip="Details anzeigen">
+                            <span class="material-icons-outlined" aria-hidden="true">visibility</span>
                         </button>
-                        ${carton.status !== 'archived' ? `
-                            <button class="btn-secondary btn-small" onclick="openMoveModal(${carton.carton_id}, '${escapeHtml(carton.carton_number)}', '${carton.location}')" title="Move Carton">
-                                🔄 Move
+                        ${statusSlug !== 'archived' ? `
+                            <button class="icon-button" type="button"
+                                data-action="open-move-modal"
+                                data-carton-id="${carton.carton_id}"
+                                data-carton-number="${escapeHtml(carton.carton_number)}"
+                                data-carton-location="${escapeHtml(carton.location)}"
+                                aria-label="Carton verschieben"
+                                title="Carton verschieben"
+                                data-tooltip="Carton verschieben">
+                                <span class="material-icons-outlined" aria-hidden="true">swap_horiz</span>
                             </button>
                         ` : `
-                            <button class="btn-secondary btn-small" disabled title="Cannot move archived carton">
-                                🔒 Archived
+                            <button class="icon-button" type="button" disabled
+                                aria-label="Carton archiviert"
+                                title="Carton archiviert">
+                                <span class="material-icons-outlined" aria-hidden="true">inventory</span>
                             </button>
                         `}
                     </div>
@@ -236,305 +427,289 @@ function renderCartonsTable(cartons) {
             </tr>
         `;
     }).join('');
+
+    tbody.innerHTML = rows;
+    setTableState({ isLoading: false, isEmpty: false });
 }
 
 function showCartonDetailsModal(data) {
     const modal = document.getElementById('cartonDetailsModal');
     const body = document.getElementById('cartonDetailsBody');
-    
-    const carton = data.carton;
-    const contents = data.contents;
-    const totals = data.totals;
-    const history = data.history;
-    
-    body.innerHTML = `
-        <div class="details-section">
-            <h4>Basic Information</h4>
+    if (!modal || !body) return;
+
+    const { carton, contents = [], totals = {}, history = [] } = data;
+
+    const detailsHtml = `
+        <section class="details-section">
+            <h4>Basisinformationen</h4>
             <div class="details-grid">
                 <div class="detail-item">
-                    <label>Carton Number:</label>
+                    <label>Carton</label>
                     <strong>${escapeHtml(carton.carton_number)}</strong>
                 </div>
                 <div class="detail-item">
-                    <label>Location:</label>
-                    <span class="location-badge location-${carton.location.toLowerCase()}">
-                        ${getLocationIcon(carton.location)} ${carton.location}
+                    <label>Standort</label>
+                    <span class="badge location-badge">
+                        <span class="material-icons-outlined" aria-hidden="true">${getLocationIconName(carton.location)}</span>
+                        <span>${escapeHtml(carton.location)}</span>
                     </span>
                 </div>
                 <div class="detail-item">
-                    <label>Status:</label>
-                    <span class="status-badge status-${carton.status.replace(' ', '-')}">${carton.status}</span>
+                    <label>Status</label>
+                    <span class="badge status-badge" data-status="${toStatusSlug(carton.status)}">
+                        ${escapeHtml(formatStatusLabel(carton.status))}
+                    </span>
                 </div>
                 <div class="detail-item">
-                    <label>Created:</label>
-                    ${formatDateTime(carton.created_at)}
+                    <label>Erstellt</label>
+                    <span>${escapeHtml(formatDateTime(carton.created_at))}</span>
                 </div>
                 <div class="detail-item">
-                    <label>Last Updated:</label>
-                    ${formatDateTime(carton.updated_at)}
+                    <label>Aktualisiert</label>
+                    <span>${escapeHtml(formatDateTime(carton.updated_at))}</span>
                 </div>
             </div>
-        </div>
+        </section>
 
-        <div class="details-section">
-            <h4>Contents Summary</h4>
+        <section class="details-section">
+            <h4>Bestandsübersicht</h4>
             <div class="totals-grid">
                 <div class="total-item">
-                    <div class="total-label">Products</div>
-                    <div class="total-value">${totals.product_count}</div>
+                    <span class="total-label">Produkte</span>
+                    <span class="total-value">${totals.product_count ?? 0}</span>
                 </div>
                 <div class="total-item">
-                    <div class="total-label">Boxes (Current)</div>
-                    <div class="total-value">${totals.boxes_current}</div>
+                    <span class="total-label">Boxen aktuell</span>
+                    <span class="total-value">${totals.boxes_current ?? 0}</span>
                 </div>
                 <div class="total-item">
-                    <div class="total-label">Boxes (Initial)</div>
-                    <div class="total-value">${totals.boxes_initial}</div>
+                    <span class="total-label">Boxen initial</span>
+                    <span class="total-value">${totals.boxes_initial ?? 0}</span>
                 </div>
                 <div class="total-item">
-                    <div class="total-label">Pairs (Current)</div>
-                    <div class="total-value">${totals.pairs_current}</div>
+                    <span class="total-label">Paare aktuell</span>
+                    <span class="total-value">${totals.pairs_current ?? 0}</span>
                 </div>
                 <div class="total-item">
-                    <div class="total-label">Sent to AMZ</div>
-                    <div class="total-value">${totals.boxes_sent_to_amazon}</div>
+                    <span class="total-label">An AMZ gesendet</span>
+                    <span class="total-value">${totals.boxes_sent_to_amazon ?? 0}</span>
                 </div>
             </div>
-        </div>
+        </section>
 
-        <div class="details-section">
-            <h4>Products in This Carton</h4>
+        <section class="details-section">
+            <h4>Produkte im Carton</h4>
             <div class="contents-table-wrapper">
                 <table class="contents-table">
                     <thead>
                         <tr>
-                            <th>Product</th>
+                            <th>Produkt</th>
                             <th>FNSKU</th>
-                            <th>Boxes Initial</th>
-                            <th>Boxes Current</th>
-                            <th>Boxes Sent</th>
-                            <th>Pairs/Box</th>
-                            <th>Pairs Current</th>
+                            <th class="numeric">Boxen initial</th>
+                            <th class="numeric">Boxen aktuell</th>
+                            <th class="numeric">An AMZ gesendet</th>
+                            <th class="numeric">Paare / Box</th>
+                            <th class="numeric">Paare aktuell</th>
                         </tr>
                     </thead>
                     <tbody>
-                        ${contents.map(item => `
+                        ${contents.map((item) => `
                             <tr>
                                 <td>${escapeHtml(item.product_name)}</td>
                                 <td><code>${escapeHtml(item.fnsku)}</code></td>
-                                <td class="text-center">${item.boxes_initial}</td>
-                                <td class="text-center"><strong>${item.boxes_current}</strong></td>
-                                <td class="text-center text-muted">${item.boxes_sent_to_amazon}</td>
-                                <td class="text-center">${item.pairs_per_box}</td>
-                                <td class="text-center"><strong>${item.pairs_current}</strong></td>
+                                <td class="numeric">${item.boxes_initial ?? 0}</td>
+                                <td class="numeric"><strong>${item.boxes_current ?? 0}</strong></td>
+                                <td class="numeric">${item.boxes_sent_to_amazon ?? 0}</td>
+                                <td class="numeric">${item.pairs_per_box ?? 0}</td>
+                                <td class="numeric"><strong>${item.pairs_current ?? 0}</strong></td>
                             </tr>
                         `).join('')}
                     </tbody>
                 </table>
             </div>
-        </div>
+        </section>
 
         ${history && history.length > 0 ? `
-            <div class="details-section">
-                <h4>Movement History</h4>
+            <section class="details-section">
+                <h4>Bewegungshistorie</h4>
                 <div class="history-list">
-                    ${history.slice(0, 10).map(item => `
-                        <div class="history-item">
-                            <div class="history-icon">${getMovementIcon(item.movement_type)}</div>
+                    ${history.slice(0, 12).map((entry) => `
+                        <article class="history-item">
+                            <span class="history-icon">
+                                <span class="material-icons-outlined" aria-hidden="true">${getMovementIconName(entry.movement_type)}</span>
+                            </span>
                             <div class="history-content">
                                 <div class="history-main">
-                                    <strong>${formatMovementType(item.movement_type)}</strong>
-                                    ${item.boxes > 0 ? `+${item.boxes}` : item.boxes} boxes
-                                    - ${escapeHtml(item.product_name)}
+                                    ${escapeHtml(formatMovementType(entry.movement_type))}
+                                    ${entry.boxes ? ` • ${entry.boxes > 0 ? '+' : ''}${entry.boxes} Boxen` : ''}
+                                    ${entry.product_name ? ` • ${escapeHtml(entry.product_name)}` : ''}
                                 </div>
                                 <div class="history-meta">
-                                    ${formatDateTime(item.created_at)}
-                                    ${item.created_by_user ? `• by ${escapeHtml(item.created_by_user)}` : ''}
-                                    ${item.shipment_reference ? `• ${escapeHtml(item.shipment_reference)}` : ''}
+                                    <span>${escapeHtml(formatDateTime(entry.created_at))}</span>
+                                    ${entry.created_by_user ? `<span>von ${escapeHtml(entry.created_by_user)}</span>` : ''}
+                                    ${entry.shipment_reference ? `<span>Shipment ${escapeHtml(entry.shipment_reference)}</span>` : ''}
                                 </div>
-                                ${item.notes ? `<div class="history-notes">${escapeHtml(item.notes)}</div>` : ''}
+                                ${entry.notes ? `<div class="history-notes">${escapeHtml(entry.notes)}</div>` : ''}
                             </div>
-                        </div>
+                        </article>
                     `).join('')}
                 </div>
-            </div>
+            </section>
         ` : ''}
     `;
-    
+
+    body.innerHTML = detailsHtml;
     modal.classList.remove('hidden');
 }
 
-// ============================================================================
-// MODAL MANAGEMENT
-// ============================================================================
-
-function openMoveModal(cartonId, cartonNumber, currentLocation) {
-    selectedCarton = { id: cartonId, number: cartonNumber, location: currentLocation };
-    
-    document.getElementById('moveCartonNumber').textContent = cartonNumber;
-    document.getElementById('currentLocationBadge').innerHTML = `
-        <span class="location-badge location-${currentLocation.toLowerCase()}">
-            ${getLocationIcon(currentLocation)} ${currentLocation}
-        </span>
-    `;
-    
-    // Reset form
-    document.getElementById('newLocation').value = '';
-    document.getElementById('moveNotes').value = '';
-    
-    // Show modal
-    document.getElementById('moveCartonModal').classList.remove('hidden');
-}
-
-function closeMoveModal() {
-    document.getElementById('moveCartonModal').classList.add('hidden');
-    selectedCarton = null;
-}
-
-function closeDetailsModal() {
-    document.getElementById('cartonDetailsModal').classList.add('hidden');
-}
-
-async function confirmMoveCarton() {
-    const newLocation = document.getElementById('newLocation').value;
-    const notes = document.getElementById('moveNotes').value;
-    
-    if (!newLocation) {
-        showError('Please select a new location');
-        return;
-    }
-    
-    if (newLocation === selectedCarton.location) {
-        showError(`Carton is already in ${newLocation}`);
-        return;
-    }
-    
-    if (!confirm(`Move carton ${selectedCarton.number} from ${selectedCarton.location} to ${newLocation}?`)) {
-        return;
-    }
-    
-    try {
-        const result = await moveCarton(selectedCarton.id, newLocation, notes);
-        
-        if (result.success) {
-            showSuccess(result.message);
-            closeMoveModal();
-            // Reload data
-            loadLocationsSummary();
-            loadCartons();
-        } else {
-            showError(result.error || 'Failed to move carton');
-        }
-    } catch (error) {
-        showError('Connection error. Please try again.');
-    }
-}
-
-function viewCartonDetails(cartonId) {
-    loadCartonDetails(cartonId);
-}
-
-// ============================================================================
-// FILTERS
-// ============================================================================
+// ---------------------------------------
+// Filters
+// ---------------------------------------
 
 function applyFilters() {
-    currentFilters.location = document.getElementById('locationFilter').value;
-    currentFilters.status = document.getElementById('statusFilter').value;
-    currentFilters.search = document.getElementById('searchInput').value.trim();
-    
+    currentFilters.location = document.getElementById('locationFilter')?.value || '';
+    currentFilters.status = document.getElementById('statusFilter')?.value || '';
+    currentFilters.search = document.getElementById('searchInput')?.value.trim() || '';
+
+    updateLocationButtons(currentFilters.location);
     loadCartons();
 }
 
 function clearFilters() {
     currentFilters = { location: '', status: '', search: '' };
-    document.getElementById('locationFilter').value = '';
-    document.getElementById('statusFilter').value = '';
-    document.getElementById('searchInput').value = '';
-    
-    // Reload summary and cartons
+
+    const locationFilter = document.getElementById('locationFilter');
+    const statusFilter = document.getElementById('statusFilter');
+    const searchInput = document.getElementById('searchInput');
+
+    if (locationFilter) locationFilter.value = '';
+    if (statusFilter) statusFilter.value = '';
+    if (searchInput) searchInput.value = '';
+
+    resetLocationButtons();
+
     loadLocationsSummary();
     loadCartons();
 }
 
 function clearSearch() {
-    document.getElementById('searchInput').value = '';
+    const searchInput = document.getElementById('searchInput');
+    if (searchInput) {
+        searchInput.value = '';
+    }
     currentFilters.search = '';
     loadCartons();
 }
 
 function filterByLocation(location) {
-    document.getElementById('locationFilter').value = location;
+    const locationFilter = document.getElementById('locationFilter');
+    if (locationFilter) {
+        locationFilter.value = location;
+    }
+
     currentFilters.location = location;
+    updateLocationButtons(location);
     loadCartons();
-    
-    // Visual feedback on summary cards
-    document.querySelectorAll('.summary-card').forEach(card => {
-        card.classList.remove('active');
-    });
-    document.querySelector(`[data-location="${location}"]`)?.classList.add('active');
 }
 
-// ============================================================================
-// UTILITY FUNCTIONS
-// ============================================================================
-
-function showSuccess(message) {
-    alert('✅ ' + message);
-}
-
-function showError(message) {
-    alert('❌ ' + message);
-}
-
-function escapeHtml(text) {
-    if (!text) return '';
-    const div = document.createElement('div');
-    div.textContent = text;
-    return div.innerHTML;
-}
-
-function formatDateTime(dateString) {
-    if (!dateString) return 'N/A';
-    const date = new Date(dateString);
-    return date.toLocaleString('en-US', {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit'
+function resetLocationButtons() {
+    document.querySelectorAll('button[data-action="filter-location"]').forEach((button) => {
+        button.classList.remove('is-active');
+        button.setAttribute('aria-pressed', 'false');
     });
 }
 
-function getLocationIcon(location) {
-    const icons = {
-        'Incoming': '📥',
-        'WML': '🏭',
-        'GMR': '🏪'
-    };
-    return icons[location] || '📦';
+function updateLocationButtons(activeLocation) {
+    document.querySelectorAll('button[data-action="filter-location"]').forEach((button) => {
+        const isActive = button.dataset.location === activeLocation && activeLocation !== '';
+        button.classList.toggle('is-active', isActive);
+        button.setAttribute('aria-pressed', String(isActive));
+    });
 }
 
-function getMovementIcon(type) {
-    const icons = {
-        'received': '📥',
-        'sent_to_amazon': '📤',
-        'recalled': '↩️',
-        'adjusted': '⚙️',
-        'damaged': '⚠️',
-        'sold': '💰'
+// ---------------------------------------
+// Modal Management
+// ---------------------------------------
+
+function openMoveModal(cartonId, cartonNumber, currentLocation) {
+    if (!cartonId) return;
+
+    selectedCarton = {
+        id: cartonId,
+        number: cartonNumber,
+        location: currentLocation
     };
-    return icons[type] || '📝';
+
+    const modal = document.getElementById('moveCartonModal');
+    const numberEl = document.getElementById('moveCartonNumber');
+    const currentLocationBadge = document.getElementById('currentLocationBadge');
+    const locationSelect = document.getElementById('newLocation');
+    const notesInput = document.getElementById('moveNotes');
+
+    if (numberEl) numberEl.textContent = cartonNumber;
+    if (currentLocationBadge) {
+        currentLocationBadge.innerHTML = `
+            <span class="badge location-badge">
+                <span class="material-icons-outlined" aria-hidden="true">${getLocationIconName(currentLocation)}</span>
+                <span>${escapeHtml(currentLocation)}</span>
+            </span>
+        `;
+    }
+    if (locationSelect) locationSelect.value = '';
+    if (notesInput) notesInput.value = '';
+
+    modal?.classList.remove('hidden');
 }
 
-function formatMovementType(type) {
-    const types = {
-        'received': 'Received',
-        'sent_to_amazon': 'Sent to Amazon',
-        'recalled': 'Recalled',
-        'adjusted': 'Adjusted',
-        'damaged': 'Damaged',
-        'sold': 'Sold'
-    };
-    return types[type] || type;
+function closeMoveModal() {
+    document.getElementById('moveCartonModal')?.classList.add('hidden');
+    selectedCarton = null;
+}
+
+function closeDetailsModal() {
+    document.getElementById('cartonDetailsModal')?.classList.add('hidden');
+}
+
+async function confirmMoveCarton() {
+    if (!selectedCarton) return;
+
+    const locationSelect = document.getElementById('newLocation');
+    const notesInput = document.getElementById('moveNotes');
+
+    const newLocation = locationSelect?.value || '';
+    const notes = notesInput?.value || '';
+
+    if (!newLocation) {
+        showError('Bitte wähle einen neuen Standort aus.');
+        return;
+    }
+
+    if (newLocation === selectedCarton.location) {
+        showError(`Carton befindet sich bereits in ${newLocation}.`);
+        return;
+    }
+
+    if (!confirm(`Carton ${selectedCarton.number} nach ${newLocation} verschieben?`)) {
+        return;
+    }
+
+    try {
+        const result = await moveCarton(selectedCarton.id, newLocation, notes);
+
+        if (result.success) {
+            showSuccess(result.message || 'Carton erfolgreich bewegt.');
+            closeMoveModal();
+            loadLocationsSummary();
+            loadCartons();
+        } else {
+            showError(result.error || 'Carton konnte nicht bewegt werden.');
+        }
+    } catch (error) {
+        console.error('Move carton error:', error);
+        showError('Verbindung fehlgeschlagen. Bitte erneut versuchen.');
+    }
+}
+
+function viewCartonDetails(cartonId) {
+    loadCartonDetails(cartonId);
 }

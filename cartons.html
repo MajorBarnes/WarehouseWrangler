@@ -4,8 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Carton Management - WarehouseWrangler</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
     <link rel="stylesheet" href="./css/main.css">
     <link rel="stylesheet" href="./css/cartons.css">
+    <link rel="icon" type="image/png" href="/favicon.ico"/>
     <script>
         // Inline auth check
         (function() {
@@ -31,190 +36,247 @@
     </script>
 </head>
 <body>
-    <!-- Header -->
-    <header class="app-header">
-        <div class="header-left">
-            <h1>🤠 WarehouseWrangler</h1>
+    <header class="site-header">
+        <div class="branding">
+            <span class="material-icons-outlined brand-icon" aria-hidden="true">move_up</span>
+            <div class="brand-copy">
+                <span class="brand-name">WarehouseWrangler</span>
+                <span class="brand-tagline">Fulfillment Control Center</span>
+            </div>
         </div>
-        <div class="header-right">
-            <a href="index.html" class="btn-secondary" style="margin-right: 12px;">🏠 Dashboard</a>
-            <span id="userDisplay">Loading...</span>
-            <button id="logoutBtn" class="btn-logout">Logout</button>
+
+        <nav class="primary-nav" aria-label="Main navigation">
+            <ul class="nav-list">
+                <li><a class="nav-link" href="index.html"><span class="material-icons-outlined" aria-hidden="true">dashboard</span><span>Dashboard</span></a></li>
+                <li><a class="nav-link" href="amazon-snapshot-upload.html"><span class="material-icons-outlined" aria-hidden="true">cloud_upload</span><span>Amazon Snapshot</span></a></li>
+                <li><a class="nav-link is-active" href="cartons.html" aria-current="page"><span class="material-icons-outlined" aria-hidden="true">inventory_2</span><span>Cartons</span></a></li>
+                <li><a class="nav-link" href="lc-upload.html"><span class="material-icons-outlined" aria-hidden="true">upload_file</span><span>LC Upload</span></a></li>
+                <li><a class="nav-link" href="products.html"><span class="material-icons-outlined" aria-hidden="true">view_list</span><span>Products</span></a></li>
+                <li><a class="nav-link" href="shipments.html"><span class="material-icons-outlined" aria-hidden="true">local_shipping</span><span>Shipments</span></a></li>
+                <li><a class="nav-link" href="users.html"><span class="material-icons-outlined" aria-hidden="true">group</span><span>Users</span></a></li>
+                <li><a class="nav-link" href="login.html"><span class="material-icons-outlined" aria-hidden="true">lock</span><span>Login</span></a></li>
+            </ul>
+        </nav>
+
+        <div class="header-actions">
+            <span class="user-display" aria-live="polite">
+                <span class="material-icons-outlined" aria-hidden="true">account_circle</span>
+                <span id="userDisplay" class="user-display-name">Loading…</span>
+            </span>
+            <button id="logoutBtn" class="btn btn-logout" type="button">
+                <span class="material-icons-outlined" aria-hidden="true">logout</span>
+                <span>Logout</span>
+            </button>
         </div>
     </header>
 
-    <!-- Main Content -->
-    <main class="app-main">
-        <!-- Page Header -->
-        <div class="page-header">
-            <h2>📦 Carton Management</h2>
-            <button id="refreshBtn" class="btn-primary">🔄 Refresh</button>
-        </div>
-
-        <!-- Summary Cards -->
-        <div class="summary-cards">
-            <div class="summary-card" data-location="all">
-                <div class="card-icon">📊</div>
-                <div class="card-content">
-                    <h3>Total Cartons</h3>
-                    <div class="card-value" id="totalCartons">0</div>
-                    <div class="card-detail">
-                        <span id="totalBoxes">0</span> boxes • 
-                        <span id="totalPairs">0</span> pairs
-                    </div>
+    <main class="app-main cartons-page">
+        <section class="page-header">
+            <div class="page-title">
+                <span class="material-icons-outlined" aria-hidden="true">inventory_2</span>
+                <div class="page-title-copy">
+                    <h2>Carton Management</h2>
+                    <p>Überwache Bestände, Standortwechsel und Versandbereitschaft jeder Karton-ID.</p>
                 </div>
             </div>
+            <div class="page-header-actions">
+                <button id="refreshBtn" class="btn btn-secondary" type="button">
+                    <span class="material-icons-outlined" aria-hidden="true">refresh</span>
+                    <span>Aktualisieren</span>
+                </button>
+            </div>
+        </section>
 
-            <div class="summary-card clickable" data-location="Incoming" onclick="filterByLocation('Incoming')">
-                <div class="card-icon">📥</div>
-                <div class="card-content">
-                    <h3>Incoming</h3>
-                    <div class="card-value" id="incomingCartons">0</div>
-                    <div class="card-detail">
-                        <span id="incomingBoxes">0</span> boxes
+        <section class="surface-card metrics-panel" aria-label="Carton overview">
+            <div class="metrics-grid">
+                <article class="metric-card">
+                    <span class="material-icons-outlined metric-icon" aria-hidden="true">insights</span>
+                    <div class="metric-content">
+                        <p class="metric-label">Gesamt</p>
+                        <p class="metric-value" id="totalCartons">0</p>
+                        <p class="metric-subtext"><span id="totalBoxes">0</span> Kartons • <span id="totalPairs">0</span> Paare</p>
                     </div>
-                </div>
-            </div>
+                </article>
 
-            <div class="summary-card clickable" data-location="WML" onclick="filterByLocation('WML')">
-                <div class="card-icon">🏭</div>
-                <div class="card-content">
-                    <h3>WML</h3>
-                    <div class="card-value" id="wmlCartons">0</div>
-                    <div class="card-detail">
-                        <span id="wmlBoxes">0</span> boxes
+                <button class="metric-card status-card" type="button" data-action="filter-location" data-location="Incoming" aria-pressed="false">
+                    <span class="material-icons-outlined metric-icon" aria-hidden="true">move_to_inbox</span>
+                    <div class="metric-content">
+                        <p class="metric-label">Incoming</p>
+                        <p class="metric-value" id="incomingCartons">0</p>
+                        <p class="metric-subtext"><span id="incomingBoxes">0</span> Boxen</p>
                     </div>
-                </div>
-            </div>
+                </button>
 
-            <div class="summary-card clickable" data-location="GMR" onclick="filterByLocation('GMR')">
-                <div class="card-icon">🏪</div>
-                <div class="card-content">
-                    <h3>GMR</h3>
-                    <div class="card-value" id="gmrCartons">0</div>
-                    <div class="card-detail">
-                        <span id="gmrBoxes">0</span> boxes
+                <button class="metric-card status-card" type="button" data-action="filter-location" data-location="WML" aria-pressed="false">
+                    <span class="material-icons-outlined metric-icon" aria-hidden="true">factory</span>
+                    <div class="metric-content">
+                        <p class="metric-label">WML</p>
+                        <p class="metric-value" id="wmlCartons">0</p>
+                        <p class="metric-subtext"><span id="wmlBoxes">0</span> Boxen</p>
                     </div>
+                </button>
+
+                <button class="metric-card status-card" type="button" data-action="filter-location" data-location="GMR" aria-pressed="false">
+                    <span class="material-icons-outlined metric-icon" aria-hidden="true">storefront</span>
+                    <div class="metric-content">
+                        <p class="metric-label">GMR</p>
+                        <p class="metric-value" id="gmrCartons">0</p>
+                        <p class="metric-subtext"><span id="gmrBoxes">0</span> Boxen</p>
+                    </div>
+                </button>
+            </div>
+        </section>
+
+        <section class="surface-card filters-panel" aria-label="Carton Filter">
+            <form class="filters-form" novalidate>
+                <div class="filters-grid">
+                    <label class="filter-field" for="locationFilter">
+                        <span class="filter-label">Standort</span>
+                        <select id="locationFilter" name="location">
+                            <option value="">Alle Standorte</option>
+                            <option value="Incoming">Incoming</option>
+                            <option value="WML">WML</option>
+                            <option value="GMR">GMR</option>
+                        </select>
+                    </label>
+
+                    <label class="filter-field" for="statusFilter">
+                        <span class="filter-label">Status</span>
+                        <select id="statusFilter" name="status">
+                            <option value="">Alle Status</option>
+                            <option value="in stock">In Stock</option>
+                            <option value="empty">Empty</option>
+                            <option value="archived">Archived</option>
+                        </select>
+                    </label>
+
+                    <label class="filter-field search-field" for="searchInput">
+                        <span class="filter-label">Suche</span>
+                        <div class="search-input">
+                            <span class="material-icons-outlined" aria-hidden="true">search</span>
+                            <input type="text" id="searchInput" name="search" placeholder="Carton, Produkt oder FNSKU suchen">
+                            <button id="clearSearchBtn" class="btn btn-tertiary" type="button" data-action="clear-search" aria-label="Suche leeren">
+                                <span class="material-icons-outlined" aria-hidden="true">close</span>
+                            </button>
+                        </div>
+                    </label>
                 </div>
+                <div class="filters-actions">
+                    <button id="applyFiltersBtn" class="btn btn-primary" type="button">
+                        <span class="material-icons-outlined" aria-hidden="true">filter_alt</span>
+                        <span>Filter anwenden</span>
+                    </button>
+                    <button id="clearFiltersBtn" class="btn btn-secondary" type="button">
+                        <span class="material-icons-outlined" aria-hidden="true">restart_alt</span>
+                        <span>Zurücksetzen</span>
+                    </button>
+                </div>
+            </form>
+        </section>
+
+        <section class="surface-card table-card" aria-label="Carton Tabelle">
+            <div id="cartonsLoading" class="loading-indicator">Cartons werden geladen…</div>
+            <div class="table-scroll" role="region" aria-live="polite" aria-label="Carton Datentabelle">
+                <table id="cartonsTable" class="cartons-table table-sticky is-hidden">
+                    <thead>
+                        <tr>
+                            <th scope="col">Carton</th>
+                            <th scope="col">Standort</th>
+                            <th scope="col">Status</th>
+                            <th scope="col" class="numeric">Produkte</th>
+                            <th scope="col" class="numeric">Boxen aktuell</th>
+                            <th scope="col" class="numeric">Boxen initial</th>
+                            <th scope="col" class="numeric">An AMZ gesendet</th>
+                            <th scope="col">Aktualisiert</th>
+                            <th scope="col" class="actions-col">Aktionen</th>
+                        </tr>
+                    </thead>
+                    <tbody id="cartonsTableBody"></tbody>
+                </table>
             </div>
-        </div>
-
-        <!-- Filters and Search -->
-        <div class="filters-section">
-            <div class="filter-group">
-                <label for="locationFilter">Location:</label>
-                <select id="locationFilter">
-                    <option value="">All Locations</option>
-                    <option value="Incoming">Incoming</option>
-                    <option value="WML">WML</option>
-                    <option value="GMR">GMR</option>
-                </select>
+            <div id="cartonsEmpty" class="empty-state is-hidden">
+                <span class="material-icons-outlined" aria-hidden="true">inventory_2</span>
+                <p>Keine Cartons gefunden. Passe die Filter an oder aktualisiere die Liste.</p>
             </div>
-
-            <div class="filter-group">
-                <label for="statusFilter">Status:</label>
-                <select id="statusFilter">
-                    <option value="">All Status</option>
-                    <option value="in stock">In Stock</option>
-                    <option value="empty">Empty</option>
-                    <option value="archived">Archived</option>
-                </select>
-            </div>
-
-            <div class="search-group">
-                <input type="text" id="searchInput" placeholder="🔍 Search by carton number, product, or FNSKU...">
-                <button id="clearSearchBtn" class="btn-secondary btn-small">Clear</button>
-            </div>
-
-            <div class="filter-actions">
-                <button id="applyFiltersBtn" class="btn-primary">Apply Filters</button>
-                <button id="clearFiltersBtn" class="btn-secondary">Clear All</button>
-            </div>
-        </div>
-
-        <!-- Cartons Table -->
-        <div class="table-container">
-            <table class="cartons-table">
-                <thead>
-                    <tr>
-                        <th>Carton Number</th>
-                        <th>Location</th>
-                        <th>Status</th>
-                        <th>Products</th>
-                        <th>Boxes (Current)</th>
-                        <th>Boxes (Initial)</th>
-                        <th>Sent to AMZ</th>
-                        <th>Updated</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody id="cartonsTableBody">
-                    <tr>
-                        <td colspan="9" class="loading">Loading cartons...</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-
-        <!-- Pagination (if needed later) -->
-        <div class="pagination" id="pagination" style="display: none;">
-            <button class="btn-secondary btn-small">Previous</button>
-            <span>Page 1 of 1</span>
-            <button class="btn-secondary btn-small">Next</button>
-        </div>
+        </section>
     </main>
 
-    <!-- Move Carton Modal -->
-    <div id="moveCartonModal" class="modal hidden">
+    <div id="moveCartonModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="moveCartonTitle">
         <div class="modal-content">
             <div class="modal-header">
-                <h3>Move Carton</h3>
-                <button class="modal-close" onclick="closeMoveModal()">&times;</button>
+                <div class="modal-title-group">
+                    <span class="material-icons-outlined" aria-hidden="true">swap_horiz</span>
+                    <div>
+                        <h3 id="moveCartonTitle">Carton verschieben</h3>
+                        <p class="modal-subtitle">Wähle einen neuen Standort für diesen Carton.</p>
+                    </div>
+                </div>
+                <button class="modal-close" type="button" data-action="close-move-modal" aria-label="Dialog schließen">
+                    <span class="material-icons-outlined" aria-hidden="true">close</span>
+                </button>
             </div>
             <div class="modal-body">
-                <p>Move carton <strong id="moveCartonNumber"></strong> to:</p>
-                <div class="form-group">
-                    <label>Current Location:</label>
-                    <div class="location-badge" id="currentLocationBadge"></div>
+                <div class="info-block">
+                    <span class="info-label">Carton</span>
+                    <span id="moveCartonNumber" class="info-value"></span>
+                </div>
+                <div class="info-block">
+                    <span class="info-label">Aktueller Standort</span>
+                    <span id="currentLocationBadge" class="info-value"></span>
                 </div>
                 <div class="form-group">
-                    <label for="newLocation">New Location *</label>
-                    <select id="newLocation" class="location-select">
-                        <option value="">-- Select Location --</option>
-                        <option value="Incoming">📥 Incoming</option>
-                        <option value="WML">🏭 WML</option>
-                        <option value="GMR">🏪 GMR</option>
+                    <label for="newLocation">Neuer Standort *</label>
+                    <select id="newLocation" class="form-control">
+                        <option value="">Standort auswählen</option>
+                        <option value="Incoming">Incoming</option>
+                        <option value="WML">WML</option>
+                        <option value="GMR">GMR</option>
                     </select>
                 </div>
                 <div class="form-group">
-                    <label for="moveNotes">Notes (optional)</label>
-                    <textarea id="moveNotes" rows="3" placeholder="Add notes about this move..."></textarea>
+                    <label for="moveNotes">Notiz (optional)</label>
+                    <textarea id="moveNotes" rows="3" placeholder="Bewegungsgrund hinzufügen"></textarea>
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn-secondary" onclick="closeMoveModal()">Cancel</button>
-                <button type="button" class="btn-primary" onclick="confirmMoveCarton()">Move Carton</button>
+                <button class="btn btn-secondary" type="button" data-action="close-move-modal">
+                    <span class="material-icons-outlined" aria-hidden="true">close</span>
+                    <span>Abbrechen</span>
+                </button>
+                <button class="btn btn-primary" type="button" data-action="confirm-move">
+                    <span class="material-icons-outlined" aria-hidden="true">check_circle</span>
+                    <span>Carton bewegen</span>
+                </button>
             </div>
         </div>
     </div>
 
-    <!-- Carton Details Modal -->
-    <div id="cartonDetailsModal" class="modal hidden">
+    <div id="cartonDetailsModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="cartonDetailsTitle">
         <div class="modal-content modal-large">
             <div class="modal-header">
-                <h3>📦 Carton Details</h3>
-                <button class="modal-close" onclick="closeDetailsModal()">&times;</button>
+                <div class="modal-title-group">
+                    <span class="material-icons-outlined" aria-hidden="true">analytics</span>
+                    <div>
+                        <h3 id="cartonDetailsTitle">Carton Details</h3>
+                        <p class="modal-subtitle">Inhalte, Bewegungen und Bestandsentwicklungen im Überblick.</p>
+                    </div>
+                </div>
+                <button class="modal-close" type="button" data-action="close-details-modal" aria-label="Dialog schließen">
+                    <span class="material-icons-outlined" aria-hidden="true">close</span>
+                </button>
             </div>
             <div class="modal-body" id="cartonDetailsBody">
-                <div class="loading">Loading carton details...</div>
+                <div class="loading-indicator">Details werden geladen…</div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn-secondary" onclick="closeDetailsModal()">Close</button>
+                <button class="btn btn-secondary" type="button" data-action="close-details-modal">
+                    <span class="material-icons-outlined" aria-hidden="true">close</span>
+                    <span>Schließen</span>
+                </button>
             </div>
         </div>
     </div>
 
-    <!-- Scripts -->
     <script src="./js/cartons.js"></script>
 </body>
 </html>

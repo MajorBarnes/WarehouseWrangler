@@ -62,3 +62,7 @@ The fonts prioritize legibility and clear separation between regular UI text and
 | **Data Scrolling** | Table headers for long data lists (e.g., cartons or upload\_history) must be **sticky** (fixed position). |
 | **Form Validation** | Implement clear, visual **real-time feedback** (green/red borders and icons) on all form fields, especially the LC Upload preview. |
 | **Critical Actions** | Actions like **"Send to AMZ"** or **"Recall"** must be preceded by a **confirmation modal** with a warning message using the **Danger** color. |
+
+## 7. Actions — Icon-Only with Tooltips
+- Replace text buttons with icon-only controls; keep accessibility via ARIA and native tooltips.
+- **Do not use inline event handlers** (no `onclick=""`, `onchange=""`, etc.). Use **data-attributes + event delegation** from JS.
