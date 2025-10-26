@@ -4,20 +4,22 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - WarehouseWrangler</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
     <link rel="stylesheet" href="./css/main.css">
     <link rel="icon" type="image/png" href="/favicon.ico"/>
     <script>
         // Inline auth check to avoid loading issues
         (function() {
-            // Get token from localStorage
             const token = localStorage.getItem('ww_auth_token');
-            
+
             if (!token) {
                 window.location.href = 'login.html';
                 return;
             }
-            
-            // Basic token validation
+
             try {
                 const parts = token.split('.');
                 if (parts.length !== 3) {
@@ -25,12 +27,11 @@
                     window.location.href = 'login.html';
                     return;
                 }
-                
+
                 const payload = JSON.parse(atob(parts[1]));
                 const now = Math.floor(Date.now() / 1000);
-                
+
                 if (payload.exp <= now) {
-                    // Token expired
                     localStorage.removeItem('ww_auth_token');
                     window.location.href = 'login.html';
                     return;
@@ -39,75 +40,170 @@
                 console.error('Token validation error:', e);
                 localStorage.removeItem('ww_auth_token');
                 window.location.href = 'login.html';
-                return;
             }
         })();
     </script>
 </head>
 <body>
-    <!-- Loading Screen -->
-    <div id="loadingScreen" class="loading-screen">
+    <div id="loadingScreen" class="loading-screen" role="status" aria-live="polite">
         <div class="loading-content">
-            <h1>🏭 WarehouseWrangler</h1>
-            <p>Loading...</p>
+            <span class="material-icons-outlined loading-icon" aria-hidden="true">warehouse</span>
+            <h1 class="loading-title">WarehouseWrangler</h1>
+            <p class="loading-text">Preparing your fulfillment control center…</p>
         </div>
     </div>
 
-    <!-- Main Dashboard (hidden until auth check complete) -->
     <div id="mainApp" class="hidden">
-        <!-- Header -->
-        <header class="app-header">
-            <div class="header-left">
-                <h1>🏭 WarehouseWrangler</h1>
+        <header class="site-header">
+            <div class="branding">
+                <span class="material-icons-outlined brand-icon" aria-hidden="true">move_up</span>
+                <div class="brand-copy">
+                    <span class="brand-name">WarehouseWrangler</span>
+                    <span class="brand-tagline">Fulfillment Control Center</span>
+                </div>
             </div>
-            <div class="header-right">
-                <a href="users.html" class="btn-secondary" style="margin-right: 12px;">👥 Benutzer</a>
-                <a href="lc-upload.html" class="btn-secondary" style="margin-right: 12px;">🆕 LC-File laden</a>
-                <span id="userDisplay">Loading...</span>
-                <button id="logoutBtn" class="btn-logout">Logout</button>
+
+            <nav class="primary-nav" aria-label="Main navigation">
+                <ul class="nav-list">
+                    <li><a class="nav-link is-active" href="index.html" aria-current="page"><span class="material-icons-outlined" aria-hidden="true">dashboard</span><span>Dashboard</span></a></li>
+                    <li><a class="nav-link" href="amazon-snapshot-upload.html"><span class="material-icons-outlined" aria-hidden="true">cloud_upload</span><span>Amazon Snapshot</span></a></li>
+                    <li><a class="nav-link" href="cartons.html"><span class="material-icons-outlined" aria-hidden="true">inventory_2</span><span>Cartons</span></a></li>
+                    <li><a class="nav-link" href="lc-upload.html"><span class="material-icons-outlined" aria-hidden="true">upload_file</span><span>LC Upload</span></a></li>
+                    <li><a class="nav-link" href="products.html"><span class="material-icons-outlined" aria-hidden="true">view_list</span><span>Products</span></a></li>
+                    <li><a class="nav-link" href="shipments.html"><span class="material-icons-outlined" aria-hidden="true">local_shipping</span><span>Shipments</span></a></li>
+                    <li><a class="nav-link" href="users.html"><span class="material-icons-outlined" aria-hidden="true">group</span><span>Users</span></a></li>
+                    <li><a class="nav-link" href="login.html"><span class="material-icons-outlined" aria-hidden="true">lock</span><span>Login</span></a></li>
+                </ul>
+            </nav>
+
+            <div class="header-actions">
+                <span class="user-display" aria-live="polite">
+                    <span class="material-icons-outlined" aria-hidden="true">account_circle</span>
+                    <span id="userDisplay" class="user-display-name">Loading…</span>
+                </span>
+                <button id="logoutBtn" class="btn btn-logout" type="button">
+                    <span class="material-icons-outlined" aria-hidden="true">logout</span>
+                    <span>Logout</span>
+                </button>
             </div>
         </header>
 
-        <!-- Main Content -->
         <main class="app-main">
-            <h2>Welcome to WarehouseWrangler!</h2>
-            <p>Dashboard coming soon...</p>
-            <div style="margin-top: 20px; padding: 20px; background: white; border-radius: 8px;">
-                <h3>🎉 Login System Working!</h3>
-                <p>You've successfully logged in to WarehouseWrangler.</p>
-                <p><strong>Quick Actions:</strong></p>
-                <ul>
-                    <li><a href="users.html" style="color: #667eea; text-decoration: none; font-weight: 500;">👥 Manage Users</a> - Add, edit, and manage user accounts</li>
-                    <li><a href="products.html" style="color: #667eea; text-decoration: none; font-weight: 500;">📦 Manage Products</a> - Add, edit, and manage your products</li>
-                    <li>📋 Carton Management (Coming soon)</li>
-                    <li>📊 Amazon Integration (Coming soon)</li>
-                </ul>
-            </div>
+            <section class="hero">
+                <div class="hero-content">
+                    <h2>Welcome to WarehouseWrangler</h2>
+                    <p>Monitor incoming shipments, validate carton data, and keep Amazon reconciliations audit-ready with a single, trusted control center.</p>
+                    <div class="hero-actions">
+                        <a class="btn btn-primary" href="lc-upload.html">
+                            <span class="material-icons-outlined" aria-hidden="true">rocket_launch</span>
+                            <span>Launch LC Upload</span>
+                        </a>
+                        <a class="btn btn-secondary" href="users.html">
+                            <span class="material-icons-outlined" aria-hidden="true">person_add</span>
+                            <span>Manage Users</span>
+                        </a>
+                    </div>
+                </div>
+                <div class="hero-highlights" aria-label="Operational highlights">
+                    <article class="highlight-card">
+                        <span class="material-icons-outlined highlight-icon success" aria-hidden="true">task_alt</span>
+                        <div class="highlight-copy">
+                            <h3>Authentication Secure</h3>
+                            <p>Session tokens validated with real-time expiry checks.</p>
+                        </div>
+                    </article>
+                    <article class="highlight-card">
+                        <span class="material-icons-outlined highlight-icon warning" aria-hidden="true">inventory</span>
+                        <div class="highlight-copy">
+                            <h3>Carton Intake</h3>
+                            <p>Configure carton verification flows before the next shipment arrives.</p>
+                        </div>
+                    </article>
+                </div>
+            </section>
+
+            <section class="dashboard-grid" aria-label="Key actions and updates">
+                <article class="card">
+                    <header class="card-header">
+                        <span class="material-icons-outlined" aria-hidden="true">bolt</span>
+                        <h3>Quick Actions</h3>
+                    </header>
+                    <ul class="action-list">
+                        <li>
+                            <a class="action-link" href="products.html">
+                                <span class="material-icons-outlined" aria-hidden="true">category</span>
+                                <span>Organize product catalog for inbound shipments.</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a class="action-link" href="cartons.html">
+                                <span class="material-icons-outlined" aria-hidden="true">qr_code_scanner</span>
+                                <span>Validate carton IDs before labeling.</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a class="action-link" href="amazon-snapshot-upload.html">
+                                <span class="material-icons-outlined" aria-hidden="true">compare_arrows</span>
+                                <span>Upload the latest Amazon inventory snapshot.</span>
+                            </a>
+                        </li>
+                    </ul>
+                </article>
+
+                <article class="card">
+                    <header class="card-header">
+                        <span class="material-icons-outlined" aria-hidden="true">insights</span>
+                        <h3>System Health</h3>
+                    </header>
+                    <ul class="status-list">
+                        <li>
+                            <span class="status-indicator success" aria-hidden="true"></span>
+                            <span>Authentication service online</span>
+                        </li>
+                        <li>
+                            <span class="status-indicator warning" aria-hidden="true"></span>
+                            <span>Carton reconciliation awaiting data</span>
+                        </li>
+                        <li>
+                            <span class="status-indicator danger" aria-hidden="true"></span>
+                            <span>Amazon recall actions require confirmation flow</span>
+                        </li>
+                    </ul>
+                </article>
+
+                <article class="card">
+                    <header class="card-header">
+                        <span class="material-icons-outlined" aria-hidden="true">playlist_add_check</span>
+                        <h3>Next Steps</h3>
+                    </header>
+                    <ol class="next-steps">
+                        <li>Finalize carton management UI for sticky headers and zebra striping.</li>
+                        <li>Configure confirmation modals for recall workflows.</li>
+                        <li>Extend upload validation with real-time field feedback.</li>
+                    </ol>
+                </article>
+            </section>
         </main>
     </div>
 
-    <!-- Main App Script -->
     <script>
-        // Show the application after auth check passes
         document.addEventListener('DOMContentLoaded', function() {
             const loadingScreen = document.getElementById('loadingScreen');
             const mainApp = document.getElementById('mainApp');
             const userDisplay = document.getElementById('userDisplay');
-            
-            // Get user data from localStorage
+
             const userDataStr = localStorage.getItem('ww_user_data');
             if (userDataStr) {
                 try {
                     const userData = JSON.parse(userDataStr);
                     if (userData && userDisplay) {
-                        userDisplay.textContent = `👤 ${userData.username}`;
+                        userDisplay.textContent = `${userData.username}`;
                     }
                 } catch (e) {
                     console.error('Error parsing user data:', e);
                 }
             }
 
-            // Hide loading, show app
             if (loadingScreen) {
                 loadingScreen.style.display = 'none';
             }
@@ -115,15 +211,12 @@
                 mainApp.classList.remove('hidden');
             }
 
-            // Setup logout button
             const logoutBtn = document.getElementById('logoutBtn');
             if (logoutBtn) {
                 logoutBtn.addEventListener('click', function() {
                     if (confirm('Are you sure you want to logout?')) {
-                        // Clear auth data
                         localStorage.removeItem('ww_auth_token');
                         localStorage.removeItem('ww_user_data');
-                        // Redirect to login
                         window.location.href = 'login.html';
                     }
                 });
