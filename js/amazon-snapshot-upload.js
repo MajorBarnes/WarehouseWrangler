@@ -39,7 +39,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Setup header
     const userData = getCurrentUser();
     if (userData) {
-        document.getElementById('userDisplay').textContent = `👤 ${userData.username}`;
+        document.getElementById('userDisplay').textContent = userData.username;
     }
 
     // Setup logout
@@ -170,15 +170,24 @@ function showPreview(data) {
     document.getElementById('summaryRows').textContent = data.statistics.rowsProcessed || 0;
 
     // Show warnings if any
+    const warningsCard = document.getElementById('warningsCard');
+    const warningsList = document.getElementById('warningsList');
+
     if (data.warnings && data.warnings.length > 0) {
-        const warningsCard = document.getElementById('warningsCard');
-        const warningsList = document.getElementById('warningsList');
-        
-        warningsList.innerHTML = data.warnings.map(w => 
-            `<li><strong>Line ${w.line}:</strong> ${escapeHtml(w.message)}</li>`
-        ).join('');
-        
+        warningsList.innerHTML = data.warnings.map(w => `
+            <li>
+                <span class="material-icons-outlined" aria-hidden="true">warning</span>
+                <div>
+                    <p class="warning-title">Line ${w.line}</p>
+                    <p>${escapeHtml(w.message)}</p>
+                </div>
+            </li>
+        `).join('');
+
         warningsCard.classList.remove('hidden');
+    } else {
+        warningsList.innerHTML = '';
+        warningsCard.classList.add('hidden');
     }
 
     // Render preview table
@@ -190,16 +199,23 @@ function renderPreviewTable(products) {
     const limit = Math.min(PREVIEW_LIMIT, products.length);
 
     const rows = products.slice(0, limit).map((item) => {
-        const statusClass = item.available_boxes > 0 ? 'badge-single' : 'badge-mixed';
-        const statusText = item.available_boxes > 0 ? '✓ In Stock' : '⚠️ Out of Stock';
+        const isAvailable = Number(item.available_boxes) > 0;
+        const statusClass = isAvailable ? 'type-badge type-badge--single' : 'type-badge type-badge--mixed';
+        const statusIcon = isAvailable ? 'check_circle' : 'report';
+        const statusText = isAvailable ? 'In Stock' : 'Out of Stock';
 
         return `
             <tr>
                 <td><strong>${escapeHtml(item.fnsku)}</strong></td>
                 <td>${escapeHtml(item.sku || 'N/A')}</td>
                 <td>${escapeHtml(item.product_name || 'Unknown')}</td>
-                <td style="text-align: center; font-weight: bold;">${item.available_boxes}</td>
-                <td><span class="badge-type ${statusClass}">${statusText}</span></td>
+                <td class="numeric">${item.available_boxes}</td>
+                <td>
+                    <span class="${statusClass}">
+                        <span class="material-icons-outlined" aria-hidden="true">${statusIcon}</span>
+                        <span>${statusText}</span>
+                    </span>
+                </td>
             </tr>
         `;
     }).join('');
@@ -210,9 +226,7 @@ function renderPreviewTable(products) {
     if (products.length > limit) {
         tbody.innerHTML += `
             <tr>
-                <td colspan="5" style="text-align: center; color: #666; font-style: italic; padding: 20px;">
-                    Showing first ${limit} of ${products.length} products...
-                </td>
+                <td colspan="5" class="table-footnote">Showing first ${limit} of ${products.length} products…</td>
             </tr>
         `;
     }
@@ -231,7 +245,7 @@ async function handleConfirm() {
     const confirmMessage = `Are you sure you want to import this snapshot?\n\n` +
                           `Date: ${parsedData.snapshotDate}\n` +
                           `Products: ${parsedData.statistics.totalProducts}\n\n` +
-                          `This will REPLACE existing data for this date.`;
+                          `This will replace existing data for this date.`;
 
     if (!confirm(confirmMessage)) {
         return;
@@ -329,7 +343,7 @@ function resetToUpload() {
 }
 
 function showError(message) {
-    alert('❌ ' + message);
+    alert('Error: ' + message);
 }
 
 function escapeHtml(text) {
