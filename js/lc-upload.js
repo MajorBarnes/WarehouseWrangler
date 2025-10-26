@@ -20,96 +20,113 @@ let parsedData = null;
 let previewData = null;
 
 // ============================================================================
-// AUTH HELPERS (Same pattern as users.js)
+// AUTH HELPERS
 // ============================================================================
 
 function getToken() {
     return localStorage.getItem('ww_auth_token');
 }
 
-function getCurrentUser() {
-    const data = localStorage.getItem('ww_user_data');
-    return data ? JSON.parse(data) : null;
-}
-
 // ============================================================================
 // INITIALIZATION
 // ============================================================================
 
-document.addEventListener('DOMContentLoaded', function() {
-    // Setup header
-    const userData = getCurrentUser();
-    if (userData) {
-        document.getElementById('userDisplay').textContent = `👤 ${userData.username}`;
+document.addEventListener('DOMContentLoaded', () => {
+    initializeHeader();
+    bindUploadControls();
+});
+
+function initializeHeader() {
+    const userDisplay = document.getElementById('userDisplay');
+    const userDataStr = localStorage.getItem('ww_user_data');
+
+    if (userDisplay) {
+        userDisplay.textContent = 'Benutzer';
+        if (userDataStr) {
+            try {
+                const userData = JSON.parse(userDataStr);
+                if (userData?.username) {
+                    userDisplay.textContent = userData.username;
+                }
+            } catch (error) {
+                console.error('Error parsing user data:', error);
+            }
+        }
     }
 
-    // Setup logout
-    document.getElementById('logoutBtn').addEventListener('click', function() {
-        if (confirm('Are you sure you want to logout?')) {
-            localStorage.removeItem('ww_auth_token');
-            localStorage.removeItem('ww_user_data');
-            window.location.href = 'login.html';
-        }
+    const logoutBtn = document.getElementById('logoutBtn');
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', () => {
+            if (confirm('Are you sure you want to logout?')) {
+                localStorage.removeItem('ww_auth_token');
+                localStorage.removeItem('ww_user_data');
+                window.location.href = 'login.html';
+            }
+        });
+    }
+}
+
+function bindUploadControls() {
+    const selectFileBtn = document.getElementById('selectFileBtn');
+    const lcFileInput = document.getElementById('lcFileInput');
+    const clearFileBtn = document.getElementById('clearFileBtn');
+    const uploadBtn = document.getElementById('uploadBtn');
+    const cancelBtn = document.getElementById('cancelBtn');
+    const confirmBtn = document.getElementById('confirmBtn');
+    const showMixedOnly = document.getElementById('showMixedOnly');
+    const uploadAnotherBtn = document.getElementById('uploadAnotherBtn');
+    const viewInventoryBtn = document.getElementById('viewInventoryBtn');
+    const tryAgainBtn = document.getElementById('tryAgainBtn');
+
+    selectFileBtn?.addEventListener('click', () => lcFileInput?.click());
+    lcFileInput?.addEventListener('change', handleFileSelect);
+    clearFileBtn?.addEventListener('click', clearFile);
+    uploadBtn?.addEventListener('click', handleUpload);
+    cancelBtn?.addEventListener('click', resetToUpload);
+    confirmBtn?.addEventListener('click', handleConfirm);
+    showMixedOnly?.addEventListener('change', filterPreview);
+    uploadAnotherBtn?.addEventListener('click', resetToUpload);
+    viewInventoryBtn?.addEventListener('click', () => {
+        window.location.href = 'index.html';
     });
-
-    // Setup file input handlers
-    document.getElementById('selectFileBtn').addEventListener('click', () => {
-        document.getElementById('lcFileInput').click();
-    });
-
-    document.getElementById('lcFileInput').addEventListener('change', handleFileSelect);
-    document.getElementById('clearFileBtn').addEventListener('click', clearFile);
-    document.getElementById('uploadBtn').addEventListener('click', handleUpload);
-
-    // Preview section handlers
-    document.getElementById('cancelBtn').addEventListener('click', resetToUpload);
-    document.getElementById('confirmBtn').addEventListener('click', handleConfirm);
-    document.getElementById('showMixedOnly').addEventListener('change', filterPreview);
-
-    // Success section handlers
-    document.getElementById('uploadAnotherBtn').addEventListener('click', resetToUpload);
-    document.getElementById('viewInventoryBtn').addEventListener('click', () => {
-        window.location.href = 'index.html'; // TODO: Update to inventory page when built
-    });
-
-    // Error section handlers
-    document.getElementById('tryAgainBtn').addEventListener('click', resetToUpload);
-});
+    tryAgainBtn?.addEventListener('click', resetToUpload);
+}
 
 // ============================================================================
 // FILE HANDLING
 // ============================================================================
 
 function handleFileSelect(event) {
-    const file = event.target.files[0];
-    
+    const file = event.target.files?.[0];
     if (!file) return;
 
-    // Validate file type
     if (!file.name.toLowerCase().endsWith('.csv')) {
         showError('Please select a CSV file.');
         return;
     }
 
-    // Validate file size
     if (file.size > MAX_FILE_SIZE) {
         showError(`File is too large. Maximum size is ${MAX_FILE_SIZE / 1024 / 1024}MB.`);
         return;
     }
 
     selectedFile = file;
-    
-    // Show file info
-    document.getElementById('fileName').textContent = file.name;
-    document.getElementById('selectedFileInfo').classList.remove('hidden');
-    document.getElementById('uploadBtn').classList.remove('hidden');
+
+    const fileName = document.getElementById('fileName');
+    const selectedFileInfo = document.getElementById('selectedFileInfo');
+    const uploadBtn = document.getElementById('uploadBtn');
+
+    if (fileName) fileName.textContent = file.name;
+    selectedFileInfo?.classList.remove('hidden');
+    uploadBtn?.classList.remove('hidden');
 }
 
 function clearFile() {
     selectedFile = null;
-    document.getElementById('lcFileInput').value = '';
-    document.getElementById('selectedFileInfo').classList.add('hidden');
-    document.getElementById('uploadBtn').classList.add('hidden');
+    const lcFileInput = document.getElementById('lcFileInput');
+    if (lcFileInput) lcFileInput.value = '';
+    document.getElementById('selectedFileInfo')?.classList.add('hidden');
+    document.getElementById('uploadBtn')?.classList.add('hidden');
 }
 
 // ============================================================================
@@ -145,7 +162,6 @@ async function handleUpload() {
         } else {
             showErrorSection(data.error || 'Failed to parse file. Please check the format.');
         }
-
     } catch (error) {
         console.error('Upload error:', error);
         showErrorSection('Connection error. Please try again.');
@@ -159,55 +175,59 @@ async function handleUpload() {
 // ============================================================================
 
 function showPreview(data) {
-    // Hide upload section
     document.getElementById('uploadSection').classList.add('hidden');
-    
-    // Show preview section
+    document.getElementById('successSection').classList.add('hidden');
+    document.getElementById('errorSection').classList.add('hidden');
+
     document.getElementById('previewSection').classList.remove('hidden');
 
-    // Populate summary
     document.getElementById('summaryPrefix').textContent = data.cartonPrefix || 'N/A';
     document.getElementById('summaryCartons').textContent = data.statistics.totalCartons || 0;
     document.getElementById('summaryProducts').textContent = data.statistics.uniqueProducts || 0;
     document.getElementById('summaryRows').textContent = data.statistics.rowsProcessed || 0;
     document.getElementById('summaryWarnings').textContent = data.warnings.length || 0;
 
-    // Show warnings if any
-    if (data.warnings.length > 0) {
-        const warningsCard = document.getElementById('warningsCard');
-        const warningsList = document.getElementById('warningsList');
-        
-        warningsList.innerHTML = data.warnings.map(w => 
-            `<li><strong>Line ${w.line}:</strong> ${escapeHtml(w.message)}</li>`
-        ).join('');
-        
-        warningsCard.classList.remove('hidden');
+    const warningsCard = document.getElementById('warningsCard');
+    const warningsList = document.getElementById('warningsList');
+
+    if (warningsCard && warningsList) {
+        if (data.warnings.length > 0) {
+            warningsList.innerHTML = data.warnings.map((warning) => `
+                <li>
+                    <span class="material-icons-outlined" aria-hidden="true">report_problem</span>
+                    <div>
+                        <p class="warning-title">Zeile ${escapeHtml(warning.line)}</p>
+                        <p>${escapeHtml(warning.message)}</p>
+                    </div>
+                </li>
+            `).join('');
+            warningsCard.classList.remove('hidden');
+        } else {
+            warningsList.innerHTML = '';
+            warningsCard.classList.add('hidden');
+        }
     }
 
-    // Prepare preview data
     previewData = preparePreviewData(data.cartons);
-    
-    // Render preview table
     renderPreviewTable(previewData);
 }
 
 function preparePreviewData(cartons) {
-    // Group cartons by carton number (for mixed carton detection)
     const cartonMap = new Map();
-    
-    cartons.forEach(carton => {
+
+    cartons.forEach((carton) => {
         if (!cartonMap.has(carton.cartonNumber)) {
             cartonMap.set(carton.cartonNumber, []);
         }
         cartonMap.get(carton.cartonNumber).push(carton);
     });
 
-    // Convert to array with type indicator
     const preview = [];
     cartonMap.forEach((products, cartonNumber) => {
         products.forEach((product, index) => {
             preview.push({
                 ...product,
+                cartonNumber,
                 isMixed: products.length > 1,
                 isFirstInGroup: index === 0
             });
@@ -219,43 +239,53 @@ function preparePreviewData(cartons) {
 
 function renderPreviewTable(data) {
     const tbody = document.getElementById('previewTableBody');
+    if (!tbody) return;
+
     const limit = Math.min(PREVIEW_LIMIT, data.length);
     const showMixedOnly = document.getElementById('showMixedOnly').checked;
 
-    // Filter if needed
     let filtered = data;
     if (showMixedOnly) {
-        filtered = data.filter(item => item.isMixed);
+        filtered = data.filter((item) => item.isMixed);
     }
 
-    const rows = filtered.slice(0, limit).map((item, idx) => {
-        const typeClass = item.isMixed ? 'badge-mixed' : 'badge-single';
-        const typeText = item.isMixed ? '🔀 Mixed' : '📦 Single';
-        const rowClass = item.isMixed ? 'carton-mixed' : '';
+    if (filtered.length === 0) {
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="5" class="table-footnote">Keine Einträge für die aktuellen Filter.</td>
+            </tr>
+        `;
+        return;
+    }
+
+    const rowsMarkup = filtered.slice(0, limit).map((item) => {
+        const badgeClass = item.isMixed ? 'type-badge type-badge--mixed' : 'type-badge type-badge--single';
+        const badgeIcon = item.isMixed ? 'call_split' : 'inventory_2';
+        const badgeLabel = item.isMixed ? 'Mischkarton' : 'Single';
+        const rowClass = item.isMixed ? 'is-mixed' : '';
+        const boxesValue = item.boxes ?? '';
 
         return `
             <tr class="${rowClass}">
-                <td><strong>${escapeHtml(item.cartonNumber)}</strong></td>
-                <td>${escapeHtml(item.fnsku)}</td>
+                <td><span class="code-text">${escapeHtml(item.cartonNumber)}</span></td>
+                <td><span class="code-text">${escapeHtml(item.fnsku)}</span></td>
                 <td>${escapeHtml(item.productName || item.sku || 'Unknown')}</td>
-                <td>${item.boxes}</td>
-                <td><span class="badge-type ${typeClass}">${typeText}</span></td>
+                <td class="numeric">${escapeHtml(boxesValue)}</td>
+                <td>
+                    <span class="${badgeClass}">
+                        <span class="material-icons-outlined" aria-hidden="true">${badgeIcon}</span>
+                        <span>${badgeLabel}</span>
+                    </span>
+                </td>
             </tr>
         `;
     }).join('');
 
-    tbody.innerHTML = rows;
-
-    // Add "showing X of Y" info if truncated
-    if (filtered.length > limit) {
-        tbody.innerHTML += `
-            <tr>
-                <td colspan="5" style="text-align: center; color: #666; font-style: italic; padding: 20px;">
-                    Showing first ${limit} of ${filtered.length} entries...
-                </td>
-            </tr>
-        `;
-    }
+    const truncated = filtered.length > limit;
+    tbody.innerHTML = truncated ? `${rowsMarkup}
+        <tr>
+            <td colspan="5" class="table-footnote">Es werden nur die ersten ${limit} von ${filtered.length} Einträgen angezeigt.</td>
+        </tr>` : rowsMarkup;
 }
 
 function filterPreview() {
@@ -300,7 +330,6 @@ async function handleConfirm() {
         } else {
             showErrorSection(data.error || 'Import failed. Please try again.');
         }
-
     } catch (error) {
         console.error('Import error:', error);
         showErrorSection('Connection error. Please try again.');
@@ -314,23 +343,20 @@ async function handleConfirm() {
 // ============================================================================
 
 function showSuccess(data) {
-    // Hide preview
     document.getElementById('previewSection').classList.add('hidden');
-    
-    // Show success
+    document.getElementById('errorSection').classList.add('hidden');
+
     document.getElementById('successSection').classList.remove('hidden');
-    
-    // Populate stats
+
     document.getElementById('successCartons').textContent = data.cartonsCreated || 0;
     document.getElementById('successProducts').textContent = data.productsUpdated || 0;
 }
 
 function showErrorSection(message) {
-    // Hide all other sections
     document.getElementById('uploadSection').classList.add('hidden');
     document.getElementById('previewSection').classList.add('hidden');
-    
-    // Show error
+    document.getElementById('successSection').classList.add('hidden');
+
     document.getElementById('errorMessage').textContent = message;
     document.getElementById('errorSection').classList.remove('hidden');
 }
@@ -340,43 +366,55 @@ function showErrorSection(message) {
 // ============================================================================
 
 function setUploadLoading(isLoading) {
-    document.getElementById('uploadBtn').disabled = isLoading;
-    document.getElementById('uploadBtnText').classList.toggle('hidden', isLoading);
-    document.getElementById('uploadSpinner').classList.toggle('hidden', !isLoading);
+    const uploadBtn = document.getElementById('uploadBtn');
+    const uploadBtnText = document.getElementById('uploadBtnText');
+    const uploadSpinner = document.getElementById('uploadSpinner');
+
+    if (!uploadBtn || !uploadBtnText || !uploadSpinner) return;
+
+    uploadBtn.disabled = isLoading;
+    uploadBtnText.classList.toggle('hidden', isLoading);
+    uploadSpinner.classList.toggle('hidden', !isLoading);
 }
 
 function setConfirmLoading(isLoading) {
-    document.getElementById('confirmBtn').disabled = isLoading;
-    document.getElementById('confirmBtnText').classList.toggle('hidden', isLoading);
-    document.getElementById('confirmSpinner').classList.toggle('hidden', !isLoading);
-    document.getElementById('cancelBtn').disabled = isLoading;
+    const confirmBtn = document.getElementById('confirmBtn');
+    const confirmBtnText = document.getElementById('confirmBtnText');
+    const confirmSpinner = document.getElementById('confirmSpinner');
+    const cancelBtn = document.getElementById('cancelBtn');
+
+    if (confirmBtn) confirmBtn.disabled = isLoading;
+    confirmBtnText?.classList.toggle('hidden', isLoading);
+    confirmSpinner?.classList.toggle('hidden', !isLoading);
+    if (cancelBtn) cancelBtn.disabled = isLoading;
 }
 
 function resetToUpload() {
-    // Hide all sections
     document.getElementById('previewSection').classList.add('hidden');
     document.getElementById('successSection').classList.add('hidden');
     document.getElementById('errorSection').classList.add('hidden');
-    
-    // Show upload section
+
     document.getElementById('uploadSection').classList.remove('hidden');
-    
-    // Reset state
+
     selectedFile = null;
     parsedData = null;
     previewData = null;
-    
-    // Clear file input
+
     clearFile();
+
+    const warningsCard = document.getElementById('warningsCard');
+    const warningsList = document.getElementById('warningsList');
+    warningsCard?.classList.add('hidden');
+    if (warningsList) warningsList.innerHTML = '';
 }
 
 function showError(message) {
-    alert('❌ ' + message);
+    alert('Fehler: ' + message);
 }
 
 function escapeHtml(text) {
-    if (!text) return '';
+    if (text === null || text === undefined) return '';
     const div = document.createElement('div');
-    div.textContent = text;
+    div.textContent = String(text);
     return div.innerHTML;
 }

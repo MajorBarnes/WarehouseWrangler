@@ -4,10 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LC File Upload - WarehouseWrangler</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
     <link rel="stylesheet" href="./css/main.css">
     <link rel="stylesheet" href="./css/lc-upload.css">
+    <link rel="icon" type="image/png" href="/favicon.ico"/>
     <script>
-        // Inline auth check (same as users.html pattern)
+        // Inline auth check (consistent with other secure pages)
         (function() {
             const token = localStorage.getItem('ww_auth_token');
             if (!token) {
@@ -23,7 +28,6 @@
                     window.location.href = 'login.html';
                     return;
                 }
-                // LC upload available to all authenticated users (not admin-only)
             } catch (e) {
                 localStorage.removeItem('ww_auth_token');
                 window.location.href = 'login.html';
@@ -32,185 +36,227 @@
     </script>
 </head>
 <body>
-    <!-- Header -->
-    <header class="app-header">
-        <div class="header-left">
-            <h1>🏭 WarehouseWrangler</h1>
+    <header class="site-header">
+        <div class="branding">
+            <span class="material-icons-outlined brand-icon" aria-hidden="true">move_up</span>
+            <div class="brand-copy">
+                <span class="brand-name">WarehouseWrangler</span>
+                <span class="brand-tagline">Fulfillment Control Center</span>
+            </div>
         </div>
-        <div class="header-right">
-            <a href="index.html" class="btn-secondary" style="margin-right: 12px;">← Dashboard</a>
-            <span id="userDisplay">Loading...</span>
-            <button id="logoutBtn" class="btn-logout">Logout</button>
+
+        <nav class="primary-nav" aria-label="Main navigation">
+            <ul class="nav-list">
+                <li><a class="nav-link" href="index.html"><span class="material-icons-outlined" aria-hidden="true">dashboard</span><span>Dashboard</span></a></li>
+                <li><a class="nav-link" href="amazon-snapshot-upload.html"><span class="material-icons-outlined" aria-hidden="true">cloud_upload</span><span>Amazon Snapshot</span></a></li>
+                <li><a class="nav-link" href="cartons.html"><span class="material-icons-outlined" aria-hidden="true">inventory_2</span><span>Cartons</span></a></li>
+                <li><a class="nav-link is-active" href="lc-upload.html" aria-current="page"><span class="material-icons-outlined" aria-hidden="true">upload_file</span><span>LC Upload</span></a></li>
+                <li><a class="nav-link" href="products.html"><span class="material-icons-outlined" aria-hidden="true">view_list</span><span>Products</span></a></li>
+                <li><a class="nav-link" href="shipments.html"><span class="material-icons-outlined" aria-hidden="true">local_shipping</span><span>Shipments</span></a></li>
+                <li><a class="nav-link" href="users.html"><span class="material-icons-outlined" aria-hidden="true">group</span><span>Users</span></a></li>
+                <li><a class="nav-link" href="login.html"><span class="material-icons-outlined" aria-hidden="true">lock</span><span>Login</span></a></li>
+            </ul>
+        </nav>
+
+        <div class="header-actions">
+            <span class="user-display" aria-live="polite">
+                <span class="material-icons-outlined" aria-hidden="true">account_circle</span>
+                <span id="userDisplay" class="user-display-name">Loading…</span>
+            </span>
+            <button id="logoutBtn" class="btn btn-logout" type="button">
+                <span class="material-icons-outlined" aria-hidden="true">logout</span>
+                <span>Logout</span>
+            </button>
         </div>
     </header>
 
-    <!-- Main Content -->
-    <main class="app-main">
-        <div class="page-header">
-            <h2>📦 LC File Upload</h2>
-            <p class="subtitle">Upload packing list (Lieferschein) to add cartons to inventory</p>
-        </div>
-
-        <!-- Upload Section -->
-        <div id="uploadSection" class="upload-section">
-            <div class="upload-card">
-                <div class="upload-icon">📄</div>
-                <h3>Select LC File</h3>
-                <p>Upload your packing list CSV file from the manufacturer</p>
-                
-                <div class="file-input-wrapper">
-                    <input type="file" id="lcFileInput" accept=".csv" class="hidden">
-                    <button id="selectFileBtn" class="btn-primary btn-large">
-                        Choose File
-                    </button>
+    <main class="app-main lc-upload-page">
+        <section class="page-header">
+            <div class="page-title">
+                <span class="material-icons-outlined" aria-hidden="true">upload_file</span>
+                <div class="page-title-copy">
+                    <h1>LC Upload</h1>
+                    <p>Importiere Lieferscheine, prüfe Warnungen und erstelle Cartons mit einem strukturierten Kontrollablauf.</p>
                 </div>
+            </div>
+        </section>
 
-                <div id="selectedFileInfo" class="selected-file hidden">
-                    <span class="file-icon">📋</span>
-                    <span id="fileName" class="file-name"></span>
-                    <button id="clearFileBtn" class="btn-clear">&times;</button>
+        <section id="uploadSection" class="surface-card upload-card" aria-labelledby="uploadCardTitle">
+            <header class="upload-card-header">
+                <span class="material-icons-outlined upload-card-icon" aria-hidden="true">cloud_upload</span>
+                <div class="upload-card-copy">
+                    <h2 id="uploadCardTitle">LC Datei auswählen</h2>
+                    <p>Lade die CSV des Herstellers hoch, um neue Cartons vorzubereiten und vor dem Import zu prüfen.</p>
                 </div>
+            </header>
 
-                <div class="upload-hints">
-                    <h4>📝 File Requirements:</h4>
-                    <ul>
-                        <li>File format: CSV (semicolon-separated)</li>
-                        <li>Must contain carton prefix (e.g., 24SVS88)</li>
-                        <li>Required columns: FNSKU, CTN NO, BOX/CARTON</li>
-                        <li>Maximum file size: 5MB</li>
-                    </ul>
-                </div>
-
-                <button id="uploadBtn" class="btn-success btn-large hidden">
-                    <span id="uploadBtnText">Parse & Preview</span>
-                    <span id="uploadSpinner" class="spinner hidden"></span>
+            <div class="file-input-wrapper">
+                <input type="file" id="lcFileInput" accept=".csv" class="visually-hidden" aria-hidden="true">
+                <button id="selectFileBtn" class="btn btn-primary btn-lg" type="button">
+                    <span class="material-icons-outlined" aria-hidden="true">description</span>
+                    <span>Datei auswählen</span>
                 </button>
             </div>
-        </div>
 
-        <!-- Preview Section (Hidden initially) -->
-        <div id="previewSection" class="preview-section hidden">
-            <!-- Summary Card -->
-            <div class="summary-card">
-                <h3>📊 Upload Summary</h3>
-                <div class="summary-grid">
-                    <div class="summary-item">
-                        <span class="summary-label">Shipment:</span>
-                        <span id="summaryPrefix" class="summary-value"></span>
-                    </div>
-                    <div class="summary-item">
-                        <span class="summary-label">Total Cartons:</span>
-                        <span id="summaryCartons" class="summary-value"></span>
-                    </div>
-                    <div class="summary-item">
-                        <span class="summary-label">Unique Products:</span>
-                        <span id="summaryProducts" class="summary-value"></span>
-                    </div>
-                    <div class="summary-item">
-                        <span class="summary-label">Rows Processed:</span>
-                        <span id="summaryRows" class="summary-value"></span>
-                    </div>
-                    <div class="summary-item">
-                        <span class="summary-label">Warnings:</span>
-                        <span id="summaryWarnings" class="summary-value"></span>
-                    </div>
+            <div id="selectedFileInfo" class="selected-file hidden" aria-live="polite">
+                <span class="material-icons-outlined" aria-hidden="true">article</span>
+                <span id="fileName" class="file-name"></span>
+                <button id="clearFileBtn" class="icon-button" type="button" aria-label="Ausgewählte Datei entfernen">
+                    <span class="material-icons-outlined" aria-hidden="true">close</span>
+                </button>
+            </div>
+
+            <div class="upload-hints" aria-labelledby="uploadHintsTitle">
+                <div class="upload-hints-header">
+                    <span class="material-icons-outlined" aria-hidden="true">info</span>
+                    <h3 id="uploadHintsTitle">Datei-Anforderungen</h3>
                 </div>
+                <ul class="upload-hints-list">
+                    <li><span class="material-icons-outlined" aria-hidden="true">check_circle</span><span>Format: CSV mit Semikolon als Trenner</span></li>
+                    <li><span class="material-icons-outlined" aria-hidden="true">check_circle</span><span>Carton-Präfix vorhanden (z.&nbsp;B. 24SVS88)</span></li>
+                    <li><span class="material-icons-outlined" aria-hidden="true">check_circle</span><span>Pflichtspalten: FNSKU, CTN NO, BOX/CARTON</span></li>
+                    <li><span class="material-icons-outlined" aria-hidden="true">check_circle</span><span>Maximale Dateigröße: 5&nbsp;MB</span></li>
+                </ul>
+            </div>
 
+            <button id="uploadBtn" class="btn btn-primary btn-lg hidden" type="button">
+                <span id="uploadBtnText">Parse &amp; Preview</span>
+                <span id="uploadSpinner" class="spinner hidden" aria-hidden="true"></span>
+            </button>
+        </section>
+
+        <section id="previewSection" class="preview-section hidden" aria-live="polite">
+            <article class="surface-card summary-card" aria-labelledby="summaryTitle">
+                <header class="summary-header">
+                    <span class="material-icons-outlined" aria-hidden="true">analytics</span>
+                    <div>
+                        <h2 id="summaryTitle">Upload Übersicht</h2>
+                        <p>Validiere Kennzahlen, bevor die Cartons importiert werden.</p>
+                    </div>
+                </header>
+                <dl class="summary-grid">
+                    <div class="summary-item">
+                        <dt>Shipment</dt>
+                        <dd id="summaryPrefix">–</dd>
+                    </div>
+                    <div class="summary-item">
+                        <dt>Cartons gesamt</dt>
+                        <dd id="summaryCartons">0</dd>
+                    </div>
+                    <div class="summary-item">
+                        <dt>Produkte</dt>
+                        <dd id="summaryProducts">0</dd>
+                    </div>
+                    <div class="summary-item">
+                        <dt>Verarbeitete Zeilen</dt>
+                        <dd id="summaryRows">0</dd>
+                    </div>
+                    <div class="summary-item">
+                        <dt>Warnungen</dt>
+                        <dd id="summaryWarnings">0</dd>
+                    </div>
+                </dl>
                 <div class="location-info">
-                    <strong>📍 Location:</strong> All cartons will be added to <span class="badge-location">Incoming</span>
+                    <span class="material-icons-outlined" aria-hidden="true">warehouse</span>
+                    <p>Alle Cartons werden in den Bereich <span class="badge badge-location">Incoming</span> importiert.</p>
                 </div>
-            </div>
+            </article>
 
-            <!-- Warnings (if any) -->
-            <div id="warningsCard" class="warnings-card hidden">
-                <h3>⚠️ Warnings</h3>
-                <ul id="warningsList" class="warnings-list"></ul>
-            </div>
-
-            <!-- Preview Table -->
-            <div class="preview-card">
-                <div class="preview-header">
-                    <h3>📋 Preview First 20 Cartons</h3>
-                    <div class="preview-filters">
-                        <label>
-                            <input type="checkbox" id="showMixedOnly" class="checkbox">
-                            <span>Show mixed cartons only</span>
-                        </label>
+            <article id="warningsCard" class="surface-card warnings-card hidden" aria-live="polite" aria-labelledby="warningsTitle">
+                <header class="warnings-header">
+                    <span class="material-icons-outlined" aria-hidden="true">warning</span>
+                    <div>
+                        <h2 id="warningsTitle">Warnungen</h2>
+                        <p>Überprüfe Auffälligkeiten, bevor der Import bestätigt wird.</p>
                     </div>
-                </div>
+                </header>
+                <ul id="warningsList" class="warnings-list"></ul>
+            </article>
 
-                <div class="table-container">
-                    <table class="preview-table">
+            <article class="surface-card preview-card" aria-labelledby="previewTitle">
+                <div class="preview-header">
+                    <div class="preview-header-title">
+                        <span class="material-icons-outlined" aria-hidden="true">table_view</span>
+                        <div>
+                            <h2 id="previewTitle">Vorschau der ersten 20 Cartons</h2>
+                            <p>Nutze die Filter, um Mischkartons schnell zu erkennen.</p>
+                        </div>
+                    </div>
+                    <label class="preview-filter" for="showMixedOnly">
+                        <input type="checkbox" id="showMixedOnly" class="checkbox">
+                        <span>Nur Mischkartons anzeigen</span>
+                    </label>
+                </div>
+                <div class="table-scroll" role="region" aria-label="Carton Vorschau">
+                    <table class="preview-table table-sticky">
                         <thead>
                             <tr>
-                                <th>Carton Number</th>
-                                <th>FNSKU</th>
-                                <th>Product</th>
-                                <th>Boxes</th>
-                                <th>Type</th>
+                                <th scope="col">Carton</th>
+                                <th scope="col">FNSKU</th>
+                                <th scope="col">Produkt</th>
+                                <th scope="col" class="numeric">Boxes</th>
+                                <th scope="col">Typ</th>
                             </tr>
                         </thead>
-                        <tbody id="previewTableBody">
-                            <!-- Populated by JavaScript -->
-                        </tbody>
+                        <tbody id="previewTableBody"></tbody>
                     </table>
                 </div>
-            </div>
+            </article>
 
-            <!-- Action Buttons -->
             <div class="action-buttons">
-                <button id="cancelBtn" class="btn-secondary btn-large">
-                    ❌ Cancel
+                <button id="cancelBtn" class="btn btn-secondary btn-lg" type="button">
+                    <span class="material-icons-outlined" aria-hidden="true">close</span>
+                    <span>Abbrechen</span>
                 </button>
-                <button id="confirmBtn" class="btn-success btn-large">
-                    <span id="confirmBtnText">✅ Confirm & Import</span>
-                    <span id="confirmSpinner" class="spinner hidden"></span>
+                <button id="confirmBtn" class="btn btn-primary btn-lg" type="button">
+                    <span id="confirmBtnText">Import bestätigen</span>
+                    <span id="confirmSpinner" class="spinner hidden" aria-hidden="true"></span>
                 </button>
             </div>
-        </div>
+        </section>
 
-        <!-- Success Section (Hidden initially) -->
-        <div id="successSection" class="success-section hidden">
-            <div class="success-card">
-                <div class="success-icon">✅</div>
-                <h2>Import Successful!</h2>
+        <section id="successSection" class="success-section hidden" aria-live="polite">
+            <article class="surface-card success-card" aria-labelledby="successTitle">
+                <span class="material-icons-outlined success-icon" aria-hidden="true">task_alt</span>
+                <h2 id="successTitle">Import erfolgreich</h2>
                 <div class="success-stats">
                     <div class="stat-item">
                         <span class="stat-value" id="successCartons">0</span>
-                        <span class="stat-label">Cartons Created</span>
+                        <span class="stat-label">Cartons erstellt</span>
                     </div>
                     <div class="stat-item">
                         <span class="stat-value" id="successProducts">0</span>
-                        <span class="stat-label">Products Updated</span>
+                        <span class="stat-label">Produkte aktualisiert</span>
                     </div>
                 </div>
                 <div class="success-actions">
-                    <button id="uploadAnotherBtn" class="btn-primary">
-                        Upload Another File
+                    <button id="uploadAnotherBtn" class="btn btn-primary" type="button">
+                        <span class="material-icons-outlined" aria-hidden="true">upload_file</span>
+                        <span>Weitere Datei hochladen</span>
                     </button>
-                    <button id="viewInventoryBtn" class="btn-secondary">
-                        View Inventory
+                    <button id="viewInventoryBtn" class="btn btn-secondary" type="button">
+                        <span class="material-icons-outlined" aria-hidden="true">inventory_2</span>
+                        <span>Zum Dashboard</span>
                     </button>
                 </div>
-            </div>
-        </div>
+            </article>
+        </section>
 
-        <!-- Error Section (Hidden initially) -->
-        <div id="errorSection" class="error-section hidden">
-            <div class="error-card">
-                <div class="error-icon">❌</div>
-                <h2>Upload Failed</h2>
+        <section id="errorSection" class="error-section hidden" aria-live="assertive">
+            <article class="surface-card error-card" aria-labelledby="errorTitle">
+                <span class="material-icons-outlined error-icon" aria-hidden="true">error</span>
+                <h2 id="errorTitle">Upload fehlgeschlagen</h2>
                 <p id="errorMessage" class="error-message"></p>
                 <div class="error-actions">
-                    <button id="tryAgainBtn" class="btn-primary">
-                        Try Again
+                    <button id="tryAgainBtn" class="btn btn-primary" type="button">
+                        <span class="material-icons-outlined" aria-hidden="true">refresh</span>
+                        <span>Erneut versuchen</span>
                     </button>
                 </div>
-            </div>
-        </div>
+            </article>
+        </section>
     </main>
 
-    <!-- Scripts -->
     <script src="./js/lc-upload.js"></script>
 </body>
 </html>
