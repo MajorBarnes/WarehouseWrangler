@@ -235,6 +235,26 @@ async function removeBoxesFromShipment(shipmentId, shipmentContentId) {
     }
 }
 
+// Confirm delete function:
+async function confirmDeleteShipment(shipmentId, shipmentReference) {
+    if (!confirm(`Delete prepared shipment "${shipmentReference}"?\n\nThis will remove the shipment and free up all reserved boxes.`)) {
+        return;
+    }
+
+    try {
+        const result = await deleteShipment(shipmentId);
+        
+        if (result.success) {
+            showSuccess(result.message);
+            loadShipments();
+        } else {
+            showError(result.error || 'Failed to delete shipment');
+        }
+    } catch (error) {
+        showError('Connection error. Please try again.');
+    }
+}
+
 async function deleteShipment(shipmentId) {
     try {
         const response = await fetch(`${API_BASE}/shipments/delete_shipment.php`, {
@@ -297,6 +317,9 @@ function renderShipmentsTable(shipments) {
                         ${shipment.status === 'prepared' ? `
                             <button class="btn-success btn-small" onclick="continueShipment(${shipment.shipment_id}, '${escapeHtml(shipment.shipment_reference)}')" title="Add boxes and send">
                                 ➕ Continue
+                            </button>
+                            <button class="btn-danger btn-small" onclick="confirmDeleteShipment(${shipment.shipment_id}, '${escapeHtml(shipment.shipment_reference)}')" title="Delete this prepared shipment">
+                                🗑️ Delete
                             </button>
                         ` : ''}
                         ${shipment.status === 'sent' ? `
@@ -390,7 +413,9 @@ function renderAvailableCartons() {
                 </span>
             </div>
             <div class="carton-info">
-                ${carton.product_count} product(s) • ${carton.total_boxes_current} boxes available
+                ${carton.product_count} product(s) • 
+                ${carton.total_boxes_available_for_shipment} boxes available
+                ${carton.total_boxes_reserved > 0 ? `<br><small style="color: orange;">⚠️ ${carton.total_boxes_reserved} reserved in other shipments</small>` : ''}
             </div>
             <button class="btn-primary btn-small" onclick="selectBoxesFromCarton(${carton.carton_id})">
                 Select Boxes →
@@ -400,19 +425,12 @@ function renderAvailableCartons() {
 }
 
 async function selectBoxesFromCarton(cartonId) {
-    try {
-        const details = await loadCartonDetails(cartonId);
-        
-        if (!details.success) {
-            showError('Failed to load carton details');
-            return;
-        }
-
-        showBoxSelectionDialog(details.carton, details.contents);
-        
-    } catch (error) {
-        showError('Failed to load carton details');
+    const carton = availableCartons.find(c => c.carton_id === cartonId);
+    if (!carton) {
+        showError('Carton not found');
+        return;
     }
+    showBoxSelectionDialog(carton, carton.products);
 }
 
 function showBoxSelectionDialog(carton, contents) {
@@ -425,22 +443,24 @@ function showBoxSelectionDialog(carton, contents) {
                         <strong>${escapeHtml(item.product_name)}</strong>
                         <div class="product-meta">
                             FNSKU: ${escapeHtml(item.fnsku)} • 
-                            Available: ${item.boxes_current} boxes (${item.pairs_current} pairs)
+                            Current: ${item.boxes_current} boxes 
+                            ${item.boxes_reserved > 0 ? `<br><span style="color: orange;">⚠️ ${item.boxes_reserved} reserved in other shipments</span>` : ''}
+                            <br><strong style="color: green;">Available for this shipment: ${item.boxes_available_for_shipment} boxes</strong>
                         </div>
                     </div>
                     <div class="quantity-input">
                         <label>Boxes to send:</label>
                         <input type="number" 
-                               id="boxes_${carton.carton_id}_${item.product_id}" 
-                               min="0" 
-                               max="${item.boxes_current}" 
-                               value="0"
-                               data-carton-id="${carton.carton_id}"
-                               data-product-id="${item.product_id}"
-                               data-carton-number="${carton.carton_number}"
-                               data-product-name="${item.product_name}"
-                               data-pairs-per-box="${item.pairs_per_box}"
-                               data-max="${item.boxes_current}">
+                            id="boxes_${carton.carton_id}_${item.product_id}" 
+                            min="0" 
+                            max="${item.boxes_available_for_shipment}" 
+                            value="0"
+                            data-carton-id="${carton.carton_id}"
+                            data-product-id="${item.product_id}"
+                            data-carton-number="${carton.carton_number}"
+                            data-product-name="${item.product_name}"
+                            data-pairs-per-box="${item.pairs_per_box}"
+                            data-max="${item.boxes_available_for_shipment}">
                     </div>
                 </div>
             `).join('')}
@@ -463,7 +483,7 @@ function closeBoxSelectionDialog() {
     if (overlay) overlay.remove();
 }
 
-function confirmBoxSelection() {
+async function confirmBoxSelection() {
     const inputs = document.querySelectorAll('[id^="boxes_"]');
     const newBoxes = [];
 
@@ -486,25 +506,52 @@ function confirmBoxSelection() {
         return;
     }
 
-    // Add to selected boxes
-    newBoxes.forEach(newBox => {
-        // Check if this carton/product combo already exists
-        const existingIndex = selectedBoxes.findIndex(b => 
-            b.carton_id === newBox.carton_id && b.product_id === newBox.product_id
-        );
-
-        if (existingIndex >= 0) {
-            // Update quantity
-            selectedBoxes[existingIndex].boxes_to_send += newBox.boxes_to_send;
+    // IMMEDIATELY save to database
+    try {
+        const result = await addBoxesToShipment(activeShipment.shipment_id, newBoxes);
+        
+        if (result.success) {
+            closeBoxSelectionDialog();
+            showSuccess(`Added ${newBoxes.length} box selection(s) to shipment`);
+            
+            // Reload shipment details to get the saved content
+            await reloadShipmentContents();
+            
+            // Reload available cartons to update reserved quantities
+            await loadAvailableCartons();
         } else {
-            selectedBoxes.push(newBox);
+            showError(result.error || 'Failed to add boxes to shipment');
+            if (result.warnings && result.warnings.length > 0) {
+                alert('Warnings:\n' + result.warnings.join('\n'));
+            }
         }
-    });
+    } catch (error) {
+        showError('Connection error. Please try again.');
+    }
+}
 
-    closeBoxSelectionDialog();
-    updateSelectedBoxesSummary();
-    renderSelectedBoxesList();
-    showSuccess(`Added ${newBoxes.length} box selection(s) to shipment`);
+async function reloadShipmentContents() {
+    try {
+        const details = await loadShipmentDetails(activeShipment.shipment_id);
+        
+        if (details.success) {
+            // Update selectedBoxes with database content including shipment_content_id
+            selectedBoxes = details.contents.map(c => ({
+                shipment_content_id: c.shipment_content_id,  // IMPORTANT!
+                carton_id: c.carton_id,
+                product_id: c.product_id,
+                boxes_to_send: c.boxes_sent,
+                carton_number: c.carton_number,
+                product_name: c.product_name,
+                pairs_per_box: c.pairs_sent / c.boxes_sent
+            }));
+            
+            updateSelectedBoxesSummary();
+            renderSelectedBoxesList();
+        }
+    } catch (error) {
+        console.error('Failed to reload shipment contents:', error);
+    }
 }
 
 function updateSelectedBoxesSummary() {
@@ -544,7 +591,7 @@ function renderSelectedBoxesList() {
             <td class="text-center"><strong>${box.boxes_to_send}</strong></td>
             <td class="text-center">${box.boxes_to_send * box.pairs_per_box}</td>
             <td>
-                <button class="btn-danger btn-small" onclick="removeSelectedBox(${index})">
+                <button class="btn-danger btn-small" onclick="removeBoxFromShipment(${box.shipment_content_id})">
                     ✕ Remove
                 </button>
             </td>
@@ -552,10 +599,28 @@ function renderSelectedBoxesList() {
     `).join('');
 }
 
-function removeSelectedBox(index) {
-    selectedBoxes.splice(index, 1);
-    updateSelectedBoxesSummary();
-    renderSelectedBoxesList();
+async function removeBoxFromShipment(shipmentContentId) {
+    if (!confirm('Remove these boxes from shipment?')) {
+        return;
+    }
+
+    try {
+        const result = await removeBoxesFromShipment(activeShipment.shipment_id, shipmentContentId);
+        
+        if (result.success) {
+            showSuccess('Boxes removed from shipment');
+            
+            // Reload shipment contents
+            await reloadShipmentContents();
+            
+            // Reload available cartons to update reserved quantities
+            await loadAvailableCartons();
+        } else {
+            showError(result.error || 'Failed to remove boxes');
+        }
+    } catch (error) {
+        showError('Connection error. Please try again.');
+    }
 }
 
 // ============================================================================
@@ -568,22 +633,9 @@ async function proceedToSend() {
         return;
     }
 
-    // First, add the boxes to the shipment
-    try {
-        const result = await addBoxesToShipment(activeShipment.shipment_id, selectedBoxes);
-
-        if (result.success) {
-            // Close add boxes modal
-            document.getElementById('addBoxesModal').classList.add('hidden');
-            
-            // Show send confirmation modal
-            showSendConfirmation();
-        } else {
-            showError(result.error || 'Failed to add boxes to shipment');
-        }
-    } catch (error) {
-        showError('Connection error. Please try again.');
-    }
+    // Boxes are already in database, just show confirmation
+    document.getElementById('addBoxesModal').classList.add('hidden');
+    showSendConfirmation();
 }
 
 function showSendConfirmation() {
@@ -703,6 +755,7 @@ async function continueShipment(shipmentId, shipmentReference) {
         
         // Load existing boxes
         selectedBoxes = details.contents.map(c => ({
+            shipment_content_id: c.shipment_content_id,
             carton_id: c.carton_id,
             product_id: c.product_id,
             boxes_to_send: c.boxes_sent,

@@ -16,6 +16,7 @@ githelp.txt
 *.log*
 *implementation*
 *.ico
+FRONTEND_UPDATES_NEEDED*
 
 # Compiled source #
 ###################
