@@ -142,8 +142,29 @@ try {
                 continue;
             }
             
-            if ($content['boxes_current'] < $boxesToSend) {
-                $errors[] = "Box entry $index: Only {$content['boxes_current']} boxes available, cannot send {$boxesToSend}";
+            // Check boxes reserved in OTHER prepared shipments
+            $reservedSql = "
+                SELECT COALESCE(SUM(sc.boxes_sent), 0) as boxes_reserved
+                FROM shipment_contents sc
+                JOIN amazon_shipments s ON sc.shipment_id = s.shipment_id
+                WHERE sc.carton_id = ? 
+                  AND sc.product_id = ? 
+                  AND s.status = 'prepared'
+                  AND s.shipment_id != ?
+            ";
+            $stmt = $db->prepare($reservedSql);
+            $stmt->execute([$cartonId, $productId, $shipmentId]);
+            $reserved = $stmt->fetch();
+            $boxesReserved = (int)$reserved['boxes_reserved'];
+            
+            $boxesAvailable = $content['boxes_current'] - $boxesReserved;
+            
+            if ($boxesAvailable < $boxesToSend) {
+                if ($boxesReserved > 0) {
+                    $errors[] = "Box entry $index: Only {$boxesAvailable} boxes available (total: {$content['boxes_current']}, reserved in other shipments: {$boxesReserved}), cannot send {$boxesToSend}";
+                } else {
+                    $errors[] = "Box entry $index: Only {$content['boxes_current']} boxes available, cannot send {$boxesToSend}";
+                }
                 continue;
             }
             
