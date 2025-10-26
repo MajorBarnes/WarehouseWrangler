@@ -261,7 +261,8 @@ async function loadCartons() {
             renderCartonsTable(data.cartons);
 
             if (currentFilters.location || currentFilters.status || currentFilters.search) {
-                updateSummaryCards(data.summary);
+                // updateSummaryCards(data.summary);
+                loadLocationsSummary();
             }
         } else {
             showError(`Failed to load cartons: ${data.error}`);
@@ -325,31 +326,55 @@ async function moveCarton(cartonId, newLocation, notes) {
 // ---------------------------------------
 
 function updateSummaryCards(summary, totals = null) {
-    if (totals) {
-        const totalCartonsEl = document.getElementById('totalCartons');
-        const totalBoxesEl = document.getElementById('totalBoxes');
-        const totalPairsEl = document.getElementById('totalPairs');
-
-        if (totalCartonsEl) totalCartonsEl.textContent = totals.total_cartons ?? 0;
-        if (totalBoxesEl) totalBoxesEl.textContent = totals.total_boxes_current ?? 0;
-        if (totalPairsEl) totalPairsEl.textContent = totals.total_pairs_current ?? 0;
+  // small helper to read the first available key
+  const pick = (obj, keys, def = 0) => {
+    if (!obj) return def;
+    for (const k of keys) {
+      if (obj[k] !== undefined && obj[k] !== null) return obj[k];
     }
+    return def;
+  };
 
-    if (!summary) return;
+  // ---- TOTALS (top-left card) ----
+  if (totals) {
+    const totalCartonsEl = document.getElementById('totalCartons');
+    const totalBoxesEl   = document.getElementById('totalBoxes');
+    const totalPairsEl   = document.getElementById('totalPairs');
 
-    const incomingCartonsEl = document.getElementById('incomingCartons');
-    const incomingBoxesEl = document.getElementById('incomingBoxes');
-    const wmlCartonsEl = document.getElementById('wmlCartons');
-    const wmlBoxesEl = document.getElementById('wmlBoxes');
-    const gmrCartonsEl = document.getElementById('gmrCartons');
-    const gmrBoxesEl = document.getElementById('gmrBoxes');
+    const tc = Number(pick(totals, ['total_cartons','cartons_total','carton_count','count_cartons'], 0));
+    const tb = Number(pick(totals, ['total_boxes_current','total_boxes','boxes_total','count_boxes'], 0));
+    const tp = Number(pick(totals, ['total_pairs_current','total_pairs','pairs_total'], 0));
 
-    if (incomingCartonsEl) incomingCartonsEl.textContent = summary.Incoming?.in_stock_cartons ?? 0;
-    if (incomingBoxesEl) incomingBoxesEl.textContent = summary.Incoming?.total_boxes_current ?? 0;
-    if (wmlCartonsEl) wmlCartonsEl.textContent = summary.WML?.in_stock_cartons ?? 0;
-    if (wmlBoxesEl) wmlBoxesEl.textContent = summary.WML?.total_boxes_current ?? 0;
-    if (gmrCartonsEl) gmrCartonsEl.textContent = summary.GMR?.in_stock_cartons ?? 0;
-    if (gmrBoxesEl) gmrBoxesEl.textContent = summary.GMR?.total_boxes_current ?? 0;
+    if (totalCartonsEl) totalCartonsEl.textContent = tc;
+    if (totalBoxesEl)   totalBoxesEl.textContent   = tb;
+    if (totalPairsEl)   totalPairsEl.textContent   = tp;
+  }
+
+  // ---- PER-LOCATION (Incoming / WML / GMR) ----
+  if (!summary) return;
+
+  const loc = (key) => summary[key] || summary[key?.toUpperCase?.()] || summary[key?.toLowerCase?.()] || {};
+
+  const incoming = loc('Incoming');
+  const wml      = loc('WML');
+  const gmr      = loc('GMR');
+
+  const cartonsKeys = ['in_stock_cartons','cartons','carton_count','total_cartons'];
+  const boxesKeys   = ['total_boxes_current','boxes','box_count','total_boxes'];
+
+  const incomingCartonsEl = document.getElementById('incomingCartons');
+  const incomingBoxesEl   = document.getElementById('incomingBoxes');
+  const wmlCartonsEl      = document.getElementById('wmlCartons');
+  const wmlBoxesEl        = document.getElementById('wmlBoxes');
+  const gmrCartonsEl      = document.getElementById('gmrCartons');
+  const gmrBoxesEl        = document.getElementById('gmrBoxes');
+
+  if (incomingCartonsEl) incomingCartonsEl.textContent = Number(pick(incoming, cartonsKeys, 0));
+  if (incomingBoxesEl)   incomingBoxesEl.textContent   = Number(pick(incoming, boxesKeys, 0));
+  if (wmlCartonsEl)      wmlCartonsEl.textContent      = Number(pick(wml, cartonsKeys, 0));
+  if (wmlBoxesEl)        wmlBoxesEl.textContent        = Number(pick(wml, boxesKeys, 0));
+  if (gmrCartonsEl)      gmrCartonsEl.textContent      = Number(pick(gmr, cartonsKeys, 0));
+  if (gmrBoxesEl)        gmrBoxesEl.textContent        = Number(pick(gmr, boxesKeys, 0));
 }
 
 function renderCartonsTable(cartons) {
