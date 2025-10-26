@@ -31,43 +31,88 @@ function getCurrentUser() {
 }
 
 // Initialize page
-document.addEventListener('DOMContentLoaded', function() {
-    // Setup header
-    const userData = getCurrentUser();
-    if (userData) {
-        document.getElementById('userDisplay').textContent = `👤 ${userData.username}`;
+document.addEventListener('DOMContentLoaded', () => {
+    initializeHeader();
+    bindShipmentsControls();
+
+    const shipmentDateInput = document.getElementById('shipmentDate');
+    if (shipmentDateInput) {
+        shipmentDateInput.valueAsDate = new Date();
     }
 
-    // Setup logout
-    document.getElementById('logoutBtn').addEventListener('click', function() {
-        if (confirm('Are you sure you want to logout?')) {
-            localStorage.removeItem('ww_auth_token');
-            localStorage.removeItem('ww_user_data');
-            window.location.href = 'login.html';
-        }
-    });
-
-    // Setup buttons
-    document.getElementById('refreshBtn').addEventListener('click', () => loadShipments());
-    document.getElementById('createShipmentBtn').addEventListener('click', openCreateShipmentModal);
-    document.getElementById('applyFiltersBtn').addEventListener('click', applyFilters);
-    document.getElementById('clearFiltersBtn').addEventListener('click', clearFilters);
-
-    // Setup form
-    document.getElementById('createShipmentForm').addEventListener('submit', handleCreateShipment);
-
-    // Set default shipment date to today
-    document.getElementById('shipmentDate').valueAsDate = new Date();
-
-    // Load initial data
     loadShipments();
 });
+
+function initializeHeader() {
+    const userDisplay = document.getElementById('userDisplay');
+    const userDataStr = localStorage.getItem('ww_user_data');
+
+    if (userDisplay) {
+        userDisplay.textContent = 'Benutzer';
+
+        if (userDataStr) {
+            try {
+                const userData = JSON.parse(userDataStr);
+                if (userData?.username) {
+                    userDisplay.textContent = userData.username;
+                }
+            } catch (error) {
+                console.error('Error parsing user data:', error);
+            }
+        }
+    }
+
+    const logoutBtn = document.getElementById('logoutBtn');
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', () => {
+            if (confirm('Are you sure you want to logout?')) {
+                localStorage.removeItem('ww_auth_token');
+                localStorage.removeItem('ww_user_data');
+                window.location.href = 'login.html';
+            }
+        });
+    }
+}
+
+function bindShipmentsControls() {
+    const refreshBtn = document.getElementById('refreshBtn');
+    refreshBtn?.addEventListener('click', () => loadShipments());
+
+    const createBtn = document.getElementById('createShipmentBtn');
+    createBtn?.addEventListener('click', openCreateShipmentModal);
+
+    document.getElementById('applyFiltersBtn')?.addEventListener('click', applyFilters);
+    document.getElementById('clearFiltersBtn')?.addEventListener('click', clearFilters);
+
+    document.getElementById('createShipmentForm')?.addEventListener('submit', handleCreateShipment);
+
+    const proceedBtn = document.getElementById('proceedToSendBtn');
+    if (proceedBtn) {
+        proceedBtn.disabled = true;
+    }
+}
 
 // ============================================================================
 // API CALLS - SHIPMENTS
 // ============================================================================
 
+function setTableLoading(isLoading) {
+    const loading = document.getElementById('shipmentsLoading');
+    const table = document.getElementById('shipmentsTable');
+    const empty = document.getElementById('shipmentsEmpty');
+
+    if (isLoading) {
+        loading?.classList.remove('is-hidden');
+        table?.classList.add('is-hidden');
+        empty?.classList.add('is-hidden');
+    } else {
+        loading?.classList.add('is-hidden');
+    }
+}
+
 async function loadShipments() {
+    setTableLoading(true);
+
     try {
         const params = new URLSearchParams();
         if (currentFilters.status) params.append('status', currentFilters.status);
@@ -83,14 +128,18 @@ async function loadShipments() {
 
         if (data.success) {
             currentShipments = data.shipments;
+            updateSummaryCards(data.summary || {});
             renderShipmentsTable(data.shipments);
-            updateSummaryCards(data.summary);
         } else {
             showError('Failed to load shipments: ' + data.error);
+            renderShipmentsTable([]);
         }
     } catch (error) {
         console.error('Load shipments error:', error);
         showError('Connection error. Please try again.');
+        renderShipmentsTable([]);
+    } finally {
+        setTableLoading(false);
     }
 }
 
@@ -259,56 +308,116 @@ async function deleteShipment(shipmentId) {
 // ============================================================================
 
 function updateSummaryCards(summary) {
-    document.getElementById('totalShipments').textContent = summary.total_shipments || 0;
-    document.getElementById('preparedShipments').textContent = summary.prepared_count || 0;
-    document.getElementById('sentShipments').textContent = summary.sent_count || 0;
-    document.getElementById('recalledShipments').textContent = summary.recalled_count || 0;
+    const totalEl = document.getElementById('totalShipments');
+    const preparedEl = document.getElementById('preparedShipments');
+    const sentEl = document.getElementById('sentShipments');
+    const recalledEl = document.getElementById('recalledShipments');
+
+    if (totalEl) totalEl.textContent = summary.total_shipments || 0;
+    if (preparedEl) preparedEl.textContent = summary.prepared_count || 0;
+    if (sentEl) sentEl.textContent = summary.sent_count || 0;
+    if (recalledEl) recalledEl.textContent = summary.recalled_count || 0;
+
+    syncStatusCardsWithFilter();
 }
 
 function renderShipmentsTable(shipments) {
+    const table = document.getElementById('shipmentsTable');
     const tbody = document.getElementById('shipmentsTableBody');
-    
-    if (shipments.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="8" class="loading">No shipments found</td></tr>';
+    const emptyState = document.getElementById('shipmentsEmpty');
+
+    if (!tbody || !table) return;
+
+    if (!shipments || shipments.length === 0) {
+        tbody.innerHTML = '';
+        table.classList.add('is-hidden');
+        emptyState?.classList.remove('is-hidden');
         return;
     }
 
+    table.classList.remove('is-hidden');
+    emptyState?.classList.add('is-hidden');
+
     tbody.innerHTML = shipments.map(shipment => {
-        const statusClass = shipment.status;
-        
+        const statusMarkup = renderStatusBadge(shipment.status);
+        const actions = renderShipmentActions(shipment);
+
         return `
             <tr data-shipment-id="${shipment.shipment_id}">
                 <td><strong>${escapeHtml(shipment.shipment_reference)}</strong></td>
                 <td>${formatDate(shipment.shipment_date)}</td>
-                <td>
-                    <span class="status-badge status-${statusClass}">
-                        ${getStatusIcon(shipment.status)} ${shipment.status}
-                    </span>
-                </td>
-                <td class="text-center">${shipment.carton_count || 0}</td>
-                <td class="text-center">${shipment.product_count || 0}</td>
-                <td class="text-center"><strong>${shipment.total_boxes || 0}</strong></td>
+                <td>${statusMarkup}</td>
+                <td class="numeric">${shipment.carton_count || 0}</td>
+                <td class="numeric">${shipment.product_count || 0}</td>
+                <td class="numeric"><strong>${shipment.total_boxes || 0}</strong></td>
                 <td>${escapeHtml(shipment.created_by_user || 'N/A')}</td>
-                <td>
-                    <div class="action-buttons">
-                        <button class="btn-primary btn-small" onclick="viewShipmentDetails(${shipment.shipment_id})" title="View Details">
-                            👁️ View
-                        </button>
-                        ${shipment.status === 'prepared' ? `
-                            <button class="btn-success btn-small" onclick="continueShipment(${shipment.shipment_id}, '${escapeHtml(shipment.shipment_reference)}')" title="Add boxes and send">
-                                ➕ Continue
-                            </button>
-                        ` : ''}
-                        ${shipment.status === 'sent' ? `
-                            <button class="btn-danger btn-small" onclick="openRecallModal(${shipment.shipment_id}, '${escapeHtml(shipment.shipment_reference)}')" title="Recall shipment">
-                                ↩️ Recall
-                            </button>
-                        ` : ''}
-                    </div>
-                </td>
+                <td class="actions-col">${actions}</td>
             </tr>
         `;
     }).join('');
+}
+
+function renderShipmentActions(shipment) {
+    const actions = [];
+
+    actions.push(`
+        <button
+            class="btn btn-surface icon-button"
+            type="button"
+            data-tooltip="Details ansehen"
+            aria-label="Details ansehen"
+            onclick="viewShipmentDetails(${shipment.shipment_id})"
+        >
+            <span class="material-icons-outlined" aria-hidden="true">visibility</span>
+        </button>
+    `);
+
+    if (shipment.status === 'prepared') {
+        actions.push(`
+            <button
+                class="btn btn-positive icon-button"
+                type="button"
+                data-tooltip="Shipment fortsetzen"
+                aria-label="Shipment fortsetzen"
+                onclick="continueShipment(${shipment.shipment_id})"
+            >
+                <span class="material-icons-outlined" aria-hidden="true">play_circle</span>
+            </button>
+        `);
+    }
+
+    if (shipment.status === 'sent') {
+        actions.push(`
+            <button
+                class="btn btn-danger icon-button"
+                type="button"
+                data-tooltip="Shipment zurückrufen"
+                aria-label="Shipment zurückrufen"
+                onclick="openRecallModal(${shipment.shipment_id}, ${JSON.stringify(shipment.shipment_reference || '')})"
+            >
+                <span class="material-icons-outlined" aria-hidden="true">undo</span>
+            </button>
+        `);
+    }
+
+    return `<div class="action-buttons">${actions.join('')}</div>`;
+}
+
+function renderStatusBadge(status) {
+    const map = {
+        'prepared': { icon: 'assignment_turned_in', label: 'Prepared' },
+        'sent': { icon: 'local_shipping', label: 'Sent' },
+        'recalled': { icon: 'undo', label: 'Recalled' }
+    };
+
+    const { icon, label } = map[status] || { icon: 'inventory_2', label: status || 'Unknown' };
+
+    return `
+        <span class="status-badge status-${status}">
+            <span class="material-icons-outlined" aria-hidden="true">${icon}</span>
+            ${label}
+        </span>
+    `;
 }
 
 // ============================================================================
@@ -377,7 +486,7 @@ function renderAvailableCartons() {
     const container = document.getElementById('availableCartonsList');
     
     if (availableCartons.length === 0) {
-        container.innerHTML = '<div class="no-data">No cartons available in WML or GMR with stock</div>';
+        container.innerHTML = '<div class="no-data">Keine Kartons mit verfügbarem Bestand gefunden.</div>';
         return;
     }
 
@@ -386,14 +495,16 @@ function renderAvailableCartons() {
             <div class="carton-header">
                 <strong>${escapeHtml(carton.carton_number)}</strong>
                 <span class="location-badge location-${carton.location.toLowerCase()}">
-                    ${getLocationIcon(carton.location)} ${carton.location}
+                    ${renderLocationIcon(carton.location)}
+                    ${escapeHtml(carton.location)}
                 </span>
             </div>
             <div class="carton-info">
-                ${carton.product_count} product(s) • ${carton.total_boxes_current} boxes available
+                ${carton.product_count} Produkte • ${carton.total_boxes_current} Boxen verfügbar
             </div>
-            <button class="btn-primary btn-small" onclick="selectBoxesFromCarton(${carton.carton_id})">
-                Select Boxes →
+            <button class="btn btn-primary btn-small" type="button" onclick="selectBoxesFromCarton(${carton.carton_id})">
+                <span class="material-icons-outlined" aria-hidden="true">add_box</span>
+                <span>Boxen auswählen</span>
             </button>
         </div>
     `).join('');
@@ -418,22 +529,21 @@ async function selectBoxesFromCarton(cartonId) {
 function showBoxSelectionDialog(carton, contents) {
     const html = `
         <div class="box-selection-dialog">
-            <h4>Select boxes from ${escapeHtml(carton.carton_number)}</h4>
-            ${contents.map((item, index) => `
+            <h4>Boxen auswählen – ${escapeHtml(carton.carton_number)}</h4>
+            ${contents.map(item => `
                 <div class="product-selection">
                     <div class="product-info">
                         <strong>${escapeHtml(item.product_name)}</strong>
                         <div class="product-meta">
-                            FNSKU: ${escapeHtml(item.fnsku)} • 
-                            Available: ${item.boxes_current} boxes (${item.pairs_current} pairs)
+                            FNSKU: ${escapeHtml(item.fnsku)} • Verfügbar: ${item.boxes_current} Boxen (${item.pairs_current} Paare)
                         </div>
                     </div>
                     <div class="quantity-input">
-                        <label>Boxes to send:</label>
-                        <input type="number" 
-                               id="boxes_${carton.carton_id}_${item.product_id}" 
-                               min="0" 
-                               max="${item.boxes_current}" 
+                        <label>Boxen zum Versand:</label>
+                        <input type="number"
+                               id="boxes_${carton.carton_id}_${item.product_id}"
+                               min="0"
+                               max="${item.boxes_current}"
                                value="0"
                                data-carton-id="${carton.carton_id}"
                                data-product-id="${item.product_id}"
@@ -445,8 +555,14 @@ function showBoxSelectionDialog(carton, contents) {
                 </div>
             `).join('')}
             <div class="dialog-actions">
-                <button class="btn-secondary" onclick="closeBoxSelectionDialog()">Cancel</button>
-                <button class="btn-primary" onclick="confirmBoxSelection()">Add to Shipment</button>
+                <button class="btn btn-secondary" type="button" onclick="closeBoxSelectionDialog()">
+                    <span class="material-icons-outlined" aria-hidden="true">close</span>
+                    <span>Abbrechen</span>
+                </button>
+                <button class="btn btn-primary" type="button" onclick="confirmBoxSelection()">
+                    <span class="material-icons-outlined" aria-hidden="true">add_circle</span>
+                    <span>Zum Shipment hinzufügen</span>
+                </button>
             </div>
         </div>
     `;
@@ -520,10 +636,10 @@ function updateSelectedBoxesSummary() {
     const proceedBtn = document.getElementById('proceedToSendBtn');
     if (totalBoxes > 0) {
         proceedBtn.disabled = false;
-        proceedBtn.textContent = `Review & Send (${totalBoxes} boxes) →`;
+        proceedBtn.querySelector('.btn-label').textContent = `Prüfen & senden (${totalBoxes})`;
     } else {
         proceedBtn.disabled = true;
-        proceedBtn.textContent = 'Review & Send →';
+        proceedBtn.querySelector('.btn-label').textContent = 'Prüfen & senden';
     }
 }
 
@@ -544,8 +660,9 @@ function renderSelectedBoxesList() {
             <td class="text-center"><strong>${box.boxes_to_send}</strong></td>
             <td class="text-center">${box.boxes_to_send * box.pairs_per_box}</td>
             <td>
-                <button class="btn-danger btn-small" onclick="removeSelectedBox(${index})">
-                    ✕ Remove
+                <button class="btn btn-danger btn-small" type="button" onclick="removeSelectedBox(${index})">
+                    <span class="material-icons-outlined" aria-hidden="true">delete</span>
+                    <span>Entfernen</span>
                 </button>
             </td>
         </tr>
@@ -591,6 +708,15 @@ function showSendConfirmation() {
     const totalPairs = selectedBoxes.reduce((sum, b) => sum + (b.boxes_to_send * b.pairs_per_box), 0);
     const uniqueCartons = new Set(selectedBoxes.map(b => b.carton_id)).size;
     const uniqueProducts = new Set(selectedBoxes.map(b => b.product_id)).size;
+
+    const confirmBtn = document.getElementById('confirmSendBtn');
+    if (confirmBtn) {
+        confirmBtn.disabled = false;
+        const label = confirmBtn.querySelector('.btn-label');
+        if (label) {
+            label.textContent = 'Shipment senden';
+        }
+    }
 
     const summaryHtml = `
         <div class="confirm-details">
@@ -655,15 +781,25 @@ function closeSendShipmentModal() {
 
 async function confirmSendShipment() {
     const confirmBtn = document.getElementById('confirmSendBtn');
-    confirmBtn.disabled = true;
-    confirmBtn.textContent = 'Sending...';
+    const label = confirmBtn?.querySelector('.btn-label');
+
+    if (confirmBtn) {
+        confirmBtn.disabled = true;
+    }
+    if (label) {
+        label.textContent = 'Wird gesendet…';
+    }
 
     try {
         const result = await sendShipment(activeShipment.shipment_id);
 
         if (result.success) {
             showSuccess(result.message);
-            
+
+            if (label) {
+                label.textContent = 'Shipment senden';
+            }
+
             // Close all modals
             document.getElementById('sendShipmentModal').classList.add('hidden');
             
@@ -673,16 +809,16 @@ async function confirmSendShipment() {
             
             // Reload shipments
             loadShipments();
-            
+
         } else {
             showError(result.error || 'Failed to send shipment');
-            confirmBtn.disabled = false;
-            confirmBtn.textContent = '🚀 Send Shipment';
+            if (confirmBtn) confirmBtn.disabled = false;
+            if (label) label.textContent = 'Shipment senden';
         }
     } catch (error) {
         showError('Connection error. Please try again.');
-        confirmBtn.disabled = false;
-        confirmBtn.textContent = '🚀 Send Shipment';
+        if (confirmBtn) confirmBtn.disabled = false;
+        if (label) label.textContent = 'Shipment senden';
     }
 }
 
@@ -690,10 +826,10 @@ async function confirmSendShipment() {
 // CONTINUE SHIPMENT (for prepared shipments)
 // ============================================================================
 
-async function continueShipment(shipmentId, shipmentReference) {
+async function continueShipment(shipmentId) {
     try {
         const details = await loadShipmentDetails(shipmentId);
-        
+
         if (!details.success) {
             showError('Failed to load shipment details');
             return;
@@ -757,9 +893,7 @@ function showShipmentDetailsModal(data) {
                 </div>
                 <div class="detail-item">
                     <label>Status:</label>
-                    <span class="status-badge status-${shipment.status}">
-                        ${getStatusIcon(shipment.status)} ${shipment.status}
-                    </span>
+                    ${renderStatusBadge(shipment.status)}
                 </div>
                 <div class="detail-item">
                     <label>Created By:</label>
@@ -892,7 +1026,8 @@ function applyFilters() {
     currentFilters.status = document.getElementById('statusFilter').value;
     currentFilters.from_date = document.getElementById('fromDateFilter').value;
     currentFilters.to_date = document.getElementById('toDateFilter').value;
-    
+
+    syncStatusCardsWithFilter();
     loadShipments();
 }
 
@@ -901,7 +1036,8 @@ function clearFilters() {
     document.getElementById('statusFilter').value = '';
     document.getElementById('fromDateFilter').value = '';
     document.getElementById('toDateFilter').value = '';
-    
+
+    syncStatusCardsWithFilter();
     loadShipments();
 }
 
@@ -909,12 +1045,26 @@ function filterByStatus(status) {
     document.getElementById('statusFilter').value = status;
     currentFilters.status = status;
     loadShipments();
-    
-    // Visual feedback
-    document.querySelectorAll('.summary-card').forEach(card => {
-        card.classList.remove('active');
+
+    syncStatusCardsWithFilter();
+}
+
+function resetStatusCards() {
+    document.querySelectorAll('.status-card').forEach(card => {
+        card.classList.remove('is-active');
+        card.setAttribute('aria-pressed', 'false');
     });
-    document.querySelector(`[data-status="${status}"]`)?.classList.add('active');
+}
+
+function syncStatusCardsWithFilter() {
+    resetStatusCards();
+    if (!currentFilters.status) return;
+
+    const target = document.querySelector(`.status-card[data-status="${currentFilters.status}"]`);
+    if (target) {
+        target.classList.add('is-active');
+        target.setAttribute('aria-pressed', 'true');
+    }
 }
 
 // ============================================================================
@@ -922,11 +1072,11 @@ function filterByStatus(status) {
 // ============================================================================
 
 function showSuccess(message) {
-    alert('✅ ' + message);
+    alert('Erfolg: ' + message);
 }
 
 function showError(message) {
-    alert('❌ ' + message);
+    alert('Fehler: ' + message);
 }
 
 function escapeHtml(text) {
@@ -958,20 +1108,12 @@ function formatDateTime(dateString) {
     });
 }
 
-function getStatusIcon(status) {
+function renderLocationIcon(location) {
     const icons = {
-        'prepared': '📝',
-        'sent': '✅',
-        'recalled': '↩️'
+        'Incoming': 'move_to_inbox',
+        'WML': 'inventory_2',
+        'GMR': 'store'
     };
-    return icons[status] || '📦';
-}
-
-function getLocationIcon(location) {
-    const icons = {
-        'Incoming': '📥',
-        'WML': '🏭',
-        'GMR': '🏪'
-    };
-    return icons[location] || '📦';
+    const icon = icons[location] || 'inventory_2';
+    return `<span class="material-icons-outlined" aria-hidden="true">${icon}</span>`;
 }
