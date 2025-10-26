@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Management - WarehouseWrangler</title>
+    <link rel="stylesheet" href="./css/main.css">
+    <link rel="stylesheet" href="./css/users.css">
+    <script>
+        // Inline auth check
+        (function() {
+            const token = localStorage.getItem('ww_auth_token');
+            if (!token) {
+                window.location.href = 'login.html';
+                return;
+            }
+            try {
+                const parts = token.split('.');
+                if (parts.length !== 3) throw new Error('Invalid token');
+                const payload = JSON.parse(atob(parts[1]));
+                if (payload.exp <= Math.floor(Date.now() / 1000)) {
+                    localStorage.removeItem('ww_auth_token');
+                    window.location.href = 'login.html';
+                    return;
+                }
+                // Check if admin
+                if (payload.role !== 'admin') {
+                    alert('Admin access required');
+                    window.location.href = 'index.html';
+                }
+            } catch (e) {
+                localStorage.removeItem('ww_auth_token');
+                window.location.href = 'login.html';
+            }
+        })();
+    </script>
+</head>
+<body>
+    <!-- Header -->
+    <header class="app-header">
+        <div class="header-left">
+            <h1>🏭 WarehouseWrangler</h1>
+        </div>
+        <div class="header-right">
+            <a href="index.html" class="btn-secondary" style="margin-right: 12px;">📶 Dashboard</a>
+            <span id="userDisplay">Loading...</span>
+            <button id="logoutBtn" class="btn-logout">Logout</button>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="app-main">
+        <div class="page-header">
+            <h2>👥 User Management</h2>
+            <button id="addUserBtn" class="btn-primary">+ Add User</button>
+        </div>
+
+        <!-- Users Table -->
+        <div class="table-container">
+            <table class="users-table">
+                <thead>
+                    <tr>
+                        <th>Username</th>
+                        <th>Email</th>
+                        <th>Role</th>
+                        <th>Status</th>
+                        <th>Last Login</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="usersTableBody">
+                    <tr>
+                        <td colspan="6" class="loading">Loading users...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+    <!-- Add/Edit User Modal -->
+    <div id="userModal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle">Add New User</h3>
+                <button class="modal-close" onclick="closeUserModal()">&times;</button>
+            </div>
+            <form id="userForm">
+                <input type="hidden" id="userId" name="user_id">
+                
+                <div class="form-group">
+                    <label for="username">Username *</label>
+                    <input type="text" id="username" name="username" required minlength="3">
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Email *</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+
+                <div class="form-group" id="passwordGroup">
+                    <label for="password">Password *</label>
+                    <input type="password" id="password" name="password" minlength="8">
+                    <small>Minimum 8 characters</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="role">Role *</label>
+                    <select id="role" name="role" required>
+                        <option value="user">User</option>
+                        <option value="admin">Admin</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="isActive" name="is_active" checked>
+                        <span>Active</span>
+                    </label>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn-secondary" onclick="closeUserModal()">Cancel</button>
+                    <button type="submit" class="btn-primary">Save User</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Change Password Modal -->
+    <div id="passwordModal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Change Password</h3>
+                <button class="modal-close" onclick="closePasswordModal()">&times;</button>
+            </div>
+            <form id="passwordForm">
+                <input type="hidden" id="passwordUserId">
+                
+                <div class="form-group" id="currentPasswordGroup">
+                    <label for="currentPassword">Current Password *</label>
+                    <input type="password" id="currentPassword" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="newPassword">New Password *</label>
+                    <input type="password" id="newPassword" required minlength="8">
+                    <small>Minimum 8 characters</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="confirmPassword">Confirm New Password *</label>
+                    <input type="password" id="confirmPassword" required minlength="8">
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn-secondary" onclick="closePasswordModal()">Cancel</button>
+                    <button type="submit" class="btn-primary">Change Password</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="./js/users.js"></script>
+</body>
+</html>

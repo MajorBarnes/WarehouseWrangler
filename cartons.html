@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carton Management - WarehouseWrangler</title>
+    <link rel="stylesheet" href="./css/main.css">
+    <link rel="stylesheet" href="./css/cartons.css">
+    <script>
+        // Inline auth check
+        (function() {
+            const token = localStorage.getItem('ww_auth_token');
+            if (!token) {
+                window.location.href = 'login.html';
+                return;
+            }
+            try {
+                const parts = token.split('.');
+                if (parts.length !== 3) throw new Error('Invalid token');
+                const payload = JSON.parse(atob(parts[1]));
+                if (payload.exp <= Math.floor(Date.now() / 1000)) {
+                    localStorage.removeItem('ww_auth_token');
+                    window.location.href = 'login.html';
+                    return;
+                }
+            } catch (e) {
+                localStorage.removeItem('ww_auth_token');
+                window.location.href = 'login.html';
+            }
+        })();
+    </script>
+</head>
+<body>
+    <!-- Header -->
+    <header class="app-header">
+        <div class="header-left">
+            <h1>🤠 WarehouseWrangler</h1>
+        </div>
+        <div class="header-right">
+            <a href="index.html" class="btn-secondary" style="margin-right: 12px;">🏠 Dashboard</a>
+            <span id="userDisplay">Loading...</span>
+            <button id="logoutBtn" class="btn-logout">Logout</button>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="app-main">
+        <!-- Page Header -->
+        <div class="page-header">
+            <h2>📦 Carton Management</h2>
+            <button id="refreshBtn" class="btn-primary">🔄 Refresh</button>
+        </div>
+
+        <!-- Summary Cards -->
+        <div class="summary-cards">
+            <div class="summary-card" data-location="all">
+                <div class="card-icon">📊</div>
+                <div class="card-content">
+                    <h3>Total Cartons</h3>
+                    <div class="card-value" id="totalCartons">0</div>
+                    <div class="card-detail">
+                        <span id="totalBoxes">0</span> boxes • 
+                        <span id="totalPairs">0</span> pairs
+                    </div>
+                </div>
+            </div>
+
+            <div class="summary-card clickable" data-location="Incoming" onclick="filterByLocation('Incoming')">
+                <div class="card-icon">📥</div>
+                <div class="card-content">
+                    <h3>Incoming</h3>
+                    <div class="card-value" id="incomingCartons">0</div>
+                    <div class="card-detail">
+                        <span id="incomingBoxes">0</span> boxes
+                    </div>
+                </div>
+            </div>
+
+            <div class="summary-card clickable" data-location="WML" onclick="filterByLocation('WML')">
+                <div class="card-icon">🏭</div>
+                <div class="card-content">
+                    <h3>WML</h3>
+                    <div class="card-value" id="wmlCartons">0</div>
+                    <div class="card-detail">
+                        <span id="wmlBoxes">0</span> boxes
+                    </div>
+                </div>
+            </div>
+
+            <div class="summary-card clickable" data-location="GMR" onclick="filterByLocation('GMR')">
+                <div class="card-icon">🏪</div>
+                <div class="card-content">
+                    <h3>GMR</h3>
+                    <div class="card-value" id="gmrCartons">0</div>
+                    <div class="card-detail">
+                        <span id="gmrBoxes">0</span> boxes
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filters and Search -->
+        <div class="filters-section">
+            <div class="filter-group">
+                <label for="locationFilter">Location:</label>
+                <select id="locationFilter">
+                    <option value="">All Locations</option>
+                    <option value="Incoming">Incoming</option>
+                    <option value="WML">WML</option>
+                    <option value="GMR">GMR</option>
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label for="statusFilter">Status:</label>
+                <select id="statusFilter">
+                    <option value="">All Status</option>
+                    <option value="in stock">In Stock</option>
+                    <option value="empty">Empty</option>
+                    <option value="archived">Archived</option>
+                </select>
+            </div>
+
+            <div class="search-group">
+                <input type="text" id="searchInput" placeholder="🔍 Search by carton number, product, or FNSKU...">
+                <button id="clearSearchBtn" class="btn-secondary btn-small">Clear</button>
+            </div>
+
+            <div class="filter-actions">
+                <button id="applyFiltersBtn" class="btn-primary">Apply Filters</button>
+                <button id="clearFiltersBtn" class="btn-secondary">Clear All</button>
+            </div>
+        </div>
+
+        <!-- Cartons Table -->
+        <div class="table-container">
+            <table class="cartons-table">
+                <thead>
+                    <tr>
+                        <th>Carton Number</th>
+                        <th>Location</th>
+                        <th>Status</th>
+                        <th>Products</th>
+                        <th>Boxes (Current)</th>
+                        <th>Boxes (Initial)</th>
+                        <th>Sent to AMZ</th>
+                        <th>Updated</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="cartonsTableBody">
+                    <tr>
+                        <td colspan="9" class="loading">Loading cartons...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination (if needed later) -->
+        <div class="pagination" id="pagination" style="display: none;">
+            <button class="btn-secondary btn-small">Previous</button>
+            <span>Page 1 of 1</span>
+            <button class="btn-secondary btn-small">Next</button>
+        </div>
+    </main>
+
+    <!-- Move Carton Modal -->
+    <div id="moveCartonModal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Move Carton</h3>
+                <button class="modal-close" onclick="closeMoveModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>Move carton <strong id="moveCartonNumber"></strong> to:</p>
+                <div class="form-group">
+                    <label>Current Location:</label>
+                    <div class="location-badge" id="currentLocationBadge"></div>
+                </div>
+                <div class="form-group">
+                    <label for="newLocation">New Location *</label>
+                    <select id="newLocation" class="location-select">
+                        <option value="">-- Select Location --</option>
+                        <option value="Incoming">📥 Incoming</option>
+                        <option value="WML">🏭 WML</option>
+                        <option value="GMR">🏪 GMR</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="moveNotes">Notes (optional)</label>
+                    <textarea id="moveNotes" rows="3" placeholder="Add notes about this move..."></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-secondary" onclick="closeMoveModal()">Cancel</button>
+                <button type="button" class="btn-primary" onclick="confirmMoveCarton()">Move Carton</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Carton Details Modal -->
+    <div id="cartonDetailsModal" class="modal hidden">
+        <div class="modal-content modal-large">
+            <div class="modal-header">
+                <h3>📦 Carton Details</h3>
+                <button class="modal-close" onclick="closeDetailsModal()">&times;</button>
+            </div>
+            <div class="modal-body" id="cartonDetailsBody">
+                <div class="loading">Loading carton details...</div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-secondary" onclick="closeDetailsModal()">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="./js/cartons.js"></script>
+</body>
+</html>

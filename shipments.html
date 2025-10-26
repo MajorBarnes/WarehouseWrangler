@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shipment Management - WarehouseWrangler</title>
+    <link rel="stylesheet" href="./css/main.css">
+    <link rel="stylesheet" href="./css/shipments.css">
+    <script>
+        // Inline auth check
+        (function() {
+            const token = localStorage.getItem('ww_auth_token');
+            if (!token) {
+                window.location.href = 'login.html';
+                return;
+            }
+            try {
+                const parts = token.split('.');
+                if (parts.length !== 3) throw new Error('Invalid token');
+                const payload = JSON.parse(atob(parts[1]));
+                if (payload.exp <= Math.floor(Date.now() / 1000)) {
+                    localStorage.removeItem('ww_auth_token');
+                    window.location.href = 'login.html';
+                    return;
+                }
+            } catch (e) {
+                localStorage.removeItem('ww_auth_token');
+                window.location.href = 'login.html';
+            }
+        })();
+    </script>
+</head>
+<body>
+    <!-- Header -->
+    <header class="app-header">
+        <div class="header-left">
+            <h1>🤠 WarehouseWrangler</h1>
+        </div>
+        <div class="header-right">
+            <a href="index.html" class="btn-secondary" style="margin-right: 12px;">🏠 Dashboard</a>
+            <a href="cartons.html" class="btn-secondary" style="margin-right: 12px;">📦 Cartons</a>
+            <span id="userDisplay">Loading...</span>
+            <button id="logoutBtn" class="btn-logout">Logout</button>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="app-main">
+        <!-- Page Header -->
+        <div class="page-header">
+            <h2>🚢 Amazon Shipments</h2>
+            <div class="header-actions">
+                <button id="refreshBtn" class="btn-secondary">🔄 Refresh</button>
+                <button id="createShipmentBtn" class="btn-primary">📤 Create Shipment</button>
+            </div>
+        </div>
+
+        <!-- Summary Cards -->
+        <div class="summary-cards">
+            <div class="summary-card">
+                <div class="card-icon">📊</div>
+                <div class="card-content">
+                    <h3>Total Shipments</h3>
+                    <div class="card-value" id="totalShipments">0</div>
+                    <div class="card-detail">All time</div>
+                </div>
+            </div>
+
+            <div class="summary-card clickable" data-status="prepared" onclick="filterByStatus('prepared')">
+                <div class="card-icon">📝</div>
+                <div class="card-content">
+                    <h3>Prepared</h3>
+                    <div class="card-value" id="preparedShipments">0</div>
+                    <div class="card-detail">Ready to send</div>
+                </div>
+            </div>
+
+            <div class="summary-card clickable" data-status="sent" onclick="filterByStatus('sent')">
+                <div class="card-icon">✅</div>
+                <div class="card-content">
+                    <h3>Sent</h3>
+                    <div class="card-value" id="sentShipments">0</div>
+                    <div class="card-detail">Boxes sent</div>
+                </div>
+            </div>
+
+            <div class="summary-card clickable" data-status="recalled" onclick="filterByStatus('recalled')">
+                <div class="card-icon">↩️</div>
+                <div class="card-content">
+                    <h3>Recalled</h3>
+                    <div class="card-value" id="recalledShipments">0</div>
+                    <div class="card-detail">Reversed</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filters -->
+        <div class="filters-section">
+            <div class="filter-group">
+                <label for="statusFilter">Status:</label>
+                <select id="statusFilter">
+                    <option value="">All Status</option>
+                    <option value="prepared">Prepared</option>
+                    <option value="sent">Sent</option>
+                    <option value="recalled">Recalled</option>
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label for="fromDateFilter">From Date:</label>
+                <input type="date" id="fromDateFilter">
+            </div>
+
+            <div class="filter-group">
+                <label for="toDateFilter">To Date:</label>
+                <input type="date" id="toDateFilter">
+            </div>
+
+            <div class="filter-actions">
+                <button id="applyFiltersBtn" class="btn-primary">Apply Filters</button>
+                <button id="clearFiltersBtn" class="btn-secondary">Clear All</button>
+            </div>
+        </div>
+
+        <!-- Shipments Table -->
+        <div class="table-container">
+            <table class="shipments-table">
+                <thead>
+                    <tr>
+                        <th>Reference</th>
+                        <th>Date</th>
+                        <th>Status</th>
+                        <th>Cartons</th>
+                        <th>Products</th>
+                        <th>Total Boxes</th>
+                        <th>Created By</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="shipmentsTableBody">
+                    <tr>
+                        <td colspan="8" class="loading">Loading shipments...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+    <!-- Create/Edit Shipment Modal (Step 1: Basic Info) -->
+    <div id="createShipmentModal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>📤 Create New Shipment</h3>
+                <button class="modal-close" onclick="closeCreateShipmentModal()">&times;</button>
+            </div>
+            <form id="createShipmentForm">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="shipmentReference">Shipment Reference *</label>
+                        <input type="text" id="shipmentReference" required 
+                               placeholder="e.g., AMZ-2025-10-001">
+                        <small>Unique identifier for this shipment</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="shipmentDate">Shipment Date *</label>
+                        <input type="date" id="shipmentDate" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="shipmentNotes">Notes (optional)</label>
+                        <textarea id="shipmentNotes" rows="3" 
+                                  placeholder="Add any notes about this shipment..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-secondary" onclick="closeCreateShipmentModal()">Cancel</button>
+                    <button type="submit" class="btn-primary">Create & Add Boxes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Add Boxes Modal (Step 2: Select Boxes) -->
+    <div id="addBoxesModal" class="modal hidden">
+        <div class="modal-content modal-large">
+            <div class="modal-header">
+                <h3>📦 Add Boxes to Shipment: <span id="currentShipmentRef"></span></h3>
+                <button class="modal-close" onclick="closeAddBoxesModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="shipment-progress">
+                    <div class="progress-step active">
+                        <div class="step-number">1</div>
+                        <div class="step-label">Created</div>
+                    </div>
+                    <div class="progress-line"></div>
+                    <div class="progress-step active">
+                        <div class="step-number">2</div>
+                        <div class="step-label">Add Boxes</div>
+                    </div>
+                    <div class="progress-line"></div>
+                    <div class="progress-step">
+                        <div class="step-number">3</div>
+                        <div class="step-label">Send</div>
+                    </div>
+                </div>
+
+                <!-- Current Shipment Summary -->
+                <div class="shipment-summary">
+                    <h4>Selected Boxes:</h4>
+                    <div class="summary-grid">
+                        <div class="summary-item">
+                            <span class="label">Total Boxes:</span>
+                            <span class="value" id="totalBoxesSelected">0</span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="label">Cartons:</span>
+                            <span class="value" id="totalCartonsSelected">0</span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="label">Products:</span>
+                            <span class="value" id="totalProductsSelected">0</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Available Cartons -->
+                <h4>Available Cartons (WML & GMR):</h4>
+                <div class="available-cartons" id="availableCartonsList">
+                    <div class="loading">Loading available cartons...</div>
+                </div>
+
+                <!-- Selected Boxes List -->
+                <div id="selectedBoxesContainer" class="selected-boxes-container hidden">
+                    <h4>Boxes Added to Shipment:</h4>
+                    <table class="selected-boxes-table">
+                        <thead>
+                            <tr>
+                                <th>Carton</th>
+                                <th>Product</th>
+                                <th>Boxes</th>
+                                <th>Pairs</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="selectedBoxesBody">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-secondary" onclick="closeAddBoxesModal()">Close</button>
+                <button type="button" class="btn-primary" id="proceedToSendBtn" onclick="proceedToSend()">
+                    Review & Send →
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Send Shipment Confirmation Modal (Step 3) -->
+    <div id="sendShipmentModal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>✅ Confirm Send Shipment</h3>
+                <button class="modal-close" onclick="closeSendShipmentModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="shipment-progress">
+                    <div class="progress-step completed">
+                        <div class="step-number">✓</div>
+                        <div class="step-label">Created</div>
+                    </div>
+                    <div class="progress-line completed"></div>
+                    <div class="progress-step completed">
+                        <div class="step-number">✓</div>
+                        <div class="step-label">Boxes Added</div>
+                    </div>
+                    <div class="progress-line"></div>
+                    <div class="progress-step active">
+                        <div class="step-number">3</div>
+                        <div class="step-label">Send</div>
+                    </div>
+                </div>
+
+                <div class="confirm-summary" id="confirmSummary">
+                    <!-- Will be populated by JavaScript -->
+                </div>
+
+                <div class="warning-box">
+                    <strong>⚠️ Important:</strong> This will update your inventory. Boxes will be deducted from cartons and marked as sent to Amazon. This action can be reversed using the "Recall" function if needed.
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-secondary" onclick="closeSendShipmentModal()">← Back</button>
+                <button type="button" class="btn-primary" id="confirmSendBtn" onclick="confirmSendShipment()">
+                    🚀 Send Shipment
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Shipment Details Modal -->
+    <div id="shipmentDetailsModal" class="modal hidden">
+        <div class="modal-content modal-large">
+            <div class="modal-header">
+                <h3>🚢 Shipment Details</h3>
+                <button class="modal-close" onclick="closeDetailsModal()">&times;</button>
+            </div>
+            <div class="modal-body" id="shipmentDetailsBody">
+                <div class="loading">Loading shipment details...</div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-secondary" onclick="closeDetailsModal()">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recall Confirmation Modal -->
+    <div id="recallModal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>↩️ Recall Shipment</h3>
+                <button class="modal-close" onclick="closeRecallModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to recall shipment <strong id="recallShipmentRef"></strong>?</p>
+                
+                <div class="warning-box">
+                    <strong>⚠️ This will:</strong>
+                    <ul>
+                        <li>Return all boxes back to their original cartons</li>
+                        <li>Update carton inventory (increase boxes_current)</li>
+                        <li>Mark the shipment as "recalled"</li>
+                        <li>Log the recall in movement history</li>
+                    </ul>
+                </div>
+
+                <div class="form-group">
+                    <label for="recallNotes">Reason for Recall *</label>
+                    <textarea id="recallNotes" rows="3" required 
+                              placeholder="Why are you recalling this shipment?"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-secondary" onclick="closeRecallModal()">Cancel</button>
+                <button type="button" class="btn-danger" onclick="confirmRecall()">Recall Shipment</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="./js/shipments.js"></script>
+</body>
+</html>

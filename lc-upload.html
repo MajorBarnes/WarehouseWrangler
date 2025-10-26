@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LC File Upload - WarehouseWrangler</title>
+    <link rel="stylesheet" href="./css/main.css">
+    <link rel="stylesheet" href="./css/lc-upload.css">
+    <script>
+        // Inline auth check (same as users.html pattern)
+        (function() {
+            const token = localStorage.getItem('ww_auth_token');
+            if (!token) {
+                window.location.href = 'login.html';
+                return;
+            }
+            try {
+                const parts = token.split('.');
+                if (parts.length !== 3) throw new Error('Invalid token');
+                const payload = JSON.parse(atob(parts[1]));
+                if (payload.exp <= Math.floor(Date.now() / 1000)) {
+                    localStorage.removeItem('ww_auth_token');
+                    window.location.href = 'login.html';
+                    return;
+                }
+                // LC upload available to all authenticated users (not admin-only)
+            } catch (e) {
+                localStorage.removeItem('ww_auth_token');
+                window.location.href = 'login.html';
+            }
+        })();
+    </script>
+</head>
+<body>
+    <!-- Header -->
+    <header class="app-header">
+        <div class="header-left">
+            <h1>🏭 WarehouseWrangler</h1>
+        </div>
+        <div class="header-right">
+            <a href="index.html" class="btn-secondary" style="margin-right: 12px;">← Dashboard</a>
+            <span id="userDisplay">Loading...</span>
+            <button id="logoutBtn" class="btn-logout">Logout</button>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="app-main">
+        <div class="page-header">
+            <h2>📦 LC File Upload</h2>
+            <p class="subtitle">Upload packing list (Lieferschein) to add cartons to inventory</p>
+        </div>
+
+        <!-- Upload Section -->
+        <div id="uploadSection" class="upload-section">
+            <div class="upload-card">
+                <div class="upload-icon">📄</div>
+                <h3>Select LC File</h3>
+                <p>Upload your packing list CSV file from the manufacturer</p>
+                
+                <div class="file-input-wrapper">
+                    <input type="file" id="lcFileInput" accept=".csv" class="hidden">
+                    <button id="selectFileBtn" class="btn-primary btn-large">
+                        Choose File
+                    </button>
+                </div>
+
+                <div id="selectedFileInfo" class="selected-file hidden">
+                    <span class="file-icon">📋</span>
+                    <span id="fileName" class="file-name"></span>
+                    <button id="clearFileBtn" class="btn-clear">&times;</button>
+                </div>
+
+                <div class="upload-hints">
+                    <h4>📝 File Requirements:</h4>
+                    <ul>
+                        <li>File format: CSV (semicolon-separated)</li>
+                        <li>Must contain carton prefix (e.g., 24SVS88)</li>
+                        <li>Required columns: FNSKU, CTN NO, BOX/CARTON</li>
+                        <li>Maximum file size: 5MB</li>
+                    </ul>
+                </div>
+
+                <button id="uploadBtn" class="btn-success btn-large hidden">
+                    <span id="uploadBtnText">Parse & Preview</span>
+                    <span id="uploadSpinner" class="spinner hidden"></span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Preview Section (Hidden initially) -->
+        <div id="previewSection" class="preview-section hidden">
+            <!-- Summary Card -->
+            <div class="summary-card">
+                <h3>📊 Upload Summary</h3>
+                <div class="summary-grid">
+                    <div class="summary-item">
+                        <span class="summary-label">Shipment:</span>
+                        <span id="summaryPrefix" class="summary-value"></span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="summary-label">Total Cartons:</span>
+                        <span id="summaryCartons" class="summary-value"></span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="summary-label">Unique Products:</span>
+                        <span id="summaryProducts" class="summary-value"></span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="summary-label">Rows Processed:</span>
+                        <span id="summaryRows" class="summary-value"></span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="summary-label">Warnings:</span>
+                        <span id="summaryWarnings" class="summary-value"></span>
+                    </div>
+                </div>
+
+                <div class="location-info">
+                    <strong>📍 Location:</strong> All cartons will be added to <span class="badge-location">Incoming</span>
+                </div>
+            </div>
+
+            <!-- Warnings (if any) -->
+            <div id="warningsCard" class="warnings-card hidden">
+                <h3>⚠️ Warnings</h3>
+                <ul id="warningsList" class="warnings-list"></ul>
+            </div>
+
+            <!-- Preview Table -->
+            <div class="preview-card">
+                <div class="preview-header">
+                    <h3>📋 Preview First 20 Cartons</h3>
+                    <div class="preview-filters">
+                        <label>
+                            <input type="checkbox" id="showMixedOnly" class="checkbox">
+                            <span>Show mixed cartons only</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    <table class="preview-table">
+                        <thead>
+                            <tr>
+                                <th>Carton Number</th>
+                                <th>FNSKU</th>
+                                <th>Product</th>
+                                <th>Boxes</th>
+                                <th>Type</th>
+                            </tr>
+                        </thead>
+                        <tbody id="previewTableBody">
+                            <!-- Populated by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="action-buttons">
+                <button id="cancelBtn" class="btn-secondary btn-large">
+                    ❌ Cancel
+                </button>
+                <button id="confirmBtn" class="btn-success btn-large">
+                    <span id="confirmBtnText">✅ Confirm & Import</span>
+                    <span id="confirmSpinner" class="spinner hidden"></span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Success Section (Hidden initially) -->
+        <div id="successSection" class="success-section hidden">
+            <div class="success-card">
+                <div class="success-icon">✅</div>
+                <h2>Import Successful!</h2>
+                <div class="success-stats">
+                    <div class="stat-item">
+                        <span class="stat-value" id="successCartons">0</span>
+                        <span class="stat-label">Cartons Created</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-value" id="successProducts">0</span>
+                        <span class="stat-label">Products Updated</span>
+                    </div>
+                </div>
+                <div class="success-actions">
+                    <button id="uploadAnotherBtn" class="btn-primary">
+                        Upload Another File
+                    </button>
+                    <button id="viewInventoryBtn" class="btn-secondary">
+                        View Inventory
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Error Section (Hidden initially) -->
+        <div id="errorSection" class="error-section hidden">
+            <div class="error-card">
+                <div class="error-icon">❌</div>
+                <h2>Upload Failed</h2>
+                <p id="errorMessage" class="error-message"></p>
+                <div class="error-actions">
+                    <button id="tryAgainBtn" class="btn-primary">
+                        Try Again
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Scripts -->
+    <script src="./js/lc-upload.js"></script>
+</body>
+</html>

@@ -1,0 +1,460 @@
+/**
+ * WarehouseWrangler - Products Management JavaScript
+ * 
+ * UPDATED: Seasonal factors now link by product_id (not product_name)
+ * 
+ * Handles CRUD operations for products/articles with seasonal factors
+ */
+
+// Configuration
+const API_BASE = './api';
+let allProducts = [];
+let filteredProducts = [];
+let editingProductId = null;
+let currentProductForFactors = null;
+
+// ============================================================================
+// INITIALIZATION
+// ============================================================================
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Load products
+    loadProducts();
+    
+    // Setup search
+    document.getElementById('searchInput').addEventListener('keyup', filterProducts);
+    
+    // Setup forms
+    document.getElementById('productForm').addEventListener('submit', handleProductSubmit);
+    document.getElementById('factorsForm').addEventListener('submit', handleFactorsSubmit);
+});
+
+// ============================================================================
+// UTILITY FUNCTIONS
+// ============================================================================
+
+function getToken() {
+    return localStorage.getItem('ww_auth_token');
+}
+
+function showSuccess(message) {
+    alert('✅ ' + message);
+}
+
+function showError(message) {
+    const errorDiv = document.getElementById('errorMessage');
+    errorDiv.innerHTML = `<div class="error">${escapeHtml(message)}</div>`;
+    setTimeout(() => {
+        errorDiv.innerHTML = '';
+    }, 5000);
+}
+
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+// ============================================================================
+// API CALLS
+// ============================================================================
+
+async function loadProducts() {
+    try {
+        document.getElementById('loadingIndicator').style.display = 'block';
+        
+        const token = getToken();
+        if (!token) {
+            window.location.href = 'login.html';
+            return;
+        }
+
+        const response = await fetch(`${API_BASE}/products/get_all.php`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            if (response.status === 401) {
+                localStorage.removeItem('ww_auth_token');
+                window.location.href = 'login.html';
+                return;
+            }
+            throw new Error(data.error || 'Failed to load products');
+        }
+
+        if (data.success) {
+            allProducts = data.products;
+            filteredProducts = allProducts;
+            renderProducts();
+        } else {
+            throw new Error(data.error || 'Unknown error');
+        }
+
+    } catch (error) {
+        showError('Fehler beim Laden der Artikel: ' + error.message);
+        console.error('Load products error:', error);
+    } finally {
+        document.getElementById('loadingIndicator').style.display = 'none';
+    }
+}
+
+async function createProduct(productData) {
+    try {
+        const response = await fetch(`${API_BASE}/products/create.php`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${getToken()}`
+            },
+            body: JSON.stringify(productData)
+        });
+
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error('Create product error:', error);
+        throw error;
+    }
+}
+
+async function updateProduct(productData) {
+    try {
+        const response = await fetch(`${API_BASE}/products/update.php`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${getToken()}`
+            },
+            body: JSON.stringify(productData)
+        });
+
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error('Update product error:', error);
+        throw error;
+    }
+}
+
+async function deleteProduct(productId) {
+    try {
+        const response = await fetch(`${API_BASE}/products/delete.php`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${getToken()}`
+            },
+            body: JSON.stringify({ product_id: productId })
+        });
+
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error('Delete product error:', error);
+        throw error;
+    }
+}
+
+async function updateSeasonalFactors(productId, factors) {
+    try {
+        const response = await fetch(`${API_BASE}/products/update_factors.php`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${getToken()}`
+            },
+            body: JSON.stringify({
+                product_id: productId,
+                factors: factors
+            })
+        });
+
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error('Update factors error:', error);
+        throw error;
+    }
+}
+
+// ============================================================================
+// UI RENDERING
+// ============================================================================
+
+function renderProducts() {
+    const tbody = document.getElementById('productsTableBody');
+    const table = document.getElementById('productsTable');
+    const noResults = document.getElementById('noResults');
+
+    if (filteredProducts.length === 0) {
+        table.style.display = 'none';
+        noResults.style.display = 'block';
+        return;
+    }
+
+    table.style.display = 'table';
+    noResults.style.display = 'none';
+
+    tbody.innerHTML = filteredProducts.map(product => `
+        <tr>
+            <td>
+                <div class="product-name">${escapeHtml(product.product_name || '-')}</div>
+                <div class="product-code">${escapeHtml(product.artikel || '-')}</div>
+            </td>
+            <td>${escapeHtml(product.artikel || '-')}</td>
+            <td class="product-code">${escapeHtml(product.fnsku || '-')}</td>
+            <td class="product-code">${escapeHtml(product.asin || '-')}</td>
+            <td class="product-code">${escapeHtml(product.sku || '-')}</td>
+            <td class="product-code">${escapeHtml(product.ean || '-')}</td>
+            <td style="text-align: center;">${product.pairs_per_box || '-'}</td>
+            <td>
+                ${product.color ? `<span class="color-badge color-${product.color.toLowerCase()}">${product.color}</span>` : '-'}
+            </td>
+            <td class="factors-cell">
+                <div class="factors-clickable" onclick="openFactorsModal(${product.product_id})" title="Klicken zum Bearbeiten">
+                    ${renderFactorsPreview(product.seasonal_factors)}
+                </div>
+            </td>
+            <td class="actions">
+                <button class="action-btn edit-btn" onclick="openEditProductModal(${product.product_id})">
+                    ✏️ Bearbeiten
+                </button>
+                <button class="action-btn delete-btn" onclick="handleDeleteProduct(${product.product_id})">
+                    🗑️ Löschen
+                </button>
+            </td>
+        </tr>
+    `).join('');
+}
+
+function renderFactorsPreview(factors) {
+    if (!factors) {
+        return '<span style="color: #999;">Keine Faktoren</span>';
+    }
+    
+    const months = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
+    const factorValues = months.map(m => factors[m] || 1.0);
+    
+    return `
+        <div class="factors-preview" title="Saisonale Faktoren (Jan-Dez) - Klicken zum Bearbeiten">
+            ${factorValues.map(val => {
+                const className = val > 1.2 ? 'factor-high' : (val < 0.8 ? 'factor-low' : '');
+                return `<div class="factor-mini ${className}">${val.toFixed(1)}</div>`;
+            }).join('')}
+        </div>
+    `;
+}
+
+function filterProducts() {
+    const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+    
+    if (!searchTerm) {
+        filteredProducts = allProducts;
+    } else {
+        filteredProducts = allProducts.filter(product => {
+            return (
+                (product.artikel && product.artikel.toLowerCase().includes(searchTerm)) ||
+                (product.product_name && product.product_name.toLowerCase().includes(searchTerm)) ||
+                (product.fnsku && product.fnsku.toLowerCase().includes(searchTerm)) ||
+                (product.asin && product.asin.toLowerCase().includes(searchTerm)) ||
+                (product.sku && product.sku.toLowerCase().includes(searchTerm)) ||
+                (product.ean && product.ean.toLowerCase().includes(searchTerm))
+            );
+        });
+    }
+    
+    renderProducts();
+}
+
+// ============================================================================
+// PRODUCT MODAL MANAGEMENT
+// ============================================================================
+
+function openAddProductModal() {
+    editingProductId = null;
+    document.getElementById('modalTitle').textContent = 'Neuer Artikel';
+    document.getElementById('productForm').reset();
+    document.getElementById('productId').value = '';
+    document.getElementById('fnsku').disabled = false;
+    document.getElementById('productModal').classList.remove('hidden');
+}
+
+function openEditProductModal(productId) {
+    const product = allProducts.find(p => p.product_id === productId);
+    if (!product) return;
+
+    editingProductId = productId;
+    document.getElementById('modalTitle').textContent = 'Artikel Bearbeiten';
+    document.getElementById('productId').value = product.product_id;
+    document.getElementById('artikel').value = product.artikel || '';
+    document.getElementById('fnsku').value = product.fnsku || '';
+    document.getElementById('fnsku').disabled = true; // Can't change FNSKU
+    document.getElementById('asin').value = product.asin || '';
+    document.getElementById('sku').value = product.sku || '';
+    document.getElementById('ean').value = product.ean || '';
+    document.getElementById('productName').value = product.product_name || '';
+    document.getElementById('pairsPerBox').value = product.pairs_per_box || '';
+    document.getElementById('color').value = product.color || '';
+    document.getElementById('avgWeeklySales').value = product.average_weekly_sales || '';
+    
+    document.getElementById('productModal').classList.remove('hidden');
+}
+
+function closeProductModal() {
+    document.getElementById('productModal').classList.add('hidden');
+    document.getElementById('productForm').reset();
+    editingProductId = null;
+}
+
+// ============================================================================
+// SEASONAL FACTORS MODAL MANAGEMENT
+// ============================================================================
+
+function openFactorsModal(productId) {
+    const product = allProducts.find(p => p.product_id === productId);
+    if (!product) return;
+
+    currentProductForFactors = product;
+    
+    document.getElementById('factorsModalTitle').textContent = 
+        `Saisonale Faktoren - ${product.artikel}`;
+    document.getElementById('factorsProductName').textContent = 
+        `Produkt: ${product.product_name}`;
+    
+    // Fill in current factors
+    const months = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
+    months.forEach(month => {
+        const value = product.seasonal_factors ? product.seasonal_factors[month] : 1.0;
+        document.getElementById(`factor_${month}`).value = value;
+    });
+    
+    document.getElementById('factorsModal').classList.remove('hidden');
+}
+
+function closeFactorsModal() {
+    document.getElementById('factorsModal').classList.add('hidden');
+    currentProductForFactors = null;
+}
+
+// ============================================================================
+// FORM HANDLERS
+// ============================================================================
+
+async function handleProductSubmit(e) {
+    e.preventDefault();
+
+    const formData = {
+        artikel: document.getElementById('artikel').value.trim(),
+        fnsku: document.getElementById('fnsku').value.trim(),
+        asin: document.getElementById('asin').value.trim() || null,
+        sku: document.getElementById('sku').value.trim() || null,
+        ean: document.getElementById('ean').value.trim() || null,
+        product_name: document.getElementById('productName').value.trim(),
+        pairs_per_box: parseInt(document.getElementById('pairsPerBox').value),
+        color: document.getElementById('color').value.trim() || null,
+        average_weekly_sales: parseFloat(document.getElementById('avgWeeklySales').value) || 0
+    };
+
+    try {
+        if (editingProductId) {
+            // Update existing product
+            formData.product_id = editingProductId;
+            const result = await updateProduct(formData);
+            
+            if (result.success) {
+                showSuccess('Artikel erfolgreich aktualisiert!');
+                closeProductModal();
+                loadProducts();
+            } else {
+                showError(result.error || 'Fehler beim Aktualisieren');
+            }
+        } else {
+            // Create new product
+            const result = await createProduct(formData);
+            
+            if (result.success) {
+                showSuccess('Artikel erfolgreich angelegt!');
+                closeProductModal();
+                loadProducts();
+            } else {
+                showError(result.error || 'Fehler beim Anlegen');
+            }
+        }
+    } catch (error) {
+        showError('Verbindungsfehler: ' + error.message);
+    }
+}
+
+async function handleFactorsSubmit(e) {
+    e.preventDefault();
+
+    if (!currentProductForFactors) return;
+
+    const months = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
+    const factors = {};
+    
+    months.forEach(month => {
+        factors[month] = parseFloat(document.getElementById(`factor_${month}`).value) || 1.0;
+    });
+
+    try {
+        // UPDATED: Now uses product_id instead of product_name
+        const result = await updateSeasonalFactors(currentProductForFactors.product_id, factors);
+        
+        if (result.success) {
+            showSuccess('Saisonale Faktoren aktualisiert!');
+            closeFactorsModal();
+            loadProducts();
+        } else {
+            showError(result.error || 'Fehler beim Aktualisieren');
+        }
+    } catch (error) {
+        showError('Verbindungsfehler: ' + error.message);
+    }
+}
+
+async function handleDeleteProduct(productId) {
+    const product = allProducts.find(p => p.product_id === productId);
+    if (!product) return;
+
+    const confirmMsg = `Artikel "${product.artikel}" wirklich löschen?\n\nDies kann nicht rückgängig gemacht werden!`;
+    if (!confirm(confirmMsg)) {
+        return;
+    }
+
+    try {
+        const result = await deleteProduct(productId);
+        
+        if (result.success) {
+            showSuccess('Artikel erfolgreich gelöscht!');
+            loadProducts();
+        } else {
+            showError(result.error || 'Fehler beim Löschen');
+        }
+    } catch (error) {
+        showError('Verbindungsfehler: ' + error.message);
+    }
+}
+
+// ============================================================================
+// HELPER FUNCTIONS
+// ============================================================================
+
+function setAllFactors(value) {
+    const months = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
+    months.forEach(month => {
+        document.getElementById(`factor_${month}`).value = value;
+    });
+}
+
+function resetFactorsToDefault() {
+    if (confirm('Alle Faktoren auf 1.0 zurücksetzen?')) {
+        setAllFactors(1.0);
+    }
+}

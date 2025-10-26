@@ -1,0 +1,39 @@
+# === BEGIN: Security and Routing ===
+
+# Force HTTPS (optional, comment out if Strato handles this)
+RewriteEngine On
+RewriteCond %{HTTPS} off
+RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+SetEnvIf Authorization "(.*)" HTTP_AUTHORIZATION=$1
+
+# Pass Authorization header to PHP (critical for JWT authentication)
+RewriteCond %{HTTP:Authorization} .
+RewriteRule ^ - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+
+# Protect sensitive files
+<FilesMatch "(^\.env|\.git|composer\.json|wp-config\.php|wp-set\.php)">
+    Require all denied
+</FilesMatch>
+
+# Protect .htaccess itself
+<Files ".htaccess">
+    Require all denied
+</Files>
+
+# Security headers (safe Strato subset)
+<IfModule mod_headers.c>
+    Header set X-Content-Type-Options "nosniff"
+    Header set X-Frame-Options "SAMEORIGIN"
+    Header set Referrer-Policy "strict-origin-when-cross-origin"
+    Header set X-XSS-Protection "1; mode=block"
+</IfModule>
+
+# === BEGIN: Assets mapping ===
+# Requests like /css/... → /css/... (inside public)
+RewriteRule ^(css|js|images|content|templates)/(.*)$ $1/$2 [L]
+
+# Allow direct access to .html files in /public
+RewriteRule ^([A-Za-z0-9_-]+\.html)$ $1 [L]
+
+RewriteRule ^productive$ indexProductive.html [L]
+# === END: Assets mapping ===
