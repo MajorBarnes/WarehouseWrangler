@@ -1,12 +1,16 @@
 <!DOCTYPE html>
-<html lang="de">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Artikel Verwaltung - WarehouseWrangler</title>
-    <link rel="stylesheet" href="css/main.css">
-    <link rel="stylesheet" href="css/users.css">
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"> 
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
+    <link rel="stylesheet" href="./css/main.css">
+    <link rel="stylesheet" href="./css/products.css">
+    <link rel="icon" type="image/png" href="/favicon.ico"/>
     <script>
         // Inline auth check - runs BEFORE page loads to prevent redirect loop
         (function() {
@@ -30,298 +34,154 @@
             }
         })();
     </script>
-    <style>
-        .factors-clickable {
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        
-        .factors-clickable:hover {
-            background: #f0f0f0;
-            border-radius: 4px;
-            transform: scale(1.05);
-        }
-        
-        .factors-preview {
-            display: flex;
-            gap: 2px;
-            flex-wrap: wrap;
-            padding: 4px;
-        }
-
-        .factor-mini {
-            width: 20px;
-            height: 20px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            background: #e8f5e9;
-            border-radius: 3px;
-            font-size: 9px;
-            font-weight: 500;
-        }
-
-        .factor-high {
-            background: #c8e6c9;
-            font-weight: bold;
-            color: #2e7d32;
-        }
-
-        .factor-low {
-            background: #ffcdd2;
-            color: #c62828;
-        }
-        
-        .color-badge {
-            display: inline-block;
-            padding: 4px 12px;
-            border-radius: 12px;
-            font-size: 12px;
-            font-weight: 500;
-        }
-
-        .color-black {
-            background: #333;
-            color: white;
-        }
-
-        .color-white {
-            background: #f5f5f5;
-            color: #333;
-            border: 1px solid #ddd;
-        }
-        
-        .product-name {
-            font-weight: 600;
-            color: #2c3e50;
-        }
-
-        .product-code {
-            font-family: 'Courier New', monospace;
-            font-size: 12px;
-            color: #666;
-            margin-top: 2px;
-        }
-        
-        .factors-form-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 16px;
-            margin: 20px 0;
-        }
-        
-        .factor-input-group {
-            display: flex;
-            flex-direction: column;
-        }
-        
-        .factor-input-group label {
-            font-size: 13px;
-            font-weight: 500;
-            margin-bottom: 4px;
-            color: #555;
-        }
-        
-        .factor-input-group input {
-            padding: 8px;
-            border: 2px solid #e0e0e0;
-            border-radius: 4px;
-            font-size: 14px;
-            text-align: center;
-        }
-        
-        .factor-input-group input:focus {
-            border-color: #7cb342;
-            outline: none;
-        }
-        
-        .factors-helper {
-            background: #f8f9fa;
-            padding: 12px;
-            border-radius: 6px;
-            margin-bottom: 16px;
-            font-size: 13px;
-            color: #666;
-        }
-        
-        .factors-actions {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 16px;
-        }
-        
-        .btn-small-action {
-            padding: 6px 12px;
-            font-size: 12px;
-            background: #e0e0e0;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        
-        .btn-small-action:hover {
-            background: #d0d0d0;
-        }
-        
-        .error {
-            background: #ffebee;
-            color: #c62828;
-            padding: 15px;
-            border-radius: 6px;
-            margin-bottom: 20px;
-        }
-        
-        .action-btn {
-            padding: 6px 12px;
-            font-size: 12px;
-            border-radius: 4px;
-            cursor: pointer;
-            border: none;
-            transition: all 0.2s;
-        }
-
-        .edit-btn {
-            background: #2196F3;
-            color: white;
-        }
-
-        .edit-btn:hover {
-            background: #1976D2;
-        }
-
-        .delete-btn {
-            background: #f44336;
-            color: white;
-        }
-
-        .delete-btn:hover {
-            background: #d32f2f;
-        }
-        
-        .actions {
-            display: flex;
-            gap: 8px;
-        }
-        
-        @media (max-width: 768px) {
-            .factors-form-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
-    </style>
 </head>
 <body>
-    <!-- Header -->
-    <header class="app-header">
-        <div class="header-left">
-            <h1><span class="material-icons" style="font-size: 24px; vertical-align: middle;">warehouse</span> WarehouseWrangler</h1> 
+    <header class="site-header">
+        <div class="branding">
+            <span class="material-icons-outlined brand-icon" aria-hidden="true">move_up</span>
+            <div class="brand-copy">
+                <span class="brand-name">WarehouseWrangler</span>
+                <span class="brand-tagline">Fulfillment Control Center</span>
+            </div>
         </div>
-        <div class="header-right">
-            <a href="index.html" class="btn-secondary" style="margin-right: 12px;"><span class="material-icons" style="font-size: 18px; vertical-align: middle;">dashboard</span> Dashboard</a>
-            <a href="lc-upload.html" class="btn-secondary" style="margin-right: 12px;"><span class="material-icons" style="font-size: 18px; vertical-align: middle;">file_upload</span> LC-File laden</a>
-            <a href="users.html" class="btn-secondary" style="margin-right: 12px;"><span class="material-icons" style="font-size: 18px; vertical-align: middle;">group</span> Benutzer</a>
+
+        <nav class="primary-nav" aria-label="Main navigation">
+            <ul class="nav-list">
+                <li><a class="nav-link" href="index.html"><span class="material-icons-outlined" aria-hidden="true">dashboard</span><span>Dashboard</span></a></li>
+                <li><a class="nav-link" href="amazon-snapshot-upload.html"><span class="material-icons-outlined" aria-hidden="true">cloud_upload</span><span>Amazon Snapshot</span></a></li>
+                <li><a class="nav-link" href="cartons.html"><span class="material-icons-outlined" aria-hidden="true">inventory_2</span><span>Cartons</span></a></li>
+                <li><a class="nav-link" href="lc-upload.html"><span class="material-icons-outlined" aria-hidden="true">upload_file</span><span>LC Upload</span></a></li>
+                <li><a class="nav-link is-active" href="products.html" aria-current="page"><span class="material-icons-outlined" aria-hidden="true">view_list</span><span>Products</span></a></li>
+                <li><a class="nav-link" href="shipments.html"><span class="material-icons-outlined" aria-hidden="true">local_shipping</span><span>Shipments</span></a></li>
+                <li><a class="nav-link" href="users.html"><span class="material-icons-outlined" aria-hidden="true">group</span><span>Users</span></a></li>
+                <li><a class="nav-link" href="login.html"><span class="material-icons-outlined" aria-hidden="true">lock</span><span>Login</span></a></li>
+            </ul>
+        </nav>
+
+        <div class="header-actions">
+            <span class="user-display" aria-live="polite">
+                <span class="material-icons-outlined" aria-hidden="true">account_circle</span>
+                <span id="userDisplay" class="user-display-name">Loading…</span>
+            </span>
+            <button id="logoutBtn" class="btn btn-logout" type="button">
+                <span class="material-icons-outlined" aria-hidden="true">logout</span>
+                <span>Logout</span>
+            </button>
         </div>
     </header>
 
-    <!-- Main Content -->
-    <main class="app-main">
-        <div class="page-header">
-            <h2><span class="material-icons" style="font-size: 24px; vertical-align: middle; margin-right: 4px;">inventory_2</span> Artikel Verwaltung</h2>
-            <button id="addProductBtn" class="btn-primary" onclick="openAddProductModal()">
-                <span class="material-icons" style="font-size: 18px; vertical-align: middle;">add</span> Artikel Anlegen
-            </button>
-        </div>
-
-        <!-- Search Bar -->
-        <div class="search-bar" style="background: white; padding: 16px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-            <input 
-                type="text" 
-                id="searchInput"
-                placeholder="🔍 Suche nach Artikel, Produkt, FNSKU, ASIN, SKU, EAN..."
-                style="width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 6px; font-size: 14px;"
-            >
-        </div>
-
-        <div id="errorMessage"></div>
-
-        <!-- Products Table -->
-        <div class="table-container">
-            <div id="loadingIndicator" style="text-align: center; padding: 40px; color: #666;">
-                Lade Artikel...
+    <main class="app-main products-page">
+        <section class="page-header">
+            <div class="page-title">
+                <span class="material-icons-outlined" aria-hidden="true">inventory_2</span>
+                <div class="page-title-copy">
+                    <h2>Artikel Verwaltung</h2>
+                    <p>Manage product catalog details, identification codes, and seasonal demand factors.</p>
+                </div>
             </div>
+            <button id="addProductBtn" class="btn btn-primary" type="button" onclick="openAddProductModal()">
+                <span class="material-icons-outlined" aria-hidden="true">add_circle</span>
+                <span>Artikel anlegen</span>
+            </button>
+        </section>
 
-            <table id="productsTable" class="users-table" style="display: none;">
+        <section class="surface-card search-panel" aria-label="Search products">
+            <div class="search-header">
+                <h3>Produktkatalog durchsuchen</h3>
+                <p>Filter by product name, article, or identification codes.</p>
+            </div>
+            <div class="search-field">
+                <span class="material-icons-outlined" aria-hidden="true">search</span>
+                <input
+                    type="text"
+                    id="searchInput"
+                    placeholder="Search by article, product, FNSKU, ASIN, SKU, or EAN"
+                    aria-label="Search products"
+                >
+            </div>
+        </section>
+
+        <div id="errorMessage" aria-live="polite"></div>
+
+        <section class="surface-card table-card" aria-label="Products table">
+            <div id="loadingIndicator" class="loading-indicator">Loading products…</div>
+
+            <table id="productsTable" class="products-table is-hidden">
                 <thead>
                     <tr>
-                        <th>Produkt (Gruppe)<br><small style="font-weight: normal;">Artikel</small></th>
-                        <th>Artikel</th>
-                        <th>FNSKU</th>
-                        <th>ASIN</th>
-                        <th>SKU</th>
-                        <th>EAN</th>
-                        <th style="text-align: center;">Paare/Box</th>
-                        <th>Farbe</th>
-                        <th>Saisonalität</th>
-                        <th>Aktionen</th>
+                        <th scope="col">Produkt (Gruppe)<br><small>Artikel</small></th>
+                        <th scope="col">Artikel</th>
+                        <th scope="col">FNSKU</th>
+                        <th scope="col">ASIN</th>
+                        <th scope="col">SKU</th>
+                        <th scope="col">EAN</th>
+                        <th scope="col" class="numeric">Paare/Box</th>
+                        <th scope="col">Farbe</th>
+                        <th scope="col">Saisonalität</th>
+                        <th scope="col" class="actions-col">Aktionen</th>
                     </tr>
                 </thead>
-                <tbody id="productsTableBody">
-                    <!-- Products will be loaded here -->
-                </tbody>
+                <tbody id="productsTableBody"></tbody>
             </table>
 
-            <div id="noResults" style="text-align: center; padding: 40px; color: #999; display: none;">
-                Keine Artikel gefunden
+            <div id="noResults" class="empty-state is-hidden">
+                <span class="material-icons-outlined" aria-hidden="true">search_off</span>
+                <p>Keine Artikel gefunden</p>
             </div>
-        </div>
+        </section>
     </main>
 
-    <!-- Product Add/Edit Modal -->
-    <div id="productModal" class="modal hidden">
+    <div id="productModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
         <div class="modal-content">
             <div class="modal-header">
-                <h3 id="modalTitle">Neuer Artikel</h3>
-                <button class="modal-close" onclick="closeProductModal()">&times;</button>
+                <div class="modal-title-group">
+                    <span class="material-icons-outlined" aria-hidden="true">inventory</span>
+                    <h3 id="modalTitle">Neuer Artikel</h3>
+                </div>
+                <button class="modal-close" type="button" onclick="closeProductModal()" aria-label="Close">
+                    <span class="material-icons-outlined" aria-hidden="true">close</span>
+                </button>
             </div>
             <form id="productForm">
                 <input type="hidden" id="productId">
-                
-                <div class="form-group">
-                    <label for="artikel">Artikel * <small>(z.B. "Sneaker Black 43-46")</small></label>
-                    <input type="text" id="artikel" required maxlength="100">
+
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="artikel">Artikel * <small>(z.B. "Sneaker Black 43-46")</small></label>
+                        <input type="text" id="artikel" required maxlength="100">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="productName">Produkt (Gruppe) * <small>(z.B. "Sneaker Bambus")</small></label>
+                        <input type="text" id="productName" required maxlength="200">
+                    </div>
                 </div>
 
-                <div class="form-group">
-                    <label for="productName">Produkt (Gruppe) * <small>(z.B. "Sneaker Bambus")</small></label>
-                    <input type="text" id="productName" required maxlength="200">
-                </div>
-
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                <div class="form-grid form-grid--two">
                     <div class="form-group">
                         <label for="fnsku">FNSKU *</label>
-                        <input type="text" id="fnsku" required maxlength="50" style="font-family: 'Courier New', monospace;">
+                        <input type="text" id="fnsku" required maxlength="50" class="input-code">
                     </div>
 
                     <div class="form-group">
                         <label for="asin">ASIN</label>
-                        <input type="text" id="asin" maxlength="50" style="font-family: 'Courier New', monospace;">
+                        <input type="text" id="asin" maxlength="50" class="input-code">
                     </div>
                 </div>
 
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                <div class="form-grid form-grid--two">
                     <div class="form-group">
                         <label for="sku">SKU</label>
-                        <input type="text" id="sku" maxlength="50" style="font-family: 'Courier New', monospace;">
+                        <input type="text" id="sku" maxlength="50" class="input-code">
                     </div>
 
                     <div class="form-group">
                         <label for="ean">EAN</label>
-                        <input type="text" id="ean" maxlength="50" style="font-family: 'Courier New', monospace;">
+                        <input type="text" id="ean" maxlength="50" class="input-code">
                     </div>
                 </div>
 
-                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px;">
+                <div class="form-grid form-grid--three">
                     <div class="form-group">
                         <label for="pairsPerBox">Paare/Box *</label>
                         <input type="number" id="pairsPerBox" required min="1" max="999">
@@ -339,38 +199,54 @@
                 </div>
 
                 <div class="modal-footer">
-                    <button type="button" class="btn-secondary" onclick="closeProductModal()">Abbrechen</button>
-                    <button type="submit" class="btn-primary">Speichern</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeProductModal()">
+                        <span class="material-icons-outlined" aria-hidden="true">close</span>
+                        <span>Abbrechen</span>
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        <span class="material-icons-outlined" aria-hidden="true">save</span>
+                        <span>Speichern</span>
+                    </button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- Seasonal Factors Modal -->
-    <div id="factorsModal" class="modal hidden">
-        <div class="modal-content" style="max-width: 700px;">
+    <div id="factorsModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="factorsModalTitle">
+        <div class="modal-content modal-content--wide">
             <div class="modal-header">
-                <div>
-                    <h3 id="factorsModalTitle">Saisonale Faktoren</h3>
-                    <p id="factorsProductName" style="margin: 4px 0 0 0; font-size: 13px; color: #666;"></p>
+                <div class="modal-title-group">
+                    <span class="material-icons-outlined" aria-hidden="true">insights</span>
+                    <div>
+                        <h3 id="factorsModalTitle">Saisonale Faktoren</h3>
+                        <p id="factorsProductName" class="modal-subtitle"></p>
+                    </div>
                 </div>
-                <button class="modal-close" onclick="closeFactorsModal()">&times;</button>
+                <button class="modal-close" type="button" onclick="closeFactorsModal()" aria-label="Close">
+                    <span class="material-icons-outlined" aria-hidden="true">close</span>
+                </button>
             </div>
             <form id="factorsForm">
                 <div class="factors-helper">
-                    ℹ️ <strong>Saisonale Faktoren</strong> beeinflussen die Verkaufsprognose.<br>
-                    <strong>1.0</strong> = Normal | <strong>&gt;1.0</strong> = Höher | <strong>&lt;1.0</strong> = Niedriger
+                    <span class="material-icons-outlined" aria-hidden="true">info</span>
+                    <div>
+                        <strong>Saisonale Faktoren</strong> beeinflussen die Verkaufsprognose.<br>
+                        <strong>1.0</strong> = Normal · <strong>&gt;1.0</strong> = Höher · <strong>&lt;1.0</strong> = Niedriger
+                    </div>
                 </div>
 
                 <div class="factors-actions">
-                    <button type="button" class="btn-small-action" onclick="resetFactorsToDefault()">
-                        🔄 Alle auf 1.0
+                    <button type="button" class="btn btn-tertiary btn-compact" onclick="resetFactorsToDefault()">
+                        <span class="material-icons-outlined" aria-hidden="true">restart_alt</span>
+                        <span>Alle auf 1.0</span>
                     </button>
-                    <button type="button" class="btn-small-action" onclick="setAllFactors(1.5)">
-                        📈 Alle auf 1.5
+                    <button type="button" class="btn btn-secondary btn-compact" onclick="setAllFactors(1.5)">
+                        <span class="material-icons-outlined" aria-hidden="true">trending_up</span>
+                        <span>Alle auf 1.5</span>
                     </button>
-                    <button type="button" class="btn-small-action" onclick="setAllFactors(0.8)">
-                        📉 Alle auf 0.8
+                    <button type="button" class="btn btn-secondary btn-compact" onclick="setAllFactors(0.8)">
+                        <span class="material-icons-outlined" aria-hidden="true">trending_down</span>
+                        <span>Alle auf 0.8</span>
                     </button>
                 </div>
 
@@ -426,14 +302,19 @@
                 </div>
 
                 <div class="modal-footer">
-                    <button type="button" class="btn-secondary" onclick="closeFactorsModal()">Abbrechen</button>
-                    <button type="submit" class="btn-primary">Faktoren Speichern</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeFactorsModal()">
+                        <span class="material-icons-outlined" aria-hidden="true">close</span>
+                        <span>Abbrechen</span>
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        <span class="material-icons-outlined" aria-hidden="true">save</span>
+                        <span>Faktoren speichern</span>
+                    </button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- Scripts -->
     <script src="./js/products.js"></script>
 </body>
 </html>
