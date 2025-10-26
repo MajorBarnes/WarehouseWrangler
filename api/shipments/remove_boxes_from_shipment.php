@@ -3,7 +3,6 @@
  * WarehouseWrangler - Remove Boxes from Shipment
  * 
  * Removes specific boxes from a prepared shipment
- * Allows users to adjust their selections before sending
  * 
  * @method POST
  * @body JSON: { 
@@ -108,9 +107,18 @@ try {
         
         // 2. Check if shipment_content exists and belongs to this shipment
         $contentSql = "
-            SELECT shipment_content_id, shipment_id, carton_id, product_id, boxes_sent
-            FROM shipment_contents
-            WHERE shipment_content_id = ? AND shipment_id = ?
+            SELECT 
+                sc.shipment_content_id,
+                sc.shipment_id,
+                sc.carton_id,
+                sc.product_id,
+                sc.boxes_sent,
+                c.carton_number,
+                p.product_name
+            FROM shipment_contents sc
+            JOIN cartons c ON sc.carton_id = c.carton_id
+            JOIN products p ON sc.product_id = p.product_id
+            WHERE sc.shipment_content_id = ? AND sc.shipment_id = ?
         ";
         $stmt = $db->prepare($contentSql);
         $stmt->execute([$shipmentContentId, $shipmentId]);
@@ -118,7 +126,7 @@ try {
         
         if (!$content) {
             $db->rollBack();
-            sendJSON(['success' => false, 'error' => 'Shipment content not found or does not belong to this shipment'], 404);
+            sendJSON(['success' => false, 'error' => 'Shipment content not found'], 404);
         }
         
         // 3. Delete the shipment content entry
@@ -126,18 +134,22 @@ try {
         $stmt = $db->prepare($deleteSql);
         $stmt->execute([$shipmentContentId]);
         
-        // 4. Update shipment updated_at timestamp
-        $updateShipmentSql = "UPDATE amazon_shipments SET updated_at = CURRENT_TIMESTAMP WHERE shipment_id = ?";
-        $stmt = $db->prepare($updateShipmentSql);
+        // 4. Update shipment timestamp
+        $updateSql = "UPDATE amazon_shipments SET updated_at = CURRENT_TIMESTAMP WHERE shipment_id = ?";
+        $stmt = $db->prepare($updateSql);
         $stmt->execute([$shipmentId]);
         
-        // 5. Commit transaction
+        // Commit transaction
         $db->commit();
         
         sendJSON([
             'success' => true,
             'message' => 'Boxes removed from shipment successfully',
-            'removed_boxes' => (int)$content['boxes_sent']
+            'removed' => [
+                'carton_number' => $content['carton_number'],
+                'product_name' => $content['product_name'],
+                'boxes' => $content['boxes_sent']
+            ]
         ]);
         
     } catch (Exception $e) {

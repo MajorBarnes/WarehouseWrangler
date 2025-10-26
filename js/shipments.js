@@ -13,7 +13,7 @@ let currentFilters = {
 
 // Current shipment being created/edited
 let activeShipment = null;
-let selectedBoxes = []; // Array of {carton_id, product_id, boxes_to_send, carton_number, product_name, pairs_per_box}
+let selectedBoxes = []; // Array of {shipment_content_id, carton_id, product_id, boxes_to_send, carton_number, product_name, pairs_per_box}
 let availableCartons = [];
 
 // Shipment to recall
@@ -196,18 +196,16 @@ async function recallShipment(shipmentId, notes) {
 
 async function loadAvailableCartons() {
     try {
-        // Get cartons from WML and GMR that have stock
-        const response = await fetch(`${API_BASE}/cartons/get_cartons.php?status=in stock`, {
+        // Use new endpoint that shows reserved quantities
+        const excludeParam = activeShipment ? `?exclude_shipment_id=${activeShipment.shipment_id}` : '';
+        const response = await fetch(`${API_BASE}/shipments/get_available_cartons.php${excludeParam}`, {
             headers: { 'Authorization': `Bearer ${getToken()}` }
         });
 
         const data = await response.json();
 
         if (data.success) {
-            // Filter to only WML and GMR
-            availableCartons = data.cartons.filter(c => 
-                (c.location === 'WML' || c.location === 'GMR') && c.total_boxes_current > 0
-            );
+            availableCartons = data.cartons;
             renderAvailableCartons();
         }
     } catch (error) {
@@ -215,16 +213,43 @@ async function loadAvailableCartons() {
     }
 }
 
-async function loadCartonDetails(cartonId) {
+async function removeBoxesFromShipment(shipmentId, shipmentContentId) {
     try {
-        const response = await fetch(`${API_BASE}/cartons/get_carton_details.php?carton_id=${cartonId}`, {
-            headers: { 'Authorization': `Bearer ${getToken()}` }
+        const response = await fetch(`${API_BASE}/shipments/remove_boxes_from_shipment.php`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${getToken()}`
+            },
+            body: JSON.stringify({
+                shipment_id: shipmentId,
+                shipment_content_id: shipmentContentId
+            })
         });
 
         const data = await response.json();
         return data;
     } catch (error) {
-        console.error('Load carton details error:', error);
+        console.error('Remove boxes error:', error);
+        throw error;
+    }
+}
+
+async function deleteShipment(shipmentId) {
+    try {
+        const response = await fetch(`${API_BASE}/shipments/delete_shipment.php`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${getToken()}`
+            },
+            body: JSON.stringify({ shipment_id: shipmentId })
+        });
+
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error('Delete shipment error:', error);
         throw error;
     }
 }

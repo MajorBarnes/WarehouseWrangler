@@ -1,6 +1,6 @@
 <?php
 /**
- * WarehouseWrangler - Delete Shipment
+ * WarehouseWrangler - Delete Prepared Shipment
  * 
  * Deletes a prepared shipment and all its contents
  * Can only delete shipments with status 'prepared'
@@ -99,28 +99,36 @@ try {
         
         if ($shipment['status'] !== 'prepared') {
             $db->rollBack();
-            sendJSON(['success' => false, 'error' => 'Can only delete shipments with status "prepared". Sent or recalled shipments must be kept for audit trail.'], 400);
+            sendJSON(['success' => false, 'error' => 'Can only delete prepared shipments. Sent shipments should be recalled instead.'], 400);
         }
         
-        // 2. Delete all shipment contents (CASCADE should handle this, but we'll be explicit)
+        // 2. Count contents (for info)
+        $countSql = "SELECT COUNT(*) as content_count FROM shipment_contents WHERE shipment_id = ?";
+        $stmt = $db->prepare($countSql);
+        $stmt->execute([$shipmentId]);
+        $countResult = $stmt->fetch();
+        $contentCount = $countResult['content_count'];
+        
+        // 3. Delete shipment contents (cascade will handle this, but let's be explicit)
         $deleteContentsSql = "DELETE FROM shipment_contents WHERE shipment_id = ?";
         $stmt = $db->prepare($deleteContentsSql);
         $stmt->execute([$shipmentId]);
         
-        $deletedContents = $stmt->rowCount();
-        
-        // 3. Delete the shipment
+        // 4. Delete the shipment
         $deleteShipmentSql = "DELETE FROM amazon_shipments WHERE shipment_id = ?";
         $stmt = $db->prepare($deleteShipmentSql);
         $stmt->execute([$shipmentId]);
         
-        // 4. Commit transaction
+        // Commit transaction
         $db->commit();
         
         sendJSON([
             'success' => true,
             'message' => "Shipment '{$shipment['shipment_reference']}' deleted successfully",
-            'deleted_contents' => $deletedContents
+            'deleted' => [
+                'shipment_reference' => $shipment['shipment_reference'],
+                'content_entries_removed' => $contentCount
+            ]
         ]);
         
     } catch (Exception $e) {

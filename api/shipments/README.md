@@ -275,7 +275,122 @@ fetch('./api/shipments/get_shipments.php?from_date=2025-10-01&to_date=2025-10-31
 
 ---
 
-## 6. Recall Shipment
+## 6. Get Available Cartons for Shipment
+
+**Endpoint:** `GET /api/shipments/get_available_cartons.php`
+
+**Description:** Get cartons available for shipment with reserved quantities calculated
+
+**Query Parameters:**
+- `exclude_shipment_id` (optional) - Exclude this shipment when calculating reserved boxes
+
+**Response:**
+```json
+{
+  "success": true,
+  "cartons": [
+    {
+      "carton_id": 5,
+      "carton_number": "25SVS147-5",
+      "location": "WML",
+      "status": "in stock",
+      "product_count": 2,
+      "total_boxes_current": 50,
+      "total_boxes_available_for_shipment": 40,
+      "total_boxes_reserved": 10,
+      "products": [
+        {
+          "content_id": 12,
+          "product_id": 3,
+          "boxes_current": 50,
+          "product_name": "Merino Ski Socks 41-42",
+          "artikel": "SKI-41-42",
+          "fnsku": "X002F2NFFV",
+          "pairs_per_box": 2,
+          "pairs_current": 100,
+          "boxes_reserved": 10,
+          "boxes_available_for_shipment": 40
+        }
+      ]
+    }
+  ],
+  "count": 1
+}
+```
+
+**Use Case:**
+- Shows only WML and GMR cartons with available stock
+- Calculates `boxes_reserved` = boxes in OTHER prepared shipments
+- Calculates `boxes_available_for_shipment` = boxes_current - boxes_reserved
+- If `exclude_shipment_id` provided, doesn't count boxes from that shipment as reserved
+
+---
+
+## 7. Remove Boxes from Shipment
+
+**Endpoint:** `POST /api/shipments/remove_boxes_from_shipment.php`
+
+**Description:** Remove specific boxes from a prepared shipment
+
+**Request Body:**
+```json
+{
+  "shipment_id": 1,
+  "shipment_content_id": 5
+}
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "message": "Boxes removed from shipment successfully",
+  "removed": {
+    "carton_number": "25SVS147-5",
+    "product_name": "Merino Ski Socks 41-42",
+    "boxes": 20
+  }
+}
+```
+
+**Validations:**
+- Shipment must exist and have status 'prepared'
+- Shipment content must exist and belong to the shipment
+
+---
+
+## 8. Delete Prepared Shipment
+
+**Endpoint:** `POST /api/shipments/delete_shipment.php`
+
+**Description:** Delete an entire prepared shipment with all its contents
+
+**Request Body:**
+```json
+{
+  "shipment_id": 1
+}
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "message": "Shipment 'AMZ-2025-10-001' deleted successfully",
+  "deleted": {
+    "shipment_reference": "AMZ-2025-10-001",
+    "content_entries_removed": 3
+  }
+}
+```
+
+**Validations:**
+- Shipment must exist and have status 'prepared'
+- Cannot delete sent or recalled shipments (use recall instead)
+
+---
+
+## 9. Recall Shipment
 
 **Endpoint:** `POST /api/shipments/recall_shipment.php`
 
