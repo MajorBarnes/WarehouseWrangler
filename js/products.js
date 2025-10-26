@@ -38,7 +38,7 @@ function getToken() {
 }
 
 function showSuccess(message) {
-    alert('✅ ' + message);
+    alert('Success: ' + message);
 }
 
 function showError(message) {
@@ -53,6 +53,13 @@ function escapeHtml(text) {
     const div = document.createElement('div');
     div.textContent = text;
     return div.innerHTML;
+}
+
+function sanitizeForClass(value) {
+    return value
+        .toLowerCase()
+        .normalize('NFD').replace(/[^\p{L}\p{N}]+/gu, '-')
+        .replace(/^-+|-+$/g, '');
 }
 
 // ============================================================================
@@ -193,15 +200,22 @@ function renderProducts() {
     const noResults = document.getElementById('noResults');
 
     if (filteredProducts.length === 0) {
-        table.style.display = 'none';
-        noResults.style.display = 'block';
+        table.classList.add('is-hidden');
+        noResults.classList.remove('is-hidden');
+        tbody.innerHTML = '';
         return;
     }
 
-    table.style.display = 'table';
-    noResults.style.display = 'none';
+    table.classList.remove('is-hidden');
+    noResults.classList.add('is-hidden');
 
-    tbody.innerHTML = filteredProducts.map(product => `
+    tbody.innerHTML = filteredProducts.map(product => {
+        const colorLabel = product.color ? escapeHtml(product.color) : '';
+        const sanitizedColor = product.color ? sanitizeForClass(product.color) : '';
+        const colorClass = sanitizedColor ? ` color-${sanitizedColor}` : '';
+        const productLabel = escapeHtml(product.product_name || product.artikel || 'Produkt');
+
+        return `
         <tr>
             <td>
                 <div class="product-name">${escapeHtml(product.product_name || '-')}</div>
@@ -212,40 +226,43 @@ function renderProducts() {
             <td class="product-code">${escapeHtml(product.asin || '-')}</td>
             <td class="product-code">${escapeHtml(product.sku || '-')}</td>
             <td class="product-code">${escapeHtml(product.ean || '-')}</td>
-            <td style="text-align: center;">${product.pairs_per_box || '-'}</td>
+            <td class="numeric">${product.pairs_per_box || '-'}</td>
             <td>
-                ${product.color ? `<span class="color-badge color-${product.color.toLowerCase()}">${product.color}</span>` : '-'}
+                ${product.color ? `<span class="color-badge${colorClass}">${colorLabel}</span>` : '-'}
             </td>
             <td class="factors-cell">
-                <div class="factors-clickable" onclick="openFactorsModal(${product.product_id})" title="Klicken zum Bearbeiten">
+                <button type="button" class="factors-trigger" onclick="openFactorsModal(${product.product_id})" aria-label="Saisonale Faktoren für ${productLabel} bearbeiten">
                     ${renderFactorsPreview(product.seasonal_factors)}
-                </div>
+                </button>
             </td>
             <td class="actions">
-                <button class="action-btn edit-btn" onclick="openEditProductModal(${product.product_id})">
-                    ✏️ Bearbeiten
+                <button type="button" class="btn btn-secondary btn-compact" onclick="openEditProductModal(${product.product_id})">
+                    <span class="material-icons-outlined" aria-hidden="true">edit</span>
+                    <span>Bearbeiten</span>
                 </button>
-                <button class="action-btn delete-btn" onclick="handleDeleteProduct(${product.product_id})">
-                    🗑️ Löschen
+                <button type="button" class="btn btn-destructive btn-compact" onclick="handleDeleteProduct(${product.product_id})">
+                    <span class="material-icons-outlined" aria-hidden="true">delete</span>
+                    <span>Löschen</span>
                 </button>
             </td>
         </tr>
-    `).join('');
+        `;
+    }).join('');
 }
 
 function renderFactorsPreview(factors) {
     if (!factors) {
-        return '<span style="color: #999;">Keine Faktoren</span>';
+        return '<span class="factors-empty">Keine Faktoren</span>';
     }
-    
+
     const months = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
     const factorValues = months.map(m => factors[m] || 1.0);
-    
+
     return `
-        <div class="factors-preview" title="Saisonale Faktoren (Jan-Dez) - Klicken zum Bearbeiten">
+        <div class="factors-preview" aria-hidden="true">
             ${factorValues.map(val => {
-                const className = val > 1.2 ? 'factor-high' : (val < 0.8 ? 'factor-low' : '');
-                return `<div class="factor-mini ${className}">${val.toFixed(1)}</div>`;
+                const className = val > 1.2 ? ' factor-high' : (val < 0.8 ? ' factor-low' : '');
+                return `<span class="factor-mini${className}">${val.toFixed(1)}</span>`;
             }).join('')}
         </div>
     `;

@@ -4,8 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LC File Upload - WarehouseWrangler</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
     <link rel="stylesheet" href="./css/main.css">
     <link rel="stylesheet" href="./css/lc-upload.css">
+    <link rel="icon" type="image/png" href="/favicon.ico"/>
     <script>
         // Inline auth check (same as users.html pattern)
         (function() {
@@ -32,15 +37,37 @@
     </script>
 </head>
 <body>
-    <!-- Header -->
-    <header class="app-header">
-        <div class="header-left">
-            <h1>🏭 WarehouseWrangler</h1>
+    <header class="site-header">
+        <div class="branding">
+            <span class="material-icons-outlined brand-icon" aria-hidden="true">move_up</span>
+            <div class="brand-copy">
+                <span class="brand-name">WarehouseWrangler</span>
+                <span class="brand-tagline">Fulfillment Control Center</span>
+            </div>
         </div>
-        <div class="header-right">
-            <a href="index.html" class="btn-secondary" style="margin-right: 12px;">← Dashboard</a>
-            <span id="userDisplay">Loading...</span>
-            <button id="logoutBtn" class="btn-logout">Logout</button>
+
+        <nav class="primary-nav" aria-label="Main navigation">
+            <ul class="nav-list">
+                <li><a class="nav-link" href="index.html"><span class="material-icons-outlined" aria-hidden="true">dashboard</span><span>Dashboard</span></a></li>
+                <li><a class="nav-link" href="amazon-snapshot-upload.html"><span class="material-icons-outlined" aria-hidden="true">cloud_upload</span><span>Amazon Snapshot</span></a></li>
+                <li><a class="nav-link" href="cartons.html"><span class="material-icons-outlined" aria-hidden="true">inventory_2</span><span>Cartons</span></a></li>
+                <li><a class="nav-link is-active" href="lc-upload.html" aria-current="page"><span class="material-icons-outlined" aria-hidden="true">upload_file</span><span>LC Upload</span></a></li>
+                <li><a class="nav-link" href="products.html"><span class="material-icons-outlined" aria-hidden="true">view_list</span><span>Products</span></a></li>
+                <li><a class="nav-link" href="shipments.html"><span class="material-icons-outlined" aria-hidden="true">local_shipping</span><span>Shipments</span></a></li>
+                <li><a class="nav-link" href="users.html"><span class="material-icons-outlined" aria-hidden="true">group</span><span>Users</span></a></li>
+                <li><a class="nav-link" href="login.html"><span class="material-icons-outlined" aria-hidden="true">lock</span><span>Login</span></a></li>
+            </ul>
+        </nav>
+
+        <div class="header-actions">
+            <span class="user-display" aria-live="polite">
+                <span class="material-icons-outlined" aria-hidden="true">account_circle</span>
+                <span id="userDisplay" class="user-display-name">Loading…</span>
+            </span>
+            <button id="logoutBtn" class="btn btn-logout" type="button">
+                <span class="material-icons-outlined" aria-hidden="true">logout</span>
+                <span>Logout</span>
+            </button>
         </div>
     </header>
 
