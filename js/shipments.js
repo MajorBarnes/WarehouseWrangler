@@ -144,10 +144,10 @@ async function loadShipments(status = currentFilters.status, fromDate = currentF
             params.set('status', currentFilters.status);
         }
         if (isValidDateInput(currentFilters.from)) {
-            params.set('from', currentFilters.from);
+            params.set('from_date', currentFilters.from);
         }
         if (isValidDateInput(currentFilters.to)) {
-            params.set('to', currentFilters.to);
+            params.set('to_date', currentFilters.to);
         }
 
         const queryString = params.toString();
