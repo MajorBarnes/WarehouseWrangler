@@ -1,0 +1,231 @@
+#dashboard {
+  padding: 1.5rem;
+  background: var(--surface, #fff);
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(25, 39, 52, 0.12);
+}
+
+#dashboardTitle {
+  margin-bottom: 1rem;
+}
+
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1.5rem;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  font-size: 0.95rem;
+}
+
+.controls label,
+.controls span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.controls input[type="date"] {
+  padding: 0.35rem 0.5rem;
+  border: 1px solid rgba(25, 39, 52, 0.2);
+  border-radius: 6px;
+  font: inherit;
+}
+
+.controls input[type="checkbox"] {
+  width: 1.05rem;
+  height: 1.05rem;
+}
+
+.bars {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  width: 100%;
+}
+
+.bar-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid rgba(25, 39, 52, 0.1);
+}
+
+.bar-row:last-child {
+  border-bottom: none;
+}
+
+.bar-row--no-demand {
+  opacity: 0.55;
+}
+
+.bar-row__header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.bar-row__title {
+  margin: 0;
+  font-size: 1.1rem;
+  color: var(--ink-strong, #14213d);
+}
+
+.bar-row__summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem 1.25rem;
+  font-size: 0.9rem;
+  color: var(--ink-mild, #4a4a4a);
+}
+
+.metric strong {
+  font-weight: 600;
+}
+
+.bar-row__bar {
+  position: relative;
+  display: flex;
+  align-items: stretch;
+  gap: 0.15rem;
+  min-height: 2.6rem;
+  padding: 0.35rem 0.75rem;
+  border-radius: 999px;
+  background: rgba(20, 33, 61, 0.06);
+  overflow: hidden;
+}
+
+.seg {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 0.82rem;
+  line-height: 1;
+  border-radius: 999px;
+  min-width: 0.75rem;
+  overflow: visible;
+  flex: 0 0 auto;
+  width: calc(var(--w, 0) * 1%);
+  transition: width 160ms ease;
+}
+
+.seg--incoming { background: var(--accent, #5865f2); }
+.seg--wml { background: #4a90e2; }
+.seg--gmr { background: #6c757d; }
+.seg--amz { background: #f0ad4e; color: #1f1300; }
+.seg--additional { background: #20c997; }
+
+.seg--hatched {
+  background-image: repeating-linear-gradient(
+    45deg,
+    transparent 0 6px,
+    rgba(0, 0, 0, 0.12) 6px 12px
+  );
+}
+
+.seg__hit {
+  position: relative;
+  appearance: none;
+  border: none;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  padding: 0.3rem 0.6rem;
+  cursor: pointer;
+  border-radius: 999px;
+}
+
+.seg__hit:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.85);
+  outline-offset: 2px;
+}
+
+.seg__tooltip {
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 0.4rem);
+  transform: translateX(-50%);
+  background: rgba(20, 33, 61, 0.92);
+  color: #fff;
+  padding: 0.45rem 0.75rem;
+  border-radius: 0.5rem;
+  font-size: 0.75rem;
+  line-height: 1.35;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 120ms ease;
+  min-width: 9rem;
+  text-align: center;
+  z-index: 5;
+}
+
+.seg__tooltip::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 0.4rem 0.4rem 0 0.4rem;
+  border-style: solid;
+  border-color: rgba(20, 33, 61, 0.92) transparent transparent transparent;
+}
+
+.seg:hover .seg__tooltip,
+.seg__hit:focus-visible + .seg__tooltip {
+  opacity: 1;
+}
+
+.guide {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 0.25rem;
+  pointer-events: none;
+  transform: translateX(calc(var(--pos, 0) * 1%));
+  border-radius: 999px;
+}
+
+.guide--min {
+  background: var(--danger, #e74c3c);
+}
+
+.guide--target {
+  background: var(--success, #21ba45);
+}
+
+@media (max-width: 768px) {
+  #dashboard {
+    padding: 1rem;
+  }
+
+  .bar-row__bar {
+    min-height: 2.4rem;
+    padding: 0.25rem 0.5rem;
+  }
+
+  .controls {
+    gap: 0.5rem 1rem;
+  }
+}
+
+@media (max-width: 520px) {
+  .bar-row__summary {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .controls {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .seg__tooltip {
+    left: auto;
+    right: 0;
+    transform: translateY(-0.4rem);
+  }
+}
