@@ -212,7 +212,379 @@ All animations from CSS transitions only — no JS `setInterval`.
 
 ---
 
-## 7. Final Acceptance Criteria
+---
+
+## 7. Authentication Consistency
+
+# Authentication Pattern Reference
+**WarehouseWrangler - Standard Auth Implementation**  
+**Date:** October 25, 2025
+
+---
+
+## 🔒 Our Authentication Pattern
+
+This is the **standard pattern** used across all WarehouseWrangler pages. Follow this for consistency and security.
+
+---
+
+## 📄 HTML Pages
+
+### **Pattern: Inline Auth Check**
+
+Place this script in the `<head>` section of **every protected page**:
+
+```html
+<script>
+    // Inline auth check
+    (function() {
+        const token = localStorage.getItem('ww_auth_token');
+        if (!token) {
+            window.location.href = 'login.html';
+            return;
+        }
+        try {
+            const parts = token.split('.');
+            if (parts.length !== 3) throw new Error('Invalid token');
+            const payload = JSON.parse(atob(parts[1]));
+            if (payload.exp <= Math.floor(Date.now() / 1000)) {
+                localStorage.removeItem('ww_auth_token');
+                window.location.href = 'login.html';
+                return;
+            }
+            // Optional: Check role if admin-only page
+            // if (payload.role !== 'admin') {
+            //     alert('Admin access required');
+            //     window.location.href = 'index.html';
+            // }
+        } catch (e) {
+            localStorage.removeItem('ww_auth_token');
+            window.location.href = 'login.html';
+        }
+    })();
+</script>
+```
+
+**Why Inline?**
+- Runs **before** page renders
+- Prevents flash of unauthorized content
+- Immediate redirect if not authenticated
+- No dependencies on external scripts
+
+---
+
+## 📜 JavaScript Files
+
+### **Pattern: Helper Functions**
+
+Include these in your `.js` files:
+
+```javascript
+/**
+ * Get authentication token from localStorage
+ */
+function getToken() {
+    return localStorage.getItem('ww_auth_token');
+}
+
+/**
+ * Get current user data from localStorage
+ */
+function getCurrentUser() {
+    const data = localStorage.getItem('ww_user_data');
+    return data ? JSON.parse(data) : null;
+}
+
+/**
+ * Setup common page elements (header, logout)
+ */
+document.addEventListener('DOMContentLoaded', function() {
+    // Display username
+    const userData = getCurrentUser();
+    if (userData) {
+        document.getElementById('userDisplay').textContent = `👤 ${userData.username}`;
+    }
+
+    // Setup logout button
+    document.getElementById('logoutBtn').addEventListener('click', function() {
+        if (confirm('Are you sure you want to logout?')) {
+            localStorage.removeItem('ww_auth_token');
+            localStorage.removeItem('ww_user_data');
+            window.location.href = 'login.html';
+        }
+    });
+});
+```
+
+---
+
+## 🔌 API Calls
+
+### **Pattern: Authorization Header**
+
+**ALL API requests must include:**
+
+```javascript
+const response = await fetch(`${API_BASE}/your/endpoint.php`, {
+    method: 'POST', // or GET, PUT, DELETE
+    headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${getToken()}` // ← CRITICAL!
+    },
+    body: JSON.stringify(data)
+});
+```
+
+**For FormData uploads (files):**
+
+```javascript
+const formData = new FormData();
+formData.append('file', selectedFile);
+
+const response = await fetch(`${API_BASE}/upload/endpoint.php`, {
+    method: 'POST',
+    headers: {
+        'Authorization': `Bearer ${getToken()}` // ← Still needed!
+        // Note: No Content-Type header - browser sets it automatically for FormData
+    },
+    body: formData
+});
+```
+
+---
+
+## 🐘 PHP Backend
+
+### **Pattern: Token Validation**
+
+**Every API endpoint must start with this:**
+
+```php
+<?php
+define('WAREHOUSEWRANGLER', true);
+require_once '../config.php';
+
+header('Content-Type: application/json');
+
+// Method check
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') { // or GET, PUT, DELETE
+    sendJSON(['success' => false, 'error' => 'Method not allowed'], 405);
+}
+
+try {
+    // ========================================================================
+    // AUTHENTICATION (Copy this block exactly!)
+    // ========================================================================
+    
+    $authHeader = '';
+    if (isset($_SERVER['HTTP_AUTHORIZATION'])) {
+        $authHeader = $_SERVER['HTTP_AUTHORIZATION'];
+    } elseif (isset($_SERVER['REDIRECT_HTTP_AUTHORIZATION'])) {
+        $authHeader = $_SERVER['REDIRECT_HTTP_AUTHORIZATION'];
+    } elseif (function_exists('apache_request_headers')) {
+        $headers = apache_request_headers();
+        $authHeader = $headers['Authorization'] ?? '';
+    }
+    
+    if (empty($authHeader) || !preg_match('/Bearer\s+(.*)$/i', $authHeader, $matches)) {
+        sendJSON(['success' => false, 'error' => 'No authorization token provided'], 401);
+    }
+    
+    $token = $matches[1];
+    
+    // Validate token
+    $parts = explode('.', $token);
+    if (count($parts) !== 3) {
+        sendJSON(['success' => false, 'error' => 'Invalid token format'], 401);
+    }
+    
+    $payload = json_decode(base64_decode(str_replace(['-', '_'], ['+', '/'], $parts[1])), true);
+    
+    // Check token expiration
+    if ($payload['exp'] < time()) {
+        sendJSON(['success' => false, 'error' => 'Token expired'], 401);
+    }
+    
+    // Optional: Check role for admin-only endpoints
+    // if ($payload['role'] !== 'admin') {
+    //     sendJSON(['success' => false, 'error' => 'Admin access required'], 403);
+    // }
+    
+    // Extract user ID for logging
+    $userId = $payload['user_id'] ?? null;
+    
+    // ========================================================================
+    // YOUR ENDPOINT LOGIC STARTS HERE
+    // ========================================================================
+    
+    // ... your code ...
+    
+} catch (Exception $e) {
+    error_log("Error: " . $e->getMessage());
+    sendJSON(['success' => false, 'error' => 'Server error occurred'], 500);
+}
+?>
+```
+
+---
+
+## 🎯 Quick Checklist
+
+### **When Creating a New Page:**
+
+- [ ] Add inline auth check script in `<head>`
+- [ ] Include `getToken()` and `getCurrentUser()` helpers in .js
+- [ ] Setup header with username display
+- [ ] Setup logout button handler
+- [ ] Create dedicated .css file (keep HTML clean)
+- [ ] Create dedicated .js file (keep HTML clean)
+
+### **When Creating a New API Endpoint:**
+
+- [ ] Add authentication block (copy from existing endpoint)
+- [ ] Extract `$userId` for logging
+- [ ] Check method (GET, POST, etc.)
+- [ ] Use try-catch for error handling
+- [ ] Return consistent JSON format
+- [ ] Use `sendJSON()` helper for responses
+
+### **When Making API Calls:**
+
+- [ ] Include `Authorization: Bearer ${getToken()}` header
+- [ ] Handle 401 response (redirect to login)
+- [ ] Handle 403 response (show access denied)
+- [ ] Use consistent error handling
+- [ ] Show loading spinners during requests
+
+---
+
+## ⚠️ Common Mistakes to Avoid
+
+### **❌ DON'T:**
+
+1. **Forget Authorization header:**
+   ```javascript
+   // WRONG - No auth!
+   fetch('/api/endpoint.php')
+   ```
+
+2. **Check auth only in JavaScript:**
+   ```javascript
+   // WRONG - Client-side only, can be bypassed!
+   if (localStorage.getItem('token')) {
+       // ... do something ...
+   }
+   ```
+
+3. **Send token in query string:**
+   ```javascript
+   // WRONG - Insecure!
+   fetch('/api/endpoint.php?token=' + token)
+   ```
+
+4. **Skip inline auth check:**
+   ```html
+   <!-- WRONG - Page loads before redirect -->
+   <script src="auth.js"></script>
+   ```
+
+### **✅ DO:**
+
+1. **Always include Authorization header:**
+   ```javascript
+   fetch('/api/endpoint.php', {
+       headers: { 'Authorization': `Bearer ${getToken()}` }
+   })
+   ```
+
+2. **Validate on BOTH client and server:**
+   - Client: Inline check for UX
+   - Server: Token validation for security
+
+3. **Use Bearer token standard:**
+   ```
+   Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+   ```
+
+4. **Inline auth check in HTML:**
+   ```html
+   <script>
+       (function() { /* auth check */ })();
+   </script>
+   ```
+
+---
+
+## 📚 Files to Reference
+
+**Working Examples:**
+- `users.html` - HTML with inline auth
+- `js/users.js` - JavaScript with token handling
+- `api/users/get_users.php` - PHP with token validation
+- `lc-upload.html` - Recent implementation
+- `api/upload/lc_file.php` - File upload with auth
+
+---
+
+## 🔐 Security Notes
+
+1. **Token Storage:**
+   - Stored in `localStorage` (accessible across tabs)
+   - Keys: `ww_auth_token`, `ww_user_data`
+   - Cleared on logout
+
+2. **Token Expiration:**
+   - Set to 24 hours
+   - Checked on both client and server
+   - Auto-logout on expiration
+
+3. **HTTPS:**
+   - Enforced via .htaccess
+   - Required for secure token transmission
+
+4. **Role-Based Access:**
+   - `admin` - Full access (users, products, etc.)
+   - `user` - Limited access (upload, view)
+   - Check in inline script AND backend
+
+---
+
+## ✅ Testing Authentication
+
+### **Manual Tests:**
+
+1. **Logged-out user:**
+   - Navigate to protected page → Should redirect to login
+
+2. **Logged-in user:**
+   - Navigate to protected page → Should load normally
+
+3. **Expired token:**
+   - Set `ww_auth_token` to expired JWT
+   - Navigate to page → Should redirect to login
+
+4. **Invalid token:**
+   - Set `ww_auth_token` to garbage
+   - Navigate to page → Should redirect to login
+
+5. **API without token:**
+   - Call API without Authorization header → 401 error
+
+6. **Admin-only page:**
+   - Login as `user`
+   - Navigate to admin page → Should redirect/block
+
+---
+
+**This pattern is PROVEN and TESTED!** ✅  
+**Use it for all new pages and endpoints.** 
+
+**Last Updated:** October 25, 2025  
+**Used In:** users, products, lc-upload modules etc.
+
+---
+
+## X. Final Acceptance Criteria
 
 | Check            | Requirement                                                    |
 | ---------------- | -------------------------------------------------------------- |
