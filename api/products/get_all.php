@@ -48,39 +48,82 @@ try {
     }
     
     $db = getDBConnection();
-    
-    // Get all products with seasonal factors
-    // NOW USES: product_id link (not product_name)
-    $stmt = $db->query("
-        SELECT 
-            p.product_id,
-            p.artikel,
-            p.fnsku,
-            p.asin,
-            p.sku,
-            p.ean,
-            p.product_name,
-            p.average_weekly_sales,
-            p.pairs_per_box,
-            p.color,
-            p.created_at,
-            p.updated_at,
-            psf.factor_jan,
-            psf.factor_feb,
-            psf.factor_mar,
-            psf.factor_apr,
-            psf.factor_may,
-            psf.factor_jun,
-            psf.factor_jul,
-            psf.factor_aug,
-            psf.factor_sep,
-            psf.factor_oct,
-            psf.factor_nov,
-            psf.factor_dec
-        FROM products p
-        LEFT JOIN product_sales_factors psf ON p.product_id = psf.product_id
-        ORDER BY p.artikel ASC
-    ");
+
+    $viewColumns = [];
+    try {
+        $colStmt = $db->prepare("
+            SELECT COLUMN_NAME
+            FROM INFORMATION_SCHEMA.COLUMNS
+            WHERE TABLE_SCHEMA = DATABASE()
+              AND TABLE_NAME = 'v_product_stock_summary'
+        ");
+        $colStmt->execute();
+        $viewColumns = array_map(static function ($row) {
+            return strtolower($row['COLUMN_NAME']);
+        }, $colStmt->fetchAll(PDO::FETCH_ASSOC));
+    } catch (PDOException $e) {
+        $viewColumns = [];
+    }
+
+    $hasView = !empty($viewColumns);
+    $hasAvgSales = in_array('average_weekly_sales', $viewColumns, true);
+    $hasPairsPerBox = in_array('pairs_per_box', $viewColumns, true);
+    $hasIncoming = in_array('incoming_pairs', $viewColumns, true);
+    $hasWml = in_array('wml_pairs', $viewColumns, true);
+    $hasGmr = in_array('gmr_pairs', $viewColumns, true);
+    $hasAmz = in_array('amz_pairs', $viewColumns, true);
+
+    $selectParts = [
+        'p.product_id',
+        'p.artikel',
+        'p.fnsku',
+        'p.asin',
+        'p.sku',
+        'p.ean',
+        'p.product_name',
+        'p.color',
+        'p.created_at',
+        'p.updated_at',
+        'psf.factor_jan',
+        'psf.factor_feb',
+        'psf.factor_mar',
+        'psf.factor_apr',
+        'psf.factor_may',
+        'psf.factor_jun',
+        'psf.factor_jul',
+        'psf.factor_aug',
+        'psf.factor_sep',
+        'psf.factor_oct',
+        'psf.factor_nov',
+        'psf.factor_dec'
+    ];
+
+    if ($hasAvgSales) {
+        $selectParts[] = 'COALESCE(v.average_weekly_sales, p.average_weekly_sales) AS average_weekly_sales';
+    } else {
+        $selectParts[] = 'p.average_weekly_sales AS average_weekly_sales';
+    }
+
+    if ($hasPairsPerBox) {
+        $selectParts[] = 'COALESCE(v.pairs_per_box, p.pairs_per_box) AS pairs_per_box';
+    } else {
+        $selectParts[] = 'p.pairs_per_box AS pairs_per_box';
+    }
+
+    $selectParts[] = $hasIncoming ? 'COALESCE(v.incoming_pairs, 0) AS incoming_pairs' : '0 AS incoming_pairs';
+    $selectParts[] = $hasWml ? 'COALESCE(v.wml_pairs, 0) AS wml_pairs' : '0 AS wml_pairs';
+    $selectParts[] = $hasGmr ? 'COALESCE(v.gmr_pairs, 0) AS gmr_pairs' : '0 AS gmr_pairs';
+    $selectParts[] = $hasAmz ? 'COALESCE(v.amz_pairs, 0) AS amz_pairs' : '0 AS amz_pairs';
+
+    $sql = "SELECT\n            " . implode(",\n            ", $selectParts) . "\n        FROM products p";
+
+    if ($hasView) {
+        $sql .= "\n        LEFT JOIN v_product_stock_summary v ON v.product_id = p.product_id";
+    }
+
+    $sql .= "\n        LEFT JOIN product_sales_factors psf ON p.product_id = psf.product_id\n        ORDER BY p.artikel ASC";
+
+    $stmt = $db->query($sql);
     
     $products = [];
     while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
@@ -101,6 +144,11 @@ try {
         ];
         
         // Build product object
+        $incomingPairs = (float)($row['incoming_pairs'] ?? 0);
+        $wmlPairs = (float)($row['wml_pairs'] ?? 0);
+        $gmrPairs = (float)($row['gmr_pairs'] ?? 0);
+        $amzPairs = (float)($row['amz_pairs'] ?? 0);
+
         $product = [
             'product_id' => (int)$row['product_id'],
             'artikel' => $row['artikel'],
@@ -110,13 +158,20 @@ try {
             'ean' => $row['ean'],
             'product_name' => $row['product_name'],
             'average_weekly_sales' => (float)$row['average_weekly_sales'],
-            'pairs_per_box' => (int)$row['pairs_per_box'],
+            'pairs_per_box' => (float)$row['pairs_per_box'],
+            'incoming_pairs' => $incomingPairs,
+            'wml_pairs' => $wmlPairs,
+            'gmr_pairs' => $gmrPairs,
+            'amz_pairs' => $amzPairs,
             'color' => $row['color'],
             'created_at' => $row['created_at'],
             'updated_at' => $row['updated_at'],
             'seasonal_factors' => $factors
         ];
-        
+
+        $product['total_pairs_internal'] = $incomingPairs + $wmlPairs + $gmrPairs;
+        $product['total_pairs_all'] = $product['total_pairs_internal'] + $amzPairs;
+
         $products[] = $product;
     }
     

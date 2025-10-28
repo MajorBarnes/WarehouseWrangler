@@ -458,13 +458,13 @@ document.addEventListener('DOMContentLoaded', initializeDashboard);
 async function initializeDashboard() {
     try {
         updateUserDisplay();
-        const [config, products] = await Promise.all([
+        const [config, productsResponse] = await Promise.all([
             fetchJSON(`${API_BASE}/config.php`),
             fetchJSON(`${API_BASE}/products/get_all.php`)
         ]);
 
         state.config = normalizeConfig(config);
-        state.products = Array.isArray(products) ? products : [];
+        state.products = unwrapProducts(productsResponse);
 
         const targetInput = document.getElementById('coverageTarget');
         state.targetDate = defaultTargetDate(state.config.LEAD_TIME_WEEKS);
@@ -499,6 +499,24 @@ function normalizeConfig(cfg) {
 function unwrapData(res) {
   if (Array.isArray(res)) return res;
   if (res && res.success && Array.isArray(res.data)) return res.data;
+  return [];
+}
+
+function unwrapProducts(res) {
+  if (Array.isArray(res)) {
+    return res;
+  }
+
+  if (res && typeof res === 'object') {
+    if (Array.isArray(res.products)) {
+      return res.products;
+    }
+
+    if (Array.isArray(res.data)) {
+      return res.data;
+    }
+  }
+
   return [];
 }
 
