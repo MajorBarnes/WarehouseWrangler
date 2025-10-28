@@ -117,6 +117,17 @@ a {
     font-size: 28px;
 }
 
+.brand-logo {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    background: rgba(0, 86, 179, 0.08);
+    padding: 4px 6px;
+    object-fit: contain;
+    object-position: center;
+    display: block;
+}
+
 .brand-copy {
     display: flex;
     flex-direction: column;
@@ -126,6 +137,19 @@ a {
 .brand-name {
     font-size: 1.5rem;
     font-weight: 600;
+}
+
+.brand-name {
+    font-size: 1.6rem;
+    font-weight: 700;
+    letter-spacing: 0.01em;
+    color: var(--color-primary);
+    text-transform: none;
+    background: linear-gradient(90deg, #004a99 0%, #0070d1 100%);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 
 .brand-tagline {
