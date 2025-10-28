@@ -231,7 +231,34 @@ header('X-Frame-Options: SAMEORIGIN');
 header('X-Content-Type-Options: nosniff');
 header('X-XSS-Protection: 1; mode=block');
 
+// ---------------------------------------------------------------------------
+// When this file is hit directly (not included), output JSON config for the UI
+// ---------------------------------------------------------------------------
+if (
+    php_sapi_name() !== 'cli' &&                 // not CLI
+    isset($_SERVER['SCRIPT_FILENAME']) &&
+    realpath(__FILE__) === realpath($_SERVER['SCRIPT_FILENAME']) // direct request
+) {
+    // If you require auth for API endpoints, include it here:
+    // require_once __DIR__ . '/auth/require_auth.php';
+
+    header('Content-Type: application/json; charset=utf-8');
+    header('Cache-Control: no-cache, no-store, must-revalidate');
+    header('Pragma: no-cache');
+    header('Expires: 0');
+
+    // Pull from system_config with safe fallbacks
+    $leadTime = (int) getConfig('LEAD_TIME_WEEKS', 13);
+    $awsUnit  = strtolower((string) getConfig('AWS_UNIT', 'boxes')) === 'pairs' ? 'pairs' : 'boxes';
+
+    echo json_encode([
+        'LEAD_TIME_WEEKS' => $leadTime,
+        'AWS_UNIT'        => $awsUnit
+    ], JSON_UNESCAPED_UNICODE);
+
+    exit;
+}
+
 // ============================================================================
 // END OF CONFIGURATION
 // ============================================================================
-?>

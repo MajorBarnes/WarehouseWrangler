@@ -38,40 +38,45 @@ const pairsFormatter = new Intl.NumberFormat(undefined, {
 });
 
 export async function fetchJSON(url, opts = {}) {
-    const token = localStorage.getItem('ww_auth_token');
+  const token = localStorage.getItem('ww_auth_token');
+  if (!token) {
+    window.location.href = '/login.html';
+    throw new Error('Missing authentication token');
+  }
 
-    if (!token) {
-        window.location.href = '/login.html';
-        throw new Error('Missing authentication token');
-    }
+  const options = { ...opts };
+  const headers = new Headers(options.headers || {});
+  if (!headers.has('Authorization')) headers.set('Authorization', `Bearer ${token}`);
+  if (!headers.has('Accept')) headers.set('Accept', 'application/json');
+  options.headers = headers;
 
-    const options = { ...opts };
-    const headers = new Headers(options.headers || {});
-    if (!headers.has('Authorization')) {
-        headers.set('Authorization', `Bearer ${token}`);
-    }
-    if (!headers.has('Accept')) {
-        headers.set('Accept', 'application/json');
-    }
+  const response = await fetch(url, options);
 
-    options.headers = headers;
+  if (response.status === 401) {
+    localStorage.removeItem('ww_auth_token');
+    localStorage.removeItem('ww_user_data');
+    window.location.href = '/login.html';
+    throw new Error('Unauthorized');
+  }
 
-    const response = await fetch(url, options);
+  if (response.status === 204) {
+    // No content; treat as null/empty object depending on caller needs
+    return null;
+  }
 
-    if (response.status === 401) {
-        localStorage.removeItem('ww_auth_token');
-        localStorage.removeItem('ww_user_data');
-        window.location.href = '/login.html';
-        throw new Error('Unauthorized');
-    }
+  if (!response.ok) {
+    const txt = await response.text().catch(() => '');
+    const err = new Error(`Request failed ${response.status} for ${url}. Body: ${txt.slice(0,200)}`);
+    err.status = response.status;
+    throw err;
+  }
 
-    if (!response.ok) {
-        const error = new Error(`Request failed with status ${response.status}`);
-        error.status = response.status;
-        throw error;
-    }
-
-    return response.json();
+  try {
+    return await response.json();
+  } catch (e) {
+    const txt = await response.text().catch(() => '');
+    throw new Error(`Invalid JSON from ${url}: ${e.message}. Body: ${txt.slice(0,200)}`);
+  }
 }
 
 export function getSeasonFactor(product, selectedMonth) {
@@ -455,7 +460,7 @@ async function initializeDashboard() {
         updateUserDisplay();
         const [config, products] = await Promise.all([
             fetchJSON(`${API_BASE}/config.php`),
-            fetchJSON(`${API_BASE}/get_all.php`)
+            fetchJSON(`${API_BASE}/products/get_all.php`)
         ]);
 
         state.config = normalizeConfig(config);
@@ -491,25 +496,28 @@ function normalizeConfig(cfg) {
     };
 }
 
-async function loadPlannedStock() {
-    const params = new URLSearchParams({
-        include_simulations: state.toggles.includeSim ? '1' : '0',
-        include_future: state.toggles.includeFuture ? '1' : '0',
-        include_inactive: '0'
-    });
+function unwrapData(res) {
+  if (Array.isArray(res)) return res;
+  if (res && res.success && Array.isArray(res.data)) return res.data;
+  return [];
+}
 
-    try {
-        const response = await fetchJSON(`${API_BASE}/planned_stock/get_planned_stock.php?${params.toString()}`);
-        const planned = Array.isArray(response) ? response : [];
-        state.planned = mergePlannedAdditional(state.products, planned);
-    } catch (error) {
-        if (error.status === 404) {
-            state.planned = new Map();
-        } else {
-            console.error('Unable to load planned stock:', error);
-            state.planned = new Map();
-        }
-    }
+async function loadPlannedStock() {
+  const params = new URLSearchParams({
+    include_simulations: state.toggles.includeSim ? '1' : '0',
+    include_future:      state.toggles.includeFuture ? '1' : '0',
+    include_inactive:    '0'
+  });
+
+  try {
+    const res = await fetchJSON(`${API_BASE}/planned_stock/get_planned_stock.php?${params.toString()}`);
+    const plannedRows = unwrapData(res);
+    state.planned = mergePlannedAdditional(state.products, plannedRows);
+  } catch (error) {
+    // 404 → endpoint not present yet; anything else → log and proceed without planned
+    console.error('Unable to load planned stock:', error);
+    state.planned = new Map();
+  }
 }
 
 function recalcState() {
