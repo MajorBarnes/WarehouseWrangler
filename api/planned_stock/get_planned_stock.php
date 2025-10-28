@@ -30,9 +30,9 @@ header('Expires: 0');
 
 try {
     $productId       = isset($_GET['product_id']) ? (int)$_GET['product_id'] : null;
-    $includeSim      = !empty($_GET['include_simulations']) && $_GET['include_simulations'] === '1';
-    $includeFuture   = !empty($_GET['include_future'])      && $_GET['include_future'] === '1';
-    $includeInactive = !empty($_GET['include_inactive'])    && $_GET['include_inactive'] === '1';
+    $includeSim      = isset($_GET['include_simulations']) && $_GET['include_simulations'] === '1';
+    $includeFuture   = isset($_GET['include_future'])      && $_GET['include_future'] === '1';
+    $includeInactive = isset($_GET['include_inactive'])    && $_GET['include_inactive'] === '1';
 
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     $columnNames = [];
@@ -72,15 +72,17 @@ try {
     if ($hasBucket) {
         $whereParts[] = "ps.bucket = 'Additional'";
     }
-    $whereParts[] = '(:pid IS NULL OR ps.product_id = :pid)';
-    if ($hasScope) {
-        $whereParts[] = '(:sim = 1 OR ps.scope = "committed")';
+    if ($productId !== null) {
+        $whereParts[] = 'ps.product_id = :pid';
     }
-    if ($hasEta) {
-        $whereParts[] = '(:future = 1 OR ps.eta_date IS NULL OR ps.eta_date <= CURDATE())';
+    if ($hasScope && !$includeSim) {
+        $whereParts[] = "ps.scope = 'committed'";
     }
-    if ($hasIsActive) {
-        $whereParts[] = '(:inactive = 1 OR ps.is_active = 1)';
+    if ($hasEta && !$includeFuture) {
+        $whereParts[] = '(ps.eta_date IS NULL OR ps.eta_date <= CURDATE())';
+    }
+    if ($hasIsActive && !$includeInactive) {
+        $whereParts[] = 'ps.is_active = 1';
     }
 
     $orderParts = ['ps.product_id'];
@@ -92,23 +94,17 @@ try {
     }
     $orderParts[] = 'ps.id';
 
+    if (empty($whereParts)) {
+        $whereParts[] = '1=1';
+    }
+
     $sql = 'SELECT ' . implode(",\n          ", $selectParts) . "\n        FROM planned_stock ps\n        JOIN products p ON p.product_id = ps.product_id\n        WHERE " . implode("\n          AND ", $whereParts) . "\n        ORDER BY " . implode(', ', $orderParts);
 
-    $params = [
-        ':pid' => $productId,
-    ];
-    if ($hasScope) {
-        $params[':sim'] = $includeSim ? 1 : 0;
-    }
-    if ($hasEta) {
-        $params[':future'] = $includeFuture ? 1 : 0;
-    }
-    if ($hasIsActive) {
-        $params[':inactive'] = $includeInactive ? 1 : 0;
-    }
-
     $stmt = $pdo->prepare($sql);
-    $stmt->execute($params);
+    if ($productId !== null) {
+        $stmt->bindValue(':pid', $productId, PDO::PARAM_INT);
+    }
+    $stmt->execute();
 
     // Final JSON (and we’ll also report any pre-include leak once to help you find it)
     $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
