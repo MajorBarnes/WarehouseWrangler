@@ -23,6 +23,70 @@
 
 ## 2. Data Model Overview
 
+## Carton module integration overview as reference for each of the html/js/css groups and their api endpoints
+
+cartons.html bootstraps the protected page by enforcing the inline JWT check before rendering, wiring the shared header/nav shell, and defining UI placeholders for the metrics cards, filter form, data table, and movement/detail modals that the script fills once data arrives.
+
+js/cartons.js centralises token access and helper formatting, hydrates the header with the cached user, and binds refresh/filter/search events. It orchestrates data loading via authenticated calls to the cartons APIs, toggles loading/empty states, renders table rows, and drives both the carton-detail modal (get\_carton\_details.php) and the move-carton workflow (move\_carton.php).
+
+The styling in css/cartons.css keeps the page aligned with the design system—card layout, sticky data table, responsive modal shell, and badge/button treatments all stem from this stylesheet—so the HTML structure can stay lean while retaining a consistent look and feel.
+
+Backend endpoints under api/cartons/ all enforce the bearer token, surface the filtered list (get\_cartons.php), build per-location summaries (get\_locations\_summary.php), supply drill-down content (get\_carton\_details.php), and apply move operations inside a transaction (move\_carton.php). The frontend’s fetch helpers call these routes and map the JSON payloads straight into UI state.
+
+## Database schema documentation 
+
+WarehouseWrangler Database Schema Fulfilment & Shipments amazon\_shipments Tracks each outbound shipment with shipment\_id PK, human-readable shipment\_reference, date, notes, status enum, and audit fields created\_by, created\_at, updated\_at.
+
+Indexed on reference, date, status, and creator to support lookups and reporting.
+
+shipment\_contents Junction table linking cartons and products to shipments (shipment\_content\_id PK) with the quantity of boxes sent.
+
+Indexed per shipment, carton, product, plus a composite (shipment\_id, carton\_id) for quick drill-down.
+
+v\_shipment\_details / v\_shipment\_summary (views) Detail view exposes shipment metadata joined to carton/product rows and derived pairs\_sent.
+
+Summary view aggregates carton/product counts and totals per shipment while keeping original status/notes fields.
+
+Inventory & Movements cartons Core inventory entity (carton\_id PK) with carton number, location enum (Incoming|WML|GMR), status enum, and timestamps.
+
+Indexed for uniqueness on carton\_number plus filters for location/status combinations.
+
+carton\_contents Lists the products within a carton, their starting/remaining/sent box counts (content\_id PK) and supports mixed-carton tracking.
+
+Unique composite index on (carton\_id, product\_id) plus single-column indexes for reporting.
+
+box\_movement\_log Audits every stock movement with movement type enum, signed box quantity, optional shipment link, notes, creator, and timestamp.
+
+Indexed by carton, product, movement type/date, shipment, and user for chronological forensics.
+
+v\_current\_inventory (view) Consolidates carton, product, and quantitative fields (boxes, pairs, percent remaining) for up-to-date dashboard use.
+
+v\_product\_stock\_summary (view) Product-level rollup of location totals, Amazon inventory, shipments, and coverage metrics (pairs/boxes).
+
+Master Data & Planning products Product catalogue (product\_id PK) with identifiers (artikel, fnsku, asin, sku, ean), naming, average weekly sales, pairs-per-box, and audit timestamps.
+
+Enforces unique fnsku; auxiliary indexes cover asin/sku/ean/name searches.
+
+planned\_stock Stores “Additional” planned boxes per product with optional eta\_date, scope (committed|simulation), user label, activation flag, and audit timestamps.
+
+Indexed for filtering on product and scope/ETA/active triad.
+
+product\_sales\_factors Seasonal multipliers per month for forecasting keyed by product with a uniqueness constraint on product\_id.
+
+External Snapshots & Uploads amazon\_snapshots Captures Amazon’s reported box counts by fnsku and snapshot date with uploader metadata.
+
+Unique key on (fnsku, snapshot\_date) plus supporting indexes.
+
+upload\_history Audit trail of packing list / Amazon snapshot imports recording file metadata, record counts, status, and uploader.
+
+Indexed on user, file type, upload timestamp, and status for admin review.
+
+Configuration & Users system\_config Key/value store for runtime settings with optional description and updated timestamp (primary key config\_key).
+
+users Authentication table storing username, bcrypt hash, optional email/name, role enum (admin|user), activation, and audit fields.
+
+Unique username plus indexes on username/email/role for lookups.  
+
 Codex must align with the **`PRODUCTIVE_DB_SCHEMA`**, which provides:
 ## **amazon\_shipments**
 
