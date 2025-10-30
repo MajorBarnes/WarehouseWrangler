@@ -7,7 +7,6 @@
 
 ## 0. Collaboration Contract
 
-* All PRs must link to the corresponding rule(s), include before/after screenshots (desktop + narrow), and pass the **UI Acceptance Checklist**.
 * Do not alter authentication, header, or navigation components.
 
 ---
@@ -24,18 +23,400 @@
 
 ## 2. Data Model Overview
 
-Codex must align with the **`PRODUCTIVE_DB_SCHEMA.md`**, which provides:
+Codex must align with the **`PRODUCTIVE_DB_SCHEMA`**, which provides:
+## **amazon\_shipments**
 
-| View / Table              | Purpose                                                    | Key Fields                                                                                                                                  |
-| ------------------------- | ---------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
-| `v_product_stock_summary` | Core stock view with total pairs, boxes, and sales metrics | `product_id`, `pairs_per_box`, `average_weekly_sales`, per-location stock columns (`incoming_pairs`, `wml_pairs`, `gmr_pairs`, `amz_pairs`) |
-| `product_sales_factors`   | Seasonal multipliers per product and month                 | `product_id`, `month`, `factor`                                                                                                             |
-| `system_config`           | Global runtime parameters                                  | `LEAD_TIME_WEEKS`, `AWS_UNIT`, `VARIANCE_THRESHOLD`, etc.                                                                                   |
-| `planned_stock`           | *New table* for additional boxes (non-operational)         | `product_id`, `quantity_boxes`, `scope`, `eta_date`, `is_active`                                                                            |
+Table comments: Shipments sent to Amazon \- groups of boxes from various cartons
 
-Codex must use these existing views instead of recalculating raw aggregations from cartons or movements.
+| Column | Type | Null | Default | Comments |
+| ----- | ----- | ----- | ----- | ----- |
+| shipment\_id *(Primary)* | int(11) | No |  |  |
+| shipment\_reference | varchar(100) | No |  | User-friendly shipment name |
+| shipment\_date | date | No |  |  |
+| notes | text | Yes | *NULL* |  |
+| status | enum('prepared', 'sent', 'recalled') | Yes | sent |  |
+| created\_by | int(11) | Yes | *NULL* |  |
+| created\_at | timestamp | Yes | current\_timestamp() |  |
+| updated\_at | timestamp | Yes | current\_timestamp() |  |
 
----
+### **Indexes**
+
+| Keyname | Type | Unique | Packed | Column | Cardinality | Collation | Null | Comment |
+| ----- | ----- | ----- | ----- | ----- | ----- | ----- | ----- | ----- |
+| PRIMARY | BTREE | Yes | No | shipment\_id | 3 | A | No |  |
+| idx\_shipment\_date | BTREE | No | No | shipment\_date | 3 | A | No |  |
+| idx\_status | BTREE | No | No | status | 3 | A | Yes |  |
+| idx\_created\_by | BTREE | No | No | created\_by | 3 | A | Yes |  |
+| idx\_shipment\_reference | BTREE | No | No | shipment\_reference | 3 | A | No |  |
+
+## **amazon\_snapshots**
+
+Table comments: Amazon inventory snapshots \- each upload replaces previous data for that date
+
+| Column | Type | Null | Default | Comments |
+| ----- | ----- | ----- | ----- | ----- |
+| snapshot\_id *(Primary)* | int(11) | No |  |  |
+| upload\_date | datetime | No |  | When uploaded to our system |
+| snapshot\_date | date | No |  | Date from Amazon report |
+| fnsku | varchar(50) | No |  |  |
+| available\_boxes | int(11) | Yes | 0 | What Amazon reports in BOXES |
+| uploaded\_by | int(11) | Yes | *NULL* |  |
+| created\_at | timestamp | Yes | current\_timestamp() |  |
+
+### **Indexes**
+
+| Keyname | Type | Unique | Packed | Column | Cardinality | Collation | Null | Comment |
+| ----- | ----- | ----- | ----- | ----- | ----- | ----- | ----- | ----- |
+| PRIMARY | BTREE | Yes | No | snapshot\_id | 26 | A | No |  |
+| unique\_snapshot | BTREE | Yes | No | fnsku | 26 | A | No |  |
+|  |  |  |  | snapshot\_date | 26 | A | No |  |
+| uploaded\_by | BTREE | No | No | uploaded\_by | 2 | A | Yes |  |
+| idx\_fnsku | BTREE | No | No | fnsku | 26 | A | No |  |
+| idx\_snapshot\_date | BTREE | No | No | snapshot\_date | 2 | A | No |  |
+| idx\_upload\_date | BTREE | No | No | upload\_date | 2 | A | No |  |
+
+## **box\_movement\_log**
+
+Table comments: Audit trail of all box movements for complete tracking history
+
+| Column | Type | Null | Default | Comments |
+| ----- | ----- | ----- | ----- | ----- |
+| log\_id *(Primary)* | int(11) | No |  |  |
+| carton\_id | int(11) | No |  |  |
+| product\_id | int(11) | No |  |  |
+| movement\_type | enum('received', 'sent\_to\_amazon', 'recalled', 'adjusted', 'damaged', 'sold') | No |  |  |
+| boxes | int(11) | No |  | Positive \= added, Negative \= removed |
+| shipment\_id | int(11) | Yes | *NULL* | Link to shipment if applicable |
+| notes | text | Yes | *NULL* |  |
+| created\_by | int(11) | Yes | *NULL* |  |
+| created\_at | timestamp | Yes | current\_timestamp() |  |
+
+### **Indexes**
+
+| Keyname | Type | Unique | Packed | Column | Cardinality | Collation | Null | Comment |
+| ----- | ----- | ----- | ----- | ----- | ----- | ----- | ----- | ----- |
+| PRIMARY | BTREE | Yes | No | log\_id | 5 | A | No |  |
+| idx\_carton | BTREE | No | No | carton\_id | 5 | A | No |  |
+| idx\_product | BTREE | No | No | product\_id | 5 | A | No |  |
+| idx\_movement\_date | BTREE | No | No | created\_at | 5 | A | Yes |  |
+| idx\_movement\_type | BTREE | No | No | movement\_type | 5 | A | No |  |
+| idx\_shipment | BTREE | No | No | shipment\_id | 5 | A | Yes |  |
+| fk\_movement\_log\_user | BTREE | No | No | created\_by | 2 | A | Yes |  |
+
+## **cartons**
+
+Table comments: Active warehouse inventory \- cartons currently tracked
+
+| Column | Type | Null | Default | Comments |
+| ----- | ----- | ----- | ----- | ----- |
+| carton\_id *(Primary)* | int(11) | No |  |  |
+| carton\_number | varchar(50) | No |  | e.g., 25SVS147-1 |
+| location | enum('Incoming', 'WML', 'GMR') | Yes | Incoming | Warehouse location |
+| status | enum('in stock', 'empty', 'archived') | Yes | in stock |  |
+| created\_at | timestamp | Yes | current\_timestamp() |  |
+| updated\_at | timestamp | Yes | current\_timestamp() |  |
+
+### **Indexes**
+
+| Keyname | Type | Unique | Packed | Column | Cardinality | Collation | Null | Comment |
+| ----- | ----- | ----- | ----- | ----- | ----- | ----- | ----- | ----- |
+| PRIMARY | BTREE | Yes | No | carton\_id | 264 | A | No |  |
+| carton\_number | BTREE | Yes | No | carton\_number | 264 | A | No |  |
+| idx\_location | BTREE | No | No | location | 6 | A | Yes |  |
+| idx\_carton\_number | BTREE | No | No | carton\_number | 264 | A | No |  |
+| idx\_status | BTREE | No | No | status | 4 | A | Yes |  |
+| idx\_location\_status | BTREE | No | No | location | 6 | A | Yes |  |
+|  |  |  |  | status | 10 | A | Yes |  |
+
+## **carton\_contents**
+
+Table comments: Contents of each carton \- supports mixed cartons with multiple products
+
+| Column | Type | Null | Default | Comments |
+| ----- | ----- | ----- | ----- | ----- |
+| content\_id *(Primary)* | int(11) | No |  |  |
+| carton\_id | int(11) | No |  |  |
+| product\_id | int(11) | No |  |  |
+| boxes\_initial | int(11) | No |  | Number of boxes when carton arrived |
+| boxes\_current | int(11) | No |  | Number of boxes currently in carton |
+| boxes\_sent\_to\_amazon | int(11) | Yes | 0 | Running total of boxes sent to Amazon |
+
+### **Indexes**
+
+| Keyname | Type | Unique | Packed | Column | Cardinality | Collation | Null | Comment |
+| ----- | ----- | ----- | ----- | ----- | ----- | ----- | ----- | ----- |
+| PRIMARY | BTREE | Yes | No | content\_id | 272 | A | No |  |
+| unique\_carton\_product | BTREE | Yes | No | carton\_id | 272 | A | No |  |
+|  |  |  |  | product\_id | 272 | A | No |  |
+| idx\_carton | BTREE | No | No | carton\_id | 272 | A | No |  |
+| idx\_product | BTREE | No | No | product\_id | 34 | A | No |  |
+
+## **planned\_stock**
+
+| Column | Type | Null | Default | Comments |
+| ----- | ----- | ----- | ----- | ----- |
+| id *(Primary)* | int(11) | No |  |  |
+| product\_id | int(11) | No |  |  |
+| quantity\_boxes | int(11) | No |  |  |
+| bucket | enum('Additional') | No | Additional |  |
+| eta\_date | date | Yes | *NULL* |  |
+| scope | enum('committed', 'simulation') | No | committed |  |
+| label | varchar(255) | Yes | *NULL* |  |
+| is\_active | tinyint(1) | No | 1 |  |
+| created\_at | timestamp | No | current\_timestamp() |  |
+| updated\_at | timestamp | No | current\_timestamp() |  |
+
+### **Indexes**
+
+| Keyname | Type | Unique | Packed | Column | Cardinality | Collation | Null | Comment |
+| ----- | ----- | ----- | ----- | ----- | ----- | ----- | ----- | ----- |
+| PRIMARY | BTREE | Yes | No | id | 0 | A | No |  |
+| idx\_planned\_product | BTREE | No | No | product\_id | 0 | A | No |  |
+| idx\_planned\_scope\_eta\_active | BTREE | No | No | scope | 0 | A | No |  |
+|  |  |  |  | eta\_date | 0 | A | Yes |  |
+|  |  |  |  | is\_active | 0 | A | No |  |
+
+## **products**
+
+Table comments: Product master data \- catalog of all products
+
+| Column | Type | Null | Default | Comments |
+| ----- | ----- | ----- | ----- | ----- |
+| product\_id *(Primary)* | int(11) | No |  |  |
+| artikel | varchar(100) | No |  | Article/Item code |
+| fnsku | varchar(50) | No |  | Fulfillment Network SKU (Amazon) |
+| asin | varchar(50) | Yes | *NULL* | Amazon Standard Identification Number |
+| sku | varchar(50) | Yes | *NULL* | Stock Keeping Unit |
+| ean | varchar(50) | Yes | *NULL* | European Article Number (barcode) |
+| product\_name | varchar(200) | No |  |  |
+| average\_weekly\_sales | decimal(10,2) | Yes | 0.00 | Average weekly sales in PAIRS |
+| pairs\_per\_box | int(11) | No |  | Fixed number of pairs per box for this product |
+| color | varchar(50) | Yes | *NULL* |  |
+| created\_at | timestamp | Yes | current\_timestamp() |  |
+| updated\_at | timestamp | Yes | current\_timestamp() |  |
+
+### **Indexes**
+
+| Keyname | Type | Unique | Packed | Column | Cardinality | Collation | Null | Comment |
+| ----- | ----- | ----- | ----- | ----- | ----- | ----- | ----- | ----- |
+| PRIMARY | BTREE | Yes | No | product\_id | 30 | A | No |  |
+| fnsku | BTREE | Yes | No | fnsku | 30 | A | No |  |
+| idx\_fnsku | BTREE | No | No | fnsku | 30 | A | No |  |
+| idx\_asin | BTREE | No | No | asin | 30 | A | Yes |  |
+| idx\_sku | BTREE | No | No | sku | 30 | A | Yes |  |
+| idx\_ean | BTREE | No | No | ean | 30 | A | Yes |  |
+| idx\_product\_name | BTREE | No | No | product\_name | 10 | A | No |  |
+
+## **product\_sales\_factors**
+
+Table comments: Seasonal sales factors for stock forecasting
+
+| Column | Type | Null | Default | Comments |
+| ----- | ----- | ----- | ----- | ----- |
+| factor\_id *(Primary)* | int(11) | No |  |  |
+| product\_id | int(11) | No |  |  |
+| factor\_jan | decimal(3,2) | Yes | 1.00 |  |
+| factor\_feb | decimal(3,2) | Yes | 1.00 |  |
+| factor\_mar | decimal(3,2) | Yes | 1.00 |  |
+| factor\_apr | decimal(3,2) | Yes | 1.00 |  |
+| factor\_may | decimal(3,2) | Yes | 1.00 |  |
+| factor\_jun | decimal(3,2) | Yes | 1.00 |  |
+| factor\_jul | decimal(3,2) | Yes | 1.00 |  |
+| factor\_aug | decimal(3,2) | Yes | 1.00 |  |
+| factor\_sep | decimal(3,2) | Yes | 1.00 |  |
+| factor\_oct | decimal(3,2) | Yes | 1.00 |  |
+| factor\_nov | decimal(3,2) | Yes | 1.00 |  |
+| factor\_dec | decimal(3,2) | Yes | 1.00 |  |
+| updated\_at | timestamp | Yes | current\_timestamp() |  |
+
+### **Indexes**
+
+| Keyname | Type | Unique | Packed | Column | Cardinality | Collation | Null | Comment |
+| ----- | ----- | ----- | ----- | ----- | ----- | ----- | ----- | ----- |
+| PRIMARY | BTREE | Yes | No | factor\_id | 30 | A | No |  |
+| unique\_product\_id | BTREE | Yes | No | product\_id | 30 | A | No |  |
+| idx\_product\_id | BTREE | No | No | product\_id | 30 | A | No |  |
+
+## **shipment\_contents**
+
+Table comments: Details of which boxes from which cartons went in each shipment
+
+| Column | Type | Null | Default | Comments |
+| ----- | ----- | ----- | ----- | ----- |
+| shipment\_content\_id *(Primary)* | int(11) | No |  |  |
+| shipment\_id | int(11) | No |  |  |
+| carton\_id | int(11) | No |  |  |
+| product\_id | int(11) | No |  |  |
+| boxes\_sent | int(11) | No |  | Quantity of boxes from this carton sent in this shipment |
+
+### **Indexes**
+
+| Keyname | Type | Unique | Packed | Column | Cardinality | Collation | Null | Comment |
+| ----- | ----- | ----- | ----- | ----- | ----- | ----- | ----- | ----- |
+| PRIMARY | BTREE | Yes | No | shipment\_content\_id | 3 | A | No |  |
+| idx\_shipment | BTREE | No | No | shipment\_id | 3 | A | No |  |
+| idx\_carton | BTREE | No | No | carton\_id | 3 | A | No |  |
+| idx\_product | BTREE | No | No | product\_id | 3 | A | No |  |
+| idx\_shipment\_carton | BTREE | No | No | shipment\_id | 3 | A | No |  |
+|  |  |  |  | carton\_id | 3 | A | No |  |
+
+## **system\_config**
+
+Table comments: System configuration settings
+
+| Column | Type | Null | Default | Comments |
+| ----- | ----- | ----- | ----- | ----- |
+| config\_key *(Primary)* | varchar(50) | No |  |  |
+| config\_value | text | Yes | *NULL* |  |
+| description | varchar(255) | Yes | *NULL* |  |
+| updated\_at | timestamp | Yes | current\_timestamp() |  |
+
+### **Indexes**
+
+| Keyname | Type | Unique | Packed | Column | Cardinality | Collation | Null | Comment |
+| ----- | ----- | ----- | ----- | ----- | ----- | ----- | ----- | ----- |
+| PRIMARY | BTREE | Yes | No | config\_key | 8 | A | No |  |
+
+## **upload\_history**
+
+Table comments: Audit trail of all file uploads
+
+| Column | Type | Null | Default | Comments |
+| ----- | ----- | ----- | ----- | ----- |
+| upload\_id *(Primary)* | int(11) | No |  |  |
+| user\_id | int(11) | No |  |  |
+| file\_type | enum('packing\_list', 'amazon\_snapshot') | No |  |  |
+| file\_name | varchar(255) | Yes | *NULL* |  |
+| records\_imported | int(11) | Yes | 0 |  |
+| upload\_status | enum('success', 'failed', 'partial') | No |  |  |
+| error\_log | text | Yes | *NULL* |  |
+| uploaded\_at | timestamp | Yes | current\_timestamp() |  |
+
+### **Indexes**
+
+| Keyname | Type | Unique | Packed | Column | Cardinality | Collation | Null | Comment |
+| ----- | ----- | ----- | ----- | ----- | ----- | ----- | ----- | ----- |
+| PRIMARY | BTREE | Yes | No | upload\_id | 9 | A | No |  |
+| idx\_user | BTREE | No | No | user\_id | 2 | A | No |  |
+| idx\_file\_type | BTREE | No | No | file\_type | 4 | A | No |  |
+| idx\_upload\_date | BTREE | No | No | uploaded\_at | 9 | A | Yes |  |
+| idx\_status | BTREE | No | No | upload\_status | 2 | A | No |  |
+
+## **users**
+
+Table comments: User accounts for authentication and authorization
+
+| Column | Type | Null | Default | Comments |
+| ----- | ----- | ----- | ----- | ----- |
+| user\_id *(Primary)* | int(11) | No |  |  |
+| username | varchar(50) | No |  |  |
+| password\_hash | varchar(255) | No |  | bcrypt hashed password |
+| email | varchar(100) | Yes | *NULL* |  |
+| full\_name | varchar(100) | Yes | *NULL* |  |
+| role | enum('admin', 'user') | Yes | user |  |
+| is\_active | tinyint(1) | Yes | 1 |  |
+| created\_at | timestamp | Yes | current\_timestamp() |  |
+| last\_login | timestamp | Yes | *NULL* |  |
+
+### **Indexes**
+
+| Keyname | Type | Unique | Packed | Column | Cardinality | Collation | Null | Comment |
+| ----- | ----- | ----- | ----- | ----- | ----- | ----- | ----- | ----- |
+| PRIMARY | BTREE | Yes | No | user\_id | 2 | A | No |  |
+| username | BTREE | Yes | No | username | 2 | A | No |  |
+| idx\_username | BTREE | No | No | username | 2 | A | No |  |
+| idx\_email | BTREE | No | No | email | 2 | A | Yes |  |
+| idx\_role | BTREE | No | No | role | 2 | A | Yes |  |
+
+# Views
+## **v\_current\_inventory**
+
+Table comments: VIEW
+
+| Column | Type | Null | Default | Comments |
+| ----- | ----- | ----- | ----- | ----- |
+| carton\_id | int(11) | No | 0 |  |
+| carton\_number | varchar(50) | No |  | e.g., 25SVS147-1 |
+| location | enum('Incoming', 'WML', 'GMR') | Yes | Incoming | Warehouse location |
+| status | enum('in stock', 'empty', 'archived') | Yes | in stock |  |
+| product\_id | int(11) | No | 0 |  |
+| product\_name | varchar(200) | No |  |  |
+| artikel | varchar(100) | No |  | Article/Item code |
+| fnsku | varchar(50) | No |  | Fulfillment Network SKU (Amazon) |
+| boxes\_initial | int(11) | No |  | Number of boxes when carton arrived |
+| boxes\_current | int(11) | No |  | Number of boxes currently in carton |
+| boxes\_sent\_to\_amazon | int(11) | Yes | 0 | Running total of boxes sent to Amazon |
+| pairs\_current | bigint(21) | No | 0 |  |
+| pairs\_initial | bigint(21) | No | 0 |  |
+| pairs\_sent\_to\_amazon | bigint(21) | Yes | *NULL* |  |
+| percent\_remaining | decimal(15,1) | Yes | *NULL* |  |
+
+## **v\_product\_stock\_summary**
+
+Table comments: VIEW
+
+| Column | Type | Null | Default | Comments |
+| ----- | ----- | ----- | ----- | ----- |
+| product\_id | int(11) | No | 0 |  |
+| product\_name | varchar(200) | No |  |  |
+| artikel | varchar(100) | No |  | Article/Item code |
+| fnsku | varchar(50) | No |  | Fulfillment Network SKU (Amazon) |
+| pairs\_per\_box | int(11) | No |  | Fixed number of pairs per box for this product |
+| average\_weekly\_sales | decimal(10,2) | Yes | 0.00 | Average weekly sales in PAIRS |
+| incoming\_boxes | decimal(32,0) | Yes | *NULL* |  |
+| wml\_boxes | decimal(32,0) | Yes | *NULL* |  |
+| gmr\_boxes | decimal(32,0) | Yes | *NULL* |  |
+| total\_internal\_boxes | decimal(32,0) | Yes | *NULL* |  |
+| total\_internal\_pairs | decimal(42,0) | Yes | *NULL* |  |
+| total\_sent\_to\_amazon\_boxes | decimal(32,0) | Yes | *NULL* |  |
+| total\_sent\_to\_amazon\_pairs | decimal(42,0) | Yes | *NULL* |  |
+| amz\_boxes | int(11) | Yes | *NULL* |  |
+| amz\_pairs | bigint(21) | Yes | *NULL* |  |
+| total\_boxes | decimal(33,0) | Yes | *NULL* |  |
+| total\_pairs | decimal(43,0) | Yes | *NULL* |  |
+| carton\_count | bigint(21) | No | 0 |  |
+
+## **v\_shipment\_details**
+
+Table comments: VIEW
+
+| Column | Type | Null | Default | Comments |
+| ----- | ----- | ----- | ----- | ----- |
+| shipment\_id | int(11) | No | 0 |  |
+| shipment\_reference | varchar(100) | No |  | User-friendly shipment name |
+| shipment\_date | date | No |  |  |
+| shipment\_status | enum('prepared', 'sent', 'recalled') | Yes | sent |  |
+| notes | text | Yes | *NULL* |  |
+| carton\_id | int(11) | No |  |  |
+| carton\_number | varchar(50) | No |  | e.g., 25SVS147-1 |
+| carton\_location | enum('Incoming', 'WML', 'GMR') | Yes | Incoming | Warehouse location |
+| product\_id | int(11) | No |  |  |
+| product\_name | varchar(200) | No |  |  |
+| artikel | varchar(100) | No |  | Article/Item code |
+| fnsku | varchar(50) | No |  | Fulfillment Network SKU (Amazon) |
+| boxes\_sent | int(11) | No |  | Quantity of boxes from this carton sent in this shipment |
+| pairs\_sent | bigint(21) | No | 0 |  |
+| created\_by\_user | varchar(50) | Yes | *NULL* |  |
+| created\_at | timestamp | Yes | current\_timestamp() |  |
+
+## **v\_shipment\_summary**
+
+Table comments: VIEW
+
+| Column | Type | Null | Default | Comments |
+| ----- | ----- | ----- | ----- | ----- |
+| shipment\_id | int(11) | No | 0 |  |
+| shipment\_reference | varchar(100) | No |  | User-friendly shipment name |
+| shipment\_date | date | No |  |  |
+| status | enum('prepared', 'sent', 'recalled') | Yes | sent |  |
+| notes | text | Yes | *NULL* |  |
+| carton\_count | bigint(21) | No | 0 |  |
+| product\_count | bigint(21) | No | 0 |  |
+| total\_boxes | decimal(32,0) | Yes | *NULL* |  |
+| created\_by\_user | varchar(50) | Yes | *NULL* |  |
+| created\_at | timestamp | Yes | current\_timestamp() |  |
+
+
 
 ## 3. Dashboard Logic (js/dashboard.js)
 
@@ -45,32 +426,7 @@ Provide clear “weeks of cover” visual feedback and forward projections.
 
 ---
 
-### 3.1 Data Sources
-
-| Source                   | Purpose                                                          |
-| ------------------------ | ---------------------------------------------------------------- |
-| `/api/get_all.php`       | Supplies `v_product_stock_summary` data per product.             |
-| `/api/config.php`        | Returns system parameters (`LEAD_TIME_WEEKS`, `AWS_UNIT`, etc.). |
-| `/api/planned_stock.php` | Returns additional planned boxes (committed & simulation).       |
-| Date input field         | Provides user-selected *target date* for projection.             |
-
----
-
-### 3.2 Units & Formulas
-
-#### Demand
-
-```js
-if (AWS_UNIT === 'pairs')
-  weekly_demand_pairs = average_weekly_sales * Sf(m);
-else
-  weekly_demand_pairs = average_weekly_sales * pairs_per_box * Sf(m);
-```
-
-* `Sf(m)` = seasonal multiplier for the selected month.
-* `average_weekly_sales` comes from `v_product_stock_summary`.
-
-#### Location Coverage
+#### Location Coverage for dashboard
 
 ```js
 weeks_L = (pairs_L + planned_pairs_L) / weekly_demand_pairs;
@@ -125,82 +481,6 @@ If `weekly_demand_pairs <= 0`, mark product as “no demand” (∞ coverage, gr
 
    * *Committed:* solid fill color (e.g., teal).
    * *Simulation:* hatched overlay.
-
----
-
-### 3.4 Visualization Specification
-
-| Element          | Description                                                           |          |     |     |     |               |
-| ---------------- | --------------------------------------------------------------------- | -------- | --- | --- | ----|-------------- |
-| **Bars**         | Horizontal stacked per product:                                       |`[Incoming| WML | GMR | AMZ | Additional]`. |
-| **Red Line**     | System threshold (`LEAD_TIME_WEEKS`).                                 |          |     |     |     |               |
-| **Green Line**   | User-selected target coverage date.                                   |          |     |     |     |               |
-| **Tooltips**     | Pairs, boxes, segment weeks, total weeks, stockout date.              |          |     |     |     |               |
-| **Labels**       | Show total coverage, remaining pairs, and “to order” values.          |          |     |     |     |               |
-| **Toggle Panel** | Filter visibility of Amazon, internal, and additional stock segments. |          |     |     |     |               |
-
-*Additional segment* should be included in both **internal** and **all** totals, but excluded from shipment calculations.
-
----
-
-### 3.5 Calculations for Totals and Filters
-
-| Filter               | Includes                          | Excludes   |
-| -------------------- | --------------------------------- | ---------- |
-| **Internal Only**    | Incoming + WML + GMR + Additional | AMZ        |
-| **All (incl. AMZ)**  | All segments                      | –          |
-| **Operational Only** | Incoming + WML + GMR + AMZ        | Additional |
-
-Coverage values, to-order projections, and visual indicators must dynamically recompute based on active filters.
-
----
-
-### 3.6 Accessibility & Performance
-
-* Avoid inline JS; use delegated events.
-* Paginate when >100 products.
-* Use ARIA labels for chart bars and threshold lines.
-* Animate red/green guidelines smoothly (CSS or JS).
-
----
-
-## 4. Files & Deliverables
-
-| File                      | Responsibility                                            |
-| ------------------------- | --------------------------------------------------------- |
-| `js/dashboard.js`         | Data fetch, seasonal adjustment, coverage, and rendering. |
-| `css/dashboard.css`       | Segment colors, hatched overlays, guideline styles.       |
-| `css/main.css`            | Shared palette and layout.                                |
-| `api/planned_stock/*.php` | CRUD for additional stock (boxes).                        |
-
----
-
-## 5. Example Logic Pseudocode
-
-```js
-for (const product of data.products) {
-  const seasonFactor = getSeasonFactor(product.id, selectedMonth);
-  const weeklyDemand = computeWeeklyDemand(product.avg_weekly_sales, product.pairs_per_box, seasonFactor, AWS_UNIT);
-
-  const segments = ['incoming', 'wml', 'gmr', 'amz'];
-  let totalPairs = 0;
-
-  for (const loc of segments) {
-    totalPairs += product[`${loc}_pairs`];
-    product[`weeks_${loc}`] = product[`${loc}_pairs`] / weeklyDemand;
-  }
-
-  // Add Additional (planned) segment
-  const planned = plannedData[product.product_id] || [];
-  const committedPairs = sum(planned.filter(p => p.scope === 'committed' && isActive(p)).map(p => p.quantity_boxes * product.pairs_per_box));
-  const simPairs = sum(planned.filter(p => p.scope === 'simulation' && isActive(p)).map(p => p.quantity_boxes * product.pairs_per_box));
-  totalPairs += committedPairs + simPairs;
-  product.weeks_additional = (committedPairs + simPairs) / weeklyDemand;
-
-  product.totalWeeks = totalPairs / weeklyDemand;
-  product.stockoutDate = addDays(today, product.totalWeeks * 7);
-}
-```
 
 ---
 
@@ -581,17 +861,5 @@ try {
 
 **Last Updated:** October 25, 2025  
 **Used In:** users, products, lc-upload modules etc.
-
----
-
-## X. Final Acceptance Criteria
-
-| Check            | Requirement                                                    |
-| ---------------- | -------------------------------------------------------------- |
-| ✅ Data accuracy  | Matches DB (v_product_stock_summary + planned_stock).          |
-| ✅ Performance    | Sub-1s render for ≤100 products.                               |
-| ✅ Visual clarity | Distinct color for each segment + hatched Additional.          |
-| ✅ Responsiveness | Horizontal scroll on small screens; guidelines remain visible. |
-| ✅ Accessibility  | ARIA labels on bars, thresholds, and toggles.                  |
 
 ---
