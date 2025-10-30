@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Planned Stock - WarehouseWrangler</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
+    <link rel="stylesheet" href="./css/main.css">
+    <link rel="stylesheet" href="./css/planned-stock.css">
+    <link rel="icon" type="image/png" sizes="32x32" href="./assets/favicon.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="./assets/apple-touch-icon.png">
+    <script>
+        (function() {
+            const token = localStorage.getItem('ww_auth_token');
+            if (!token) {
+                window.location.href = 'login.html';
+                return;
+            }
+            try {
+                const parts = token.split('.');
+                if (parts.length !== 3) throw new Error('Invalid token');
+                const payload = JSON.parse(atob(parts[1]));
+                if (payload.exp <= Math.floor(Date.now() / 1000)) {
+                    localStorage.removeItem('ww_auth_token');
+                    window.location.href = 'login.html';
+                    return;
+                }
+            } catch (error) {
+                localStorage.removeItem('ww_auth_token');
+                window.location.href = 'login.html';
+            }
+        })();
+    </script>
+</head>
+<body>
+    <header class="site-header">
+        <div class="branding">
+            <img src="./assets/logo.png" alt="WarehouseWrangler Logo" class="brand-logo">
+            <div class="brand-copy">
+                <span class="brand-name">WarehouseWrangler</span>
+                <span class="brand-tagline">Fulfillment Control Center</span>
+            </div>
+        </div>
+
+        <nav class="primary-nav" aria-label="Main navigation">
+            <ul class="nav-list">
+                <li><a class="nav-link" href="index.html"><span class="material-icons-outlined" aria-hidden="true">dashboard</span><span>Dashboard</span></a></li>
+                <li><a class="nav-link" href="amazon-snapshot-upload.html"><span class="material-icons-outlined" aria-hidden="true">cloud_upload</span><span>Amazon Snapshot</span></a></li>
+                <li><a class="nav-link" href="cartons.html"><span class="material-icons-outlined" aria-hidden="true">inventory_2</span><span>Cartons</span></a></li>
+                <li><a class="nav-link is-active" href="planned-stock.html" aria-current="page"><span class="material-icons-outlined" aria-hidden="true">analytics</span><span>Planned Stock</span></a></li>
+                <li><a class="nav-link" href="lc-upload.html"><span class="material-icons-outlined" aria-hidden="true">upload_file</span><span>LC Upload</span></a></li>
+                <li><a class="nav-link" href="products.html"><span class="material-icons-outlined" aria-hidden="true">view_list</span><span>Products</span></a></li>
+                <li><a class="nav-link" href="shipments.html"><span class="material-icons-outlined" aria-hidden="true">local_shipping</span><span>Shipments</span></a></li>
+                <li><a class="nav-link" href="users.html"><span class="material-icons-outlined" aria-hidden="true">group</span><span>Users</span></a></li>
+                <li><a class="nav-link" href="login.html"><span class="material-icons-outlined" aria-hidden="true">lock</span><span>Login</span></a></li>
+            </ul>
+        </nav>
+
+        <div class="header-actions">
+            <span class="user-display" aria-live="polite">
+                <span class="material-icons-outlined" aria-hidden="true">account_circle</span>
+                <span id="userDisplay" class="user-display-name">Loading…</span>
+            </span>
+            <button id="logoutBtn" class="btn btn-logout" type="button">
+                <span class="material-icons-outlined" aria-hidden="true">logout</span>
+                <span>Logout</span>
+            </button>
+        </div>
+    </header>
+
+    <main class="app-main planned-stock-page">
+        <section class="page-header">
+            <div class="page-title">
+                <span class="material-icons-outlined" aria-hidden="true">analytics</span>
+                <div class="page-title-copy">
+                    <h2>Planned Stock</h2>
+                    <p>Steuere zusätzliche Bestände und Simulationen für jede Produkt-ID inklusive ETA und Aktivierungsstatus.</p>
+                </div>
+            </div>
+            <div class="page-header-actions">
+                <button id="refreshBtn" class="btn btn-secondary" type="button">
+                    <span class="material-icons-outlined" aria-hidden="true">refresh</span>
+                    <span>Aktualisieren</span>
+                </button>
+                <button id="addEntryBtn" class="btn btn-primary" type="button">
+                    <span class="material-icons-outlined" aria-hidden="true">add_circle</span>
+                    <span>Planung anlegen</span>
+                </button>
+            </div>
+        </section>
+
+        <section class="surface-card metrics-panel" aria-label="Planned stock overview">
+            <div class="metrics-grid">
+                <article class="metric-card">
+                    <span class="material-icons-outlined metric-icon" aria-hidden="true">inventory</span>
+                    <div class="metric-content">
+                        <p class="metric-label">Aktive Planung</p>
+                        <p class="metric-value"><span id="activeBoxes">0</span> Boxen</p>
+                        <p class="metric-subtext"><span id="activePairs">0</span> Paare in Summe</p>
+                    </div>
+                </article>
+                <article class="metric-card">
+                    <span class="material-icons-outlined metric-icon" aria-hidden="true">fact_check</span>
+                    <div class="metric-content">
+                        <p class="metric-label">Committed</p>
+                        <p class="metric-value"><span id="committedBoxes">0</span> Boxen</p>
+                        <p class="metric-subtext"><span id="committedPairs">0</span> Paare geplant</p>
+                    </div>
+                </article>
+                <article class="metric-card">
+                    <span class="material-icons-outlined metric-icon" aria-hidden="true">science</span>
+                    <div class="metric-content">
+                        <p class="metric-label">Simulationen</p>
+                        <p class="metric-value"><span id="simulationBoxes">0</span> Boxen</p>
+                        <p class="metric-subtext"><span id="simulationPairs">0</span> Paare simuliert</p>
+                    </div>
+                </article>
+            </div>
+        </section>
+
+        <section class="surface-card filters-panel" aria-label="Planned stock filter">
+            <form id="filtersForm" class="filters-form" novalidate>
+                <div class="filters-grid">
+                    <label class="filter-field" for="productFilter">
+                        <span class="filter-label">Produkt</span>
+                        <select id="productFilter" name="product">
+                            <option value="">Alle Produkte</option>
+                        </select>
+                    </label>
+                    <label class="filter-field search-field" for="searchInput">
+                        <span class="filter-label">Suche</span>
+                        <div class="search-input">
+                            <span class="material-icons-outlined" aria-hidden="true">search</span>
+                            <input type="text" id="searchInput" name="search" placeholder="Nach Label, Produkt oder Scope suchen">
+                        </div>
+                    </label>
+                    <div class="filter-field checkbox-group">
+                        <span class="filter-label">Erweiterte Ansicht</span>
+                        <label class="checkbox-inline">
+                            <input type="checkbox" id="includeSimulations">
+                            <span>Simulationen anzeigen</span>
+                        </label>
+                        <label class="checkbox-inline">
+                            <input type="checkbox" id="includeFuture">
+                            <span>zukünftige ETAs</span>
+                        </label>
+                        <label class="checkbox-inline">
+                            <input type="checkbox" id="includeInactive">
+                            <span>inaktive Planung</span>
+                        </label>
+                    </div>
+                </div>
+                <div class="filter-actions">
+                    <button type="submit" class="btn btn-secondary" id="applyFiltersBtn">
+                        <span class="material-icons-outlined" aria-hidden="true">tune</span>
+                        <span>Filter anwenden</span>
+                    </button>
+                    <button type="button" class="btn btn-secondary" id="resetFiltersBtn">
+                        <span class="material-icons-outlined" aria-hidden="true">backspace</span>
+                        <span>Zurücksetzen</span>
+                    </button>
+                </div>
+            </form>
+        </section>
+
+        <section class="surface-card table-card" aria-label="Planned stock table">
+            <div id="plannedStockLoading" class="loading-indicator">Lade geplante Bestände…</div>
+            <div class="table-scroll" role="region" aria-live="polite" aria-label="Geplante Bestände">
+                <table id="plannedStockTable" class="planned-stock-table table-sticky is-hidden">
+                    <thead>
+                        <tr>
+                            <th scope="col">Produkt<br><small>Artikel</small></th>
+                            <th scope="col">Scope</th>
+                            <th scope="col">Label</th>
+                            <th scope="col" class="numeric">Boxen</th>
+                            <th scope="col" class="numeric">Paare</th>
+                            <th scope="col">ETA</th>
+                            <th scope="col">Status</th>
+                            <th scope="col" class="actions-col">Aktionen</th>
+                        </tr>
+                    </thead>
+                    <tbody id="plannedStockTableBody"></tbody>
+                </table>
+            </div>
+            <div id="plannedStockEmpty" class="empty-state is-hidden">
+                <span class="material-icons-outlined" aria-hidden="true">inventory_2</span>
+                <p>Keine geplanten Bestände gefunden</p>
+            </div>
+        </section>
+    </main>
+
+    <div id="plannedStockModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="plannedStockModalTitle">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title-group">
+                    <span class="material-icons-outlined" aria-hidden="true">addchart</span>
+                    <div>
+                        <h3 id="plannedStockModalTitle">Neue Planung</h3>
+                        <p id="plannedStockModalSubtitle" class="modal-subtitle">Zusätzliche Boxen für ein Produkt definieren.</p>
+                    </div>
+                </div>
+                <button class="modal-close" type="button" id="plannedStockModalClose" aria-label="Dialog schließen">
+                    <span class="material-icons-outlined" aria-hidden="true">close</span>
+                </button>
+            </div>
+            <form id="plannedStockForm" aria-describedby="plannedStockModalSubtitle">
+                <input type="hidden" id="plannedStockId">
+                <div class="modal-body">
+                    <div class="form-grid form-grid--two">
+                        <div class="form-group">
+                            <label for="entryProduct">Produkt *</label>
+                            <select id="entryProduct" required>
+                                <option value="">Produkt wählen</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="entryScope">Scope *</label>
+                            <select id="entryScope" required>
+                                <option value="committed">Committed</option>
+                                <option value="simulation">Simulation</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="entryBoxes">Boxen *</label>
+                            <input type="number" id="entryBoxes" min="1" step="1" required>
+                            <small>Ganze Boxen, mindestens 1</small>
+                        </div>
+                        <div class="form-group">
+                            <label for="entryEta">ETA</label>
+                            <input type="date" id="entryEta">
+                            <small>Optionales Lieferdatum</small>
+                        </div>
+                        <div class="form-group">
+                            <label for="entryLabel">Label</label>
+                            <input type="text" id="entryLabel" maxlength="120" placeholder="z.B. Order #4711">
+                        </div>
+                        <div class="form-group form-group--checkbox">
+                            <label class="checkbox-inline">
+                                <input type="checkbox" id="entryIsActive" checked>
+                                <span>Aktiv</span>
+                            </label>
+                            <small>Inaktive Einträge zählen nicht in die Summe</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" id="modalCancelBtn">
+                        <span class="material-icons-outlined" aria-hidden="true">close</span>
+                        <span>Abbrechen</span>
+                    </button>
+                    <button type="submit" class="btn btn-primary" id="modalSubmitBtn">
+                        <span class="material-icons-outlined" aria-hidden="true">save</span>
+                        <span id="modalSubmitText">Speichern</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="./js/planned-stock.js" defer></script>
+</body>
+</html>
