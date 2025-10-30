@@ -7,6 +7,30 @@ let plannedStockRows = [];
 let productsIndex = new Map();
 let modalMode = 'create';
 
+function resetPlannedStockForm() {
+    const form = document.getElementById('plannedStockForm');
+    if (form) {
+        form.reset();
+    }
+
+    const entryId = document.getElementById('plannedStockId');
+    const entryScope = document.getElementById('entryScope');
+    const entryBoxes = document.getElementById('entryBoxes');
+    const entryEta = document.getElementById('entryEta');
+    const entryLabel = document.getElementById('entryLabel');
+    const entryIsActive = document.getElementById('entryIsActive');
+
+    if (entryId) entryId.value = '';
+    if (entryScope) entryScope.value = 'committed';
+    if (entryBoxes) {
+        entryBoxes.value = '';
+        entryBoxes.min = '1';
+    }
+    if (entryEta) entryEta.value = '';
+    if (entryLabel) entryLabel.value = '';
+    if (entryIsActive) entryIsActive.checked = true;
+}
+
 const filterState = {
     productId: '',
     includeSimulations: false,
@@ -112,6 +136,22 @@ function bindEventHandlers() {
     document.getElementById('plannedStockForm')?.addEventListener('submit', handlePlannedStockSubmit);
 
     document.getElementById('plannedStockTableBody')?.addEventListener('click', handleTableAction);
+
+    document.getElementById('plannedStockModal')?.addEventListener('click', (event) => {
+        if (event.target === event.currentTarget) {
+            closePlannedStockModal();
+        }
+    });
+
+    document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape') {
+            const modal = document.getElementById('plannedStockModal');
+            if (modal && !modal.classList.contains('hidden')) {
+                event.preventDefault();
+                closePlannedStockModal();
+            }
+        }
+    });
 }
 
 function applyFilters() {
@@ -430,6 +470,7 @@ function openPlannedStockModal(mode, entry = null) {
         entryLabel.value = entry.label || '';
         entryIsActive.checked = Number(entry.is_active ?? 1) === 1;
     } else {
+        resetPlannedStockForm();
         modalTitle.textContent = 'Neue Planung';
         modalSubtitle.textContent = 'Zusätzliche Boxen und optionales ETA für ein Produkt hinterlegen.';
         if (modalSubmitText) {
@@ -437,22 +478,31 @@ function openPlannedStockModal(mode, entry = null) {
         }
         entryBoxes.min = '1';
 
-        entryId.value = '';
         entryProduct.value = '';
-        entryScope.value = 'committed';
-        entryBoxes.value = '';
         entryEta.value = '';
         entryLabel.value = '';
-        entryIsActive.checked = true;
+    }
+
+    if (modal) {
+        modal.dataset.mode = mode;
     }
 
     modal.classList.remove('hidden');
+
+    requestAnimationFrame(() => {
+        entryProduct?.focus();
+    });
 }
 
 function closePlannedStockModal() {
     const modal = document.getElementById('plannedStockModal');
     if (modal) {
         modal.classList.add('hidden');
+        modal.removeAttribute('data-mode');
+    }
+
+    if (modalMode === 'create') {
+        resetPlannedStockForm();
     }
 }
 

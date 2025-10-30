@@ -206,42 +206,44 @@
                     <span class="material-icons-outlined" aria-hidden="true">close</span>
                 </button>
             </div>
-            <form id="plannedStockForm">
+            <form id="plannedStockForm" aria-describedby="plannedStockModalSubtitle">
                 <input type="hidden" id="plannedStockId">
-                <div class="form-grid form-grid--two">
-                    <div class="form-group">
-                        <label for="entryProduct">Produkt *</label>
-                        <select id="entryProduct" required>
-                            <option value="">Produkt wählen</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="entryScope">Scope *</label>
-                        <select id="entryScope" required>
-                            <option value="committed">Committed</option>
-                            <option value="simulation">Simulation</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="entryBoxes">Boxen *</label>
-                        <input type="number" id="entryBoxes" min="1" step="1" required>
-                        <small>Ganze Boxen, mindestens 1</small>
-                    </div>
-                    <div class="form-group">
-                        <label for="entryEta">ETA</label>
-                        <input type="date" id="entryEta">
-                        <small>Optionales Lieferdatum</small>
-                    </div>
-                    <div class="form-group">
-                        <label for="entryLabel">Label</label>
-                        <input type="text" id="entryLabel" maxlength="120" placeholder="z.B. Order #4711">
-                    </div>
-                    <div class="form-group form-group--checkbox">
-                        <label class="checkbox-inline">
-                            <input type="checkbox" id="entryIsActive" checked>
-                            <span>Aktiv</span>
-                        </label>
-                        <small>Inaktive Einträge zählen nicht in die Summe</small>
+                <div class="modal-body">
+                    <div class="form-grid form-grid--two">
+                        <div class="form-group">
+                            <label for="entryProduct">Produkt *</label>
+                            <select id="entryProduct" required>
+                                <option value="">Produkt wählen</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="entryScope">Scope *</label>
+                            <select id="entryScope" required>
+                                <option value="committed">Committed</option>
+                                <option value="simulation">Simulation</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="entryBoxes">Boxen *</label>
+                            <input type="number" id="entryBoxes" min="1" step="1" required>
+                            <small>Ganze Boxen, mindestens 1</small>
+                        </div>
+                        <div class="form-group">
+                            <label for="entryEta">ETA</label>
+                            <input type="date" id="entryEta">
+                            <small>Optionales Lieferdatum</small>
+                        </div>
+                        <div class="form-group">
+                            <label for="entryLabel">Label</label>
+                            <input type="text" id="entryLabel" maxlength="120" placeholder="z.B. Order #4711">
+                        </div>
+                        <div class="form-group form-group--checkbox">
+                            <label class="checkbox-inline">
+                                <input type="checkbox" id="entryIsActive" checked>
+                                <span>Aktiv</span>
+                            </label>
+                            <small>Inaktive Einträge zählen nicht in die Summe</small>
+                        </div>
                     </div>
                 </div>
                 <div class="modal-footer">

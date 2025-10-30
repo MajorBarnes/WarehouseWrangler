@@ -452,8 +452,15 @@
 }
 
 #plannedStockForm {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+
+#plannedStockForm .modal-body {
     padding: 1.75rem;
-    display: grid;
+    display: flex;
+    flex-direction: column;
     gap: 1.5rem;
 }
 
@@ -505,6 +512,9 @@
     display: flex;
     justify-content: flex-end;
     gap: 0.75rem;
+    padding: 1.25rem 1.75rem;
+    border-top: 1px solid var(--color-border);
+    background: rgba(15, 40, 70, 0.02);
 }
 
 @media (max-width: 960px) {
