@@ -10,6 +10,9 @@ let currentFilters = {
     search: ''
 };
 let selectedCarton = null;
+const cartonMetadataCache = new Map();
+let cartonTooltipElement = null;
+let isCartonTooltipInitialized = false;
 
 // ---------------------------------------
 // Helpers
@@ -134,6 +137,7 @@ function showError(message) {
 document.addEventListener('DOMContentLoaded', () => {
     initializeHeader();
     bindCartonControls();
+    initializeCartonTooltip();
 
     loadLocationsSummary();
     loadCartons();
@@ -159,6 +163,35 @@ function initializeHeader() {
             }
         });
     }
+}
+
+function initializeCartonTooltip() {
+    if (isCartonTooltipInitialized) {
+        return;
+    }
+
+    cartonTooltipElement = document.getElementById('cartonTooltip');
+    const tbody = document.getElementById('cartonsTableBody');
+
+    if (!cartonTooltipElement || !tbody) {
+        return;
+    }
+
+    isCartonTooltipInitialized = true;
+    cartonTooltipElement.setAttribute('aria-hidden', 'true');
+
+    const scrollContainer = document.querySelector('.table-scroll');
+    if (scrollContainer) {
+        scrollContainer.addEventListener('scroll', hideCartonTooltip, { passive: true });
+    }
+
+    window.addEventListener('scroll', hideCartonTooltip, { passive: true });
+    window.addEventListener('resize', hideCartonTooltip, { passive: true });
+
+    tbody.addEventListener('mouseenter', handleCartonRowEnter, true);
+    tbody.addEventListener('mouseleave', handleCartonRowLeave, true);
+    tbody.addEventListener('focusin', handleCartonRowFocus);
+    tbody.addEventListener('focusout', handleCartonRowBlur);
 }
 
 function bindCartonControls() {
@@ -381,10 +414,12 @@ function renderCartonsTable(cartons) {
     const tbody = document.getElementById('cartonsTableBody');
     if (!tbody) return;
 
+    cartonMetadataCache.clear();
     if (!Array.isArray(cartons) || cartons.length === 0) {
         tbody.innerHTML = '';
         currentCartons = [];
         setTableState({ isLoading: false, isEmpty: true });
+        hideCartonTooltip();
         return;
     }
 
@@ -395,8 +430,11 @@ function renderCartonsTable(cartons) {
             ? `<code>${escapeHtml(carton.carton_reference)}</code>`
             : '';
 
+        const metadata = Array.isArray(carton.product_metadata) ? carton.product_metadata : [];
+        cartonMetadataCache.set(Number(carton.carton_id), metadata);
+
         return `
-            <tr data-carton-id="${carton.carton_id}">
+            <tr data-carton-id="${carton.carton_id}" data-has-products="${metadata.length > 0}" tabindex="0">
                 <td>
                     <div class="carton-identifier">
                         <strong>${escapeHtml(carton.carton_number)}</strong>
@@ -454,7 +492,123 @@ function renderCartonsTable(cartons) {
     }).join('');
 
     tbody.innerHTML = rows;
+    hideCartonTooltip();
     setTableState({ isLoading: false, isEmpty: false });
+}
+
+function handleCartonRowEnter(event) {
+    const row = event.target.closest('tr[data-carton-id]');
+    if (!row) {
+        return;
+    }
+    showCartonTooltip(row);
+}
+
+function handleCartonRowLeave(event) {
+    const row = event.target.closest('tr[data-carton-id]');
+    if (!row) {
+        return;
+    }
+
+    const related = event.relatedTarget;
+    if (related && row.contains(related)) {
+        return;
+    }
+
+    hideCartonTooltip();
+}
+
+function handleCartonRowFocus(event) {
+    const row = event.target.closest('tr[data-carton-id]');
+    if (!row) {
+        return;
+    }
+    showCartonTooltip(row);
+}
+
+function handleCartonRowBlur(event) {
+    const row = event.target.closest('tr[data-carton-id]');
+    if (!row) {
+        return;
+    }
+
+    const nextTarget = event.relatedTarget;
+    if (nextTarget && row.contains(nextTarget)) {
+        return;
+    }
+
+    hideCartonTooltip();
+}
+
+function showCartonTooltip(row) {
+    if (!cartonTooltipElement) {
+        return;
+    }
+
+    const cartonId = Number(row.dataset.cartonId);
+    const metadata = cartonMetadataCache.get(cartonId) || [];
+
+    if (!metadata.length) {
+        hideCartonTooltip();
+        return;
+    }
+
+    const itemsHtml = metadata.map((item) => {
+        const artikel = escapeHtml(item.artikel ?? '');
+        const productGroup = escapeHtml(item.product_group ?? '');
+        const fnsku = escapeHtml(item.fnsku ?? '');
+
+        return `
+            <li class="carton-tooltip__item">
+                <span class="carton-tooltip__product">${productGroup || 'Produkt ohne Namen'}</span>
+                <span class="carton-tooltip__meta">Artikel: ${artikel || '—'}</span>
+                <span class="carton-tooltip__meta">FNSKU: ${fnsku || '—'}</span>
+            </li>
+        `;
+    }).join('');
+
+    cartonTooltipElement.innerHTML = `
+        <div class="carton-tooltip__header">Produkte (${metadata.length})</div>
+        <ul class="carton-tooltip__list">${itemsHtml}</ul>
+    `;
+
+    cartonTooltipElement.classList.add('is-visible');
+    cartonTooltipElement.setAttribute('aria-hidden', 'false');
+    cartonTooltipElement.style.top = '-9999px';
+    cartonTooltipElement.style.left = '-9999px';
+
+    const rowRect = row.getBoundingClientRect();
+    const tooltipRect = cartonTooltipElement.getBoundingClientRect();
+    const viewportWidth = document.documentElement.clientWidth;
+    const padding = 16;
+    const offset = 12;
+
+    let top = rowRect.top - tooltipRect.height - offset;
+    if (top < padding) {
+        top = rowRect.bottom + offset;
+    }
+
+    let left = rowRect.left + (rowRect.width / 2) - (tooltipRect.width / 2);
+    if (left < padding) {
+        left = padding;
+    }
+    if (left + tooltipRect.width > viewportWidth - padding) {
+        left = Math.max(padding, viewportWidth - tooltipRect.width - padding);
+    }
+
+    cartonTooltipElement.style.top = `${top}px`;
+    cartonTooltipElement.style.left = `${left}px`;
+}
+
+function hideCartonTooltip() {
+    if (!cartonTooltipElement) {
+        return;
+    }
+
+    cartonTooltipElement.classList.remove('is-visible');
+    cartonTooltipElement.setAttribute('aria-hidden', 'true');
+    cartonTooltipElement.style.top = '';
+    cartonTooltipElement.style.left = '';
 }
 
 function showCartonDetailsModal(data) {
