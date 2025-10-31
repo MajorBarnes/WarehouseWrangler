@@ -87,13 +87,15 @@
 }
 
 .bar-row__segments {
+    --segment-bar-height: 2.25rem;
     display: flex;
     align-items: stretch;
     gap: 0.25rem;
     background: var(--surface-subtle, #eef1f7);
     border-radius: 0.5rem;
     overflow: hidden;
-    min-height: 2.25rem;
+    min-height: var(--segment-bar-height);
+    height: var(--segment-bar-height);
 }
 
 .seg {
