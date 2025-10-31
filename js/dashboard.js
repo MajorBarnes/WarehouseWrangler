@@ -184,6 +184,8 @@ export function computeCoverage(productRow, plannedMap, cfg, month, toggles) {
         weeklyDemand,
         totalWeeks: 0,
         segments: [],
+        locationBreakdown: [],
+        hasAmazonData: false,
         totals: {
             internalPairs: 0,
             internalWeeks: 0,
@@ -210,6 +212,21 @@ export function computeCoverage(productRow, plannedMap, cfg, month, toggles) {
         gmr: Number(productRow.gmr_pairs) || 0,
         amz: Number(productRow.amz_pairs) || 0
     };
+
+    const hasAmazonField = Object.prototype.hasOwnProperty.call(productRow, 'amz_pairs');
+
+    const locationBreakdown = [
+        { key: 'incoming', label: 'Incoming', pairs: locations.incoming },
+        { key: 'wml', label: 'WML', pairs: locations.wml },
+        { key: 'gmr', label: 'GMR', pairs: locations.gmr }
+    ];
+
+    if (hasAmazonField) {
+        locationBreakdown.push({ key: 'amz', label: 'Amazon', pairs: locations.amz });
+        result.hasAmazonData = true;
+    }
+
+    result.locationBreakdown = locationBreakdown;
 
     const planned = plannedMap.get(productId);
     const includeAdditional = !!toggles.includeAdditional;
@@ -386,6 +403,24 @@ export function renderDashboard(currentState) {
         } else {
             metaEl.appendChild(createMetaChip('To-order', '—'));
         }
+
+        const locationEntries = Array.isArray(row.locationBreakdown) ? row.locationBreakdown : [];
+        const includeAmazon = !!currentState.toggles?.includeAmazon;
+
+        locationEntries.forEach(location => {
+            if (location.key === 'amz') {
+                if (!includeAmazon || !row.hasAmazonData) {
+                    return;
+                }
+            }
+
+            const pairs = Number(location.pairs) || 0;
+            const boxes = row.pairsPerBox > 0 ? pairs / row.pairsPerBox : null;
+            const boxesLabel = boxes == null ? '— boxes' : `${numberFormatter.format(boxes)} boxes`;
+            const pairsLabel = `${pairsFormatter.format(pairs)} pairs`;
+
+            metaEl.appendChild(createMetaChip(location.label, `${boxesLabel} / ${pairsLabel}`));
+        });
 
         headerEl.appendChild(metaEl);
         rowEl.appendChild(headerEl);
@@ -739,9 +774,10 @@ function updateUserDisplay() {
 }
 
 function defaultTargetDate(leadWeeks) {
-    const weeks = Number(leadWeeks) || 0;
+    const baseWeeks = Number(leadWeeks) || 0;
+    const totalWeeks = Math.max(0, baseWeeks) + 13;
     const base = startOfDay(new Date());
-    return addDays(base, Math.ceil(weeks * 7));
+    return addDays(base, Math.ceil(totalWeeks * 7));
 }
 
 function toInputValue(date) {
