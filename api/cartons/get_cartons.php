@@ -112,7 +112,69 @@ try {
         $stmt->execute();
     }
     
-    $cartons = $stmt->fetchAll();
+    $cartons = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    $cartonMetadata = [];
+    $cartonProductSeen = [];
+
+    if (!empty($cartons)) {
+        $cartonIds = array_map(static function ($carton) {
+            return (int)$carton['carton_id'];
+        }, $cartons);
+        $cartonIds = array_values(array_unique($cartonIds));
+
+        $placeholders = implode(',', array_fill(0, count($cartonIds), '?'));
+
+        $metadataSql = "
+            SELECT
+                cc.carton_id,
+                p.artikel,
+                p.fnsku,
+                p.product_name AS product_group
+            FROM carton_contents cc
+            JOIN products p ON cc.product_id = p.product_id
+            WHERE cc.carton_id IN ($placeholders)
+            ORDER BY p.product_name, p.artikel
+        ";
+
+        $metaStmt = $db->prepare($metadataSql);
+        $metaStmt->execute($cartonIds);
+
+        while ($row = $metaStmt->fetch(PDO::FETCH_ASSOC)) {
+            $cartonId = (int)$row['carton_id'];
+            $artikel = $row['artikel'] ?? '';
+            $fnsku = $row['fnsku'] ?? '';
+            $productGroup = $row['product_group'] ?? '';
+
+            $dedupeKey = $fnsku . '|' . $artikel;
+
+            if (!isset($cartonProductSeen[$cartonId])) {
+                $cartonProductSeen[$cartonId] = [];
+            }
+
+            if (isset($cartonProductSeen[$cartonId][$dedupeKey])) {
+                continue;
+            }
+
+            $cartonProductSeen[$cartonId][$dedupeKey] = true;
+
+            if (!isset($cartonMetadata[$cartonId])) {
+                $cartonMetadata[$cartonId] = [];
+            }
+
+            $cartonMetadata[$cartonId][] = [
+                'artikel' => $artikel,
+                'product_group' => $productGroup,
+                'fnsku' => $fnsku
+            ];
+        }
+
+        foreach ($cartons as &$carton) {
+            $cartonId = (int)$carton['carton_id'];
+            $carton['product_metadata'] = $cartonMetadata[$cartonId] ?? [];
+        }
+        unset($carton);
+    }
     
     // Get summary statistics per location
     $summarySql = "

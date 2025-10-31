@@ -333,6 +333,69 @@ button.metric-card:is(:hover, :focus-visible) {
     background: rgba(0, 86, 179, 0.04);
 }
 
+.carton-tooltip {
+    position: fixed;
+    pointer-events: none;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border-strong, rgba(15, 23, 42, 0.12));
+    border-radius: 0.75rem;
+    box-shadow: 0 18px 36px -18px rgba(15, 23, 42, 0.45), 0 12px 24px -12px rgba(15, 23, 42, 0.2);
+    padding: 0.75rem 1rem;
+    min-width: 240px;
+    max-width: 320px;
+    max-height: 360px;
+    overflow-y: auto;
+    opacity: 0;
+    transform: translateY(6px);
+    transition: opacity 0.15s ease, transform 0.15s ease;
+    z-index: 40;
+    visibility: hidden;
+    color: var(--color-text);
+}
+
+.carton-tooltip.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+    visibility: visible;
+}
+
+.carton-tooltip__header {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--color-muted);
+}
+
+.carton-tooltip__list {
+    margin: 0.5rem 0 0;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+
+.carton-tooltip__item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    background: rgba(0, 86, 179, 0.04);
+    border-radius: 0.5rem;
+    padding: 0.5rem 0.65rem;
+}
+
+.carton-tooltip__product {
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--color-primary);
+}
+
+.carton-tooltip__meta {
+    font-size: 0.8rem;
+    color: var(--color-muted);
+}
+
 .cartons-table .numeric {
     text-align: right;
 }
