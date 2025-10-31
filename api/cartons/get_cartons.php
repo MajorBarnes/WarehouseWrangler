@@ -7,7 +7,7 @@
  * @method GET
  * @param string location (optional) - Filter by location: Incoming, WML, GMR
  * @param string status (optional) - Filter by status: in stock, empty, archived
- * @param string search (optional) - Search by carton number or product name
+ * @param string search (optional) - Search by carton number, product name, or FNSKU
  * @returns JSON: { "success": bool, "cartons": array, "summary": object }
  */
 
@@ -72,20 +72,17 @@ try {
         $params[] = $_GET['status'];
     }
     
-    // Search by carton number or product name
-    $searchJoin = '';
+    // Search by carton number, product name, or FNSKU
     if (isset($_GET['search']) && !empty($_GET['search'])) {
         $searchTerm = '%' . $_GET['search'] . '%';
         $where[] = "(c.carton_number LIKE ? OR p.product_name LIKE ? OR p.fnsku LIKE ?)";
         $params[] = $searchTerm;
         $params[] = $searchTerm;
         $params[] = $searchTerm;
-        $searchJoin = "LEFT JOIN carton_contents cc ON c.carton_id = cc.carton_id
-                       LEFT JOIN products p ON cc.product_id = p.product_id";
     }
-    
+
     $whereClause = !empty($where) ? 'WHERE ' . implode(' AND ', $where) : '';
-    
+
     // Get cartons with their contents
     $sql = "
         SELECT DISTINCT
@@ -95,13 +92,13 @@ try {
             c.status,
             c.created_at,
             c.updated_at,
-            COUNT(DISTINCT cc2.product_id) as product_count,
-            SUM(cc2.boxes_current) as total_boxes_current,
-            SUM(cc2.boxes_initial) as total_boxes_initial,
-            SUM(cc2.boxes_sent_to_amazon) as total_boxes_sent
+            COUNT(DISTINCT cc.product_id) as product_count,
+            SUM(cc.boxes_current) as total_boxes_current,
+            SUM(cc.boxes_initial) as total_boxes_initial,
+            SUM(cc.boxes_sent_to_amazon) as total_boxes_sent
         FROM cartons c
-        LEFT JOIN carton_contents cc2 ON c.carton_id = cc2.carton_id
-        $searchJoin
+        LEFT JOIN carton_contents cc ON c.carton_id = cc.carton_id
+        LEFT JOIN products p ON cc.product_id = p.product_id
         $whereClause
         GROUP BY c.carton_id
         ORDER BY c.created_at DESC
