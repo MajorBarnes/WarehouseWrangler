@@ -165,6 +165,33 @@
     z-index: 5;
 }
 
+.seg--incoming .seg__tooltip {
+    background: var(--accent, #5c6bc0);
+    color: #fff;
+}
+
+.seg--wml .seg__tooltip {
+    background: #4a90e2;
+    color: #fff;
+}
+
+.seg--gmr .seg__tooltip {
+    background: #6c757d;
+    color: #fff;
+}
+
+.seg--amz .seg__tooltip {
+    background: #f0ad4e;
+    color: #1c2333;
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.08);
+}
+
+.seg--additional .seg__tooltip {
+    background: #20c997;
+    color: #0e2f25;
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.08);
+}
+
 .seg:hover .seg__tooltip,
 .seg__hit:focus + .seg__tooltip {
     opacity: 1;
