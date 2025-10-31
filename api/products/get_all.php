@@ -47,8 +47,11 @@ try {
     $hasAvgSales = in_array('average_weekly_sales', $viewColumns, true);
     $hasPairsPerBox = in_array('pairs_per_box', $viewColumns, true);
     $hasIncoming = in_array('incoming_pairs', $viewColumns, true);
+    $hasIncomingBoxes = in_array('incoming_boxes', $viewColumns, true);
     $hasWml = in_array('wml_pairs', $viewColumns, true);
+    $hasWmlBoxes = in_array('wml_boxes', $viewColumns, true);
     $hasGmr = in_array('gmr_pairs', $viewColumns, true);
+    $hasGmrBoxes = in_array('gmr_boxes', $viewColumns, true);
     $hasAmz = in_array('amz_pairs', $viewColumns, true);
 
     $selectParts = [
@@ -89,8 +92,11 @@ try {
     }
 
     $selectParts[] = $hasIncoming ? 'COALESCE(v.incoming_pairs, 0) AS incoming_pairs' : '0 AS incoming_pairs';
+    $selectParts[] = $hasIncomingBoxes ? 'COALESCE(v.incoming_boxes, 0) AS incoming_boxes' : '0 AS incoming_boxes';
     $selectParts[] = $hasWml ? 'COALESCE(v.wml_pairs, 0) AS wml_pairs' : '0 AS wml_pairs';
+    $selectParts[] = $hasWmlBoxes ? 'COALESCE(v.wml_boxes, 0) AS wml_boxes' : '0 AS wml_boxes';
     $selectParts[] = $hasGmr ? 'COALESCE(v.gmr_pairs, 0) AS gmr_pairs' : '0 AS gmr_pairs';
+    $selectParts[] = $hasGmrBoxes ? 'COALESCE(v.gmr_boxes, 0) AS gmr_boxes' : '0 AS gmr_boxes';
     $selectParts[] = $hasAmz ? 'COALESCE(v.amz_pairs, 0) AS amz_pairs' : '0 AS amz_pairs';
 
     $sql = "SELECT\n            " . implode(",\n            ", $selectParts) . "\n        FROM products p";
@@ -122,9 +128,22 @@ try {
         ];
         
         // Build product object
+        $pairsPerBox = (float)($row['pairs_per_box'] ?? 0);
+
         $incomingPairs = (float)($row['incoming_pairs'] ?? 0);
+        if (!$hasIncoming && $hasIncomingBoxes) {
+            $incomingPairs = (float)($row['incoming_boxes'] ?? 0) * $pairsPerBox;
+        }
+
         $wmlPairs = (float)($row['wml_pairs'] ?? 0);
+        if (!$hasWml && $hasWmlBoxes) {
+            $wmlPairs = (float)($row['wml_boxes'] ?? 0) * $pairsPerBox;
+        }
+
         $gmrPairs = (float)($row['gmr_pairs'] ?? 0);
+        if (!$hasGmr && $hasGmrBoxes) {
+            $gmrPairs = (float)($row['gmr_boxes'] ?? 0) * $pairsPerBox;
+        }
         $amzPairs = (float)($row['amz_pairs'] ?? 0);
 
         $product = [
