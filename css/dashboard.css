@@ -81,6 +81,39 @@
     color: var(--text-strong, #1c2333);
 }
 
+.bar-row__meta-chip--colored {
+    color: #fff;
+}
+
+.bar-row__meta-chip--colored strong {
+    color: inherit;
+}
+
+.bar-row__meta-chip--incoming {
+    background: var(--accent, #5c6bc0);
+}
+
+.bar-row__meta-chip--wml {
+    background: #4a90e2;
+}
+
+.bar-row__meta-chip--gmr {
+    background: #6c757d;
+}
+
+.bar-row__meta-chip--amz {
+    background: #f0ad4e;
+    color: #1c2333;
+}
+
+.bar-row__meta-chip--amz strong {
+    color: inherit;
+}
+
+.bar-row__meta-chip--additional {
+    background: #20c997;
+}
+
 .bar-row__track {
     position: relative;
     padding: 0.75rem 0;

@@ -405,6 +405,7 @@ export function renderDashboard(currentState) {
         }
 
         const locationEntries = Array.isArray(row.locationBreakdown) ? row.locationBreakdown : [];
+        const segmentKeySet = new Set(['incoming', 'wml', 'gmr', 'amz', 'additional']);
         const includeAmazon = !!currentState.toggles?.includeAmazon;
 
         locationEntries.forEach(location => {
@@ -419,7 +420,8 @@ export function renderDashboard(currentState) {
             const boxesLabel = boxes == null ? '— boxes' : `${numberFormatter.format(boxes)} boxes`;
             const pairsLabel = `${pairsFormatter.format(pairs)} pairs`;
 
-            metaEl.appendChild(createMetaChip(location.label, `${boxesLabel} / ${pairsLabel}`));
+            const variant = segmentKeySet.has(location.key) ? location.key : null;
+            metaEl.appendChild(createMetaChip(location.label, `${boxesLabel} / ${pairsLabel}`, { variant }));
         });
 
         headerEl.appendChild(metaEl);
@@ -711,9 +713,14 @@ function showDashboardError(error) {
     container.appendChild(message);
 }
 
-function createMetaChip(label, value) {
+function createMetaChip(label, value, options = {}) {
     const chip = document.createElement('span');
-    chip.className = 'bar-row__meta-chip';
+    const classes = ['bar-row__meta-chip'];
+    if (options.variant) {
+        classes.push(`bar-row__meta-chip--${options.variant}`);
+        classes.push('bar-row__meta-chip--colored');
+    }
+    chip.className = classes.join(' ');
     chip.innerHTML = `<strong>${label}:</strong> ${value}`;
     return chip;
 }
