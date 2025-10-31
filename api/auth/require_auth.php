@@ -15,6 +15,9 @@ function send_unauthorized($msg = 'Authentication required') {
 function get_bearer_token() {
     // Try standard header first
     $hdr = $_SERVER['HTTP_AUTHORIZATION'] ?? '';
+    if (!$hdr && isset($_SERVER['REDIRECT_HTTP_AUTHORIZATION'])) {
+        $hdr = $_SERVER['REDIRECT_HTTP_AUTHORIZATION'];
+    }
     if (!$hdr && function_exists('apache_request_headers')) {
         $headers = apache_request_headers();
         if (isset($headers['Authorization'])) $hdr = $headers['Authorization'];
