@@ -12,10 +12,20 @@
 
 define('WAREHOUSEWRANGLER', true);
 require_once '../config.php';
-// require_once '../auth/require_auth.php';
+require_once __DIR__ . '/../auth/require_auth.php';
 
 header('Content-Type: application/json; charset=utf-8');
 header('Cache-Control: no-store');
+
+$token = get_bearer_token();
+if (!$token) {
+    send_unauthorized('No authorization token provided');
+}
+
+$claims = verify_jwt($token);
+if (!$claims) {
+    send_unauthorized('Invalid or expired token');
+}
 
 if (!function_exists('sendJSON')) {
     function sendJSON($data, $status = 200) {
