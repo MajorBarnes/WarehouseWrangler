@@ -12,6 +12,17 @@ ob_start();
 require_once __DIR__ . '/../config.php';   // <-- do NOT echo/print this
 $leakedBefore = ob_get_contents();          // capture anything that leaked (like '1')
 ob_end_clean();                             // fully end & discard that buffer
+require_once __DIR__ . '/../auth/require_auth.php';
+
+$token = get_bearer_token();
+if (!$token) {
+    send_unauthorized('No authorization token provided');
+}
+
+$claims = verify_jwt($token);
+if (!$claims) {
+    send_unauthorized('Invalid or expired token');
+}
 
 // 3) Acquire PDO from config (covers $pdo, $db, function helpers)
 $pdo = $pdo ?? ($db ?? (function_exists('getDBConnection') ? getDBConnection() : (function_exists('getPDO') ? getPDO() : (function_exists('db') ? db() : null))));
