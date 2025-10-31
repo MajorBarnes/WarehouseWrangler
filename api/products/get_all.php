@@ -11,7 +11,8 @@
  */
 
 define('WAREHOUSEWRANGLER', true);
-require_once '../config.php';
+require_once __DIR__ . '/../config.php';
+require_once __DIR__ . '/../auth/require_auth.php';
 
 header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: *');
@@ -21,31 +22,8 @@ if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
 }
 
 try {
-    // Authenticate
-    $authHeader = '';
-    if (isset($_SERVER['HTTP_AUTHORIZATION'])) {
-        $authHeader = $_SERVER['HTTP_AUTHORIZATION'];
-    } elseif (isset($_SERVER['REDIRECT_HTTP_AUTHORIZATION'])) {
-        $authHeader = $_SERVER['REDIRECT_HTTP_AUTHORIZATION'];
-    } elseif (function_exists('apache_request_headers')) {
-        $headers = apache_request_headers();
-        $authHeader = $headers['Authorization'] ?? '';
-    }
-    
-    if (empty($authHeader) || !preg_match('/Bearer\s+(.*)$/i', $authHeader, $matches)) {
-        sendJSON(['success' => false, 'error' => 'No authorization token provided'], 401);
-    }
-    
-    $token = $matches[1];
-    $parts = explode('.', $token);
-    if (count($parts) !== 3) {
-        sendJSON(['success' => false, 'error' => 'Invalid token format'], 401);
-    }
-    
-    $payload = json_decode(base64_decode(str_replace(['-', '_'], ['+', '/'], $parts[1])), true);
-    if ($payload['exp'] < time()) {
-        sendJSON(['success' => false, 'error' => 'Token expired'], 401);
-    }
+    // Authenticate request
+    $claims = require_auth();
     
     $db = getDBConnection();
 
