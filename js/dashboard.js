@@ -739,9 +739,10 @@ function updateUserDisplay() {
 }
 
 function defaultTargetDate(leadWeeks) {
-    const weeks = Number(leadWeeks) || 0;
+    const baseWeeks = Number(leadWeeks) || 0;
+    const totalWeeks = Math.max(0, baseWeeks) + 13;
     const base = startOfDay(new Date());
-    return addDays(base, Math.ceil(weeks * 7));
+    return addDays(base, Math.ceil(totalWeeks * 7));
 }
 
 function toInputValue(date) {
