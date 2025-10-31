@@ -705,6 +705,36 @@ async function reloadShipmentContents() {
     }
 }
 
+async function removeSelectedBox(index) {
+    if (!Number.isInteger(index) || index < 0 || index >= selectedBoxes.length) {
+        return;
+    }
+
+    const entry = selectedBoxes[index];
+    if (!entry) {
+        return;
+    }
+
+    if (entry.shipment_content_id) {
+        if (!activeShipment || !activeShipment.shipment_id) {
+            showError('Shipment context missing. Please reload and try again.');
+            return;
+        }
+
+        try {
+            await removeBoxFromShipment(entry.shipment_content_id);
+        } catch (error) {
+            console.error('removeBoxFromShipment failed:', error);
+            showError('Failed to remove boxes from shipment. Please try again.');
+        }
+        return;
+    }
+
+    selectedBoxes.splice(index, 1);
+    updateSelectedBoxesSummary();
+    renderSelectedBoxesList();
+}
+
 function updateSelectedBoxesSummary() {
     const totalBoxes = selectedBoxes.reduce((sum, b) => sum + b.boxes_to_send, 0);
     const uniqueCartons = new Set(selectedBoxes.map(b => b.carton_id)).size;
