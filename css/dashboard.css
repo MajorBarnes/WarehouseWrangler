@@ -87,9 +87,7 @@
 }
 
 .bar-row__segments {
-    display: grid;
-    grid-auto-flow: column;
-    grid-auto-columns: minmax(0, 1fr);
+    display: flex;
     gap: 0.25rem;
     background: var(--surface-subtle, #eef1f7);
     border-radius: 0.5rem;
@@ -103,6 +101,7 @@
     height: 100%;
     transition: width 0.3s ease;
     width: calc(var(--w, 0) * 1%);
+    flex: 0 0 auto;
 }
 
 .seg--incoming {
