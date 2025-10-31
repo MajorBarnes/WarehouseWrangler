@@ -226,9 +226,14 @@ button.metric-card:is(:hover, :focus-visible) {
 .table-scroll {
     border: 1px solid var(--color-border);
     border-radius: var(--radius-md);
-    overflow: auto;
-    max-height: 70vh;
+    overflow: visible;
     background: var(--color-surface);
+}
+
+.table-scroll__viewport {
+    max-height: 70vh;
+    overflow: auto;
+    border-radius: inherit;
 }
 
 .table-sticky thead th {

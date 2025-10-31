@@ -179,8 +179,9 @@
         <section class="surface-card table-card" aria-label="Carton Tabelle">
             <div id="cartonsLoading" class="loading-indicator">Cartons werden geladen…</div>
             <div class="table-scroll" role="region" aria-live="polite" aria-label="Carton Datentabelle">
-                <table id="cartonsTable" class="cartons-table table-sticky is-hidden">
-                    <thead>
+                <div class="table-scroll__viewport">
+                    <table id="cartonsTable" class="cartons-table table-sticky is-hidden">
+                        <thead>
                         <tr>
                             <th scope="col">Carton</th>
                             <th scope="col">Standort</th>
@@ -193,8 +194,9 @@
                             <th scope="col" class="actions-col">Aktionen</th>
                         </tr>
                     </thead>
-                    <tbody id="cartonsTableBody"></tbody>
-                </table>
+                        <tbody id="cartonsTableBody"></tbody>
+                    </table>
+                </div>
             </div>
             <div id="cartonTooltip" class="carton-tooltip" role="status" aria-live="polite" aria-hidden="true"></div>
             <div id="cartonsEmpty" class="empty-state is-hidden">

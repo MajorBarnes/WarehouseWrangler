@@ -102,8 +102,9 @@
                 </div>
             </header>
             <div class="table-scroll" role="region" aria-live="polite" aria-label="User directory">
-                <table class="users-table table-sticky">
-                    <thead>
+                <div class="table-scroll__viewport">
+                    <table class="users-table table-sticky">
+                        <thead>
                         <tr>
                             <th scope="col">Username</th>
                             <th scope="col">Email</th>
@@ -113,12 +114,13 @@
                             <th scope="col" class="actions-column">Actions</th>
                         </tr>
                     </thead>
-                    <tbody id="usersTableBody">
-                        <tr class="table-loading-row">
-                            <td colspan="6" class="table-loading">Loading users…</td>
-                        </tr>
-                    </tbody>
-                </table>
+                        <tbody id="usersTableBody">
+                            <tr class="table-loading-row">
+                                <td colspan="6" class="table-loading">Loading users…</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </section>
     </main>

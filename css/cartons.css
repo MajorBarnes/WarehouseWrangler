@@ -289,8 +289,12 @@ button.metric-card:is(:hover, :focus-visible) {
 }
 
 .table-scroll {
-    overflow: auto;
+    overflow: visible;
+}
+
+.table-scroll__viewport {
     max-height: 70vh;
+    overflow: auto;
 }
 
 .table-sticky thead th {
