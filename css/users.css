@@ -73,8 +73,14 @@
 .table-scroll {
     border: 1px solid var(--color-border);
     border-radius: var(--radius-md);
-    overflow: auto;
+    overflow: visible;
     background: var(--color-surface);
+}
+
+.table-scroll__viewport {
+    max-height: 70vh;
+    overflow: auto;
+    border-radius: inherit;
 }
 
 .users-table {

@@ -173,8 +173,9 @@
             <div id="shipmentsLoading" class="loading-indicator">Shipments werden geladen…</div>
 
             <div class="table-scroll" role="region" aria-live="polite" aria-label="Shipment Tabelle">
-                <table id="shipmentsTable" class="shipments-table table-sticky is-hidden">
-                    <thead>
+                <div class="table-scroll__viewport">
+                    <table id="shipmentsTable" class="shipments-table table-sticky is-hidden">
+                        <thead>
                         <tr>
                             <th scope="col">Reference</th>
                             <th scope="col">Datum</th>
@@ -186,8 +187,9 @@
                             <th scope="col" class="actions-col">Aktionen</th>
                         </tr>
                     </thead>
-                    <tbody id="shipmentsTableBody"></tbody>
-                </table>
+                        <tbody id="shipmentsTableBody"></tbody>
+                    </table>
+                </div>
             </div>
 
             <div id="shipmentsEmpty" class="empty-state is-hidden">
