@@ -199,8 +199,9 @@
                 </div>
 
                 <div class="table-scroll" role="region" aria-live="polite" aria-label="Amazon snapshot preview">
-                    <table class="preview-table table-sticky">
-                        <thead>
+                    <div class="table-scroll__viewport">
+                        <table class="preview-table table-sticky">
+                            <thead>
                             <tr>
                                 <th scope="col">FNSKU</th>
                                 <th scope="col">SKU</th>
@@ -209,10 +210,11 @@
                                 <th scope="col">Status</th>
                             </tr>
                         </thead>
-                        <tbody id="previewTableBody">
-                            <!-- Populated by JavaScript -->
-                        </tbody>
-                    </table>
+                            <tbody id="previewTableBody">
+                                <!-- Populated by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </article>
 

@@ -126,9 +126,20 @@
     gap: 0.25rem;
     background: var(--surface-subtle, #eef1f7);
     border-radius: 0.5rem;
-    overflow: hidden;
+    overflow: visible;
     min-height: var(--segment-bar-height);
     height: var(--segment-bar-height);
+    position: relative;
+}
+
+.bar-row__segments > .seg:first-child {
+    border-top-left-radius: 0.5rem;
+    border-bottom-left-radius: 0.5rem;
+}
+
+.bar-row__segments > .seg:last-child {
+    border-top-right-radius: 0.5rem;
+    border-bottom-right-radius: 0.5rem;
 }
 
 .seg {

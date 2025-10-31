@@ -180,7 +180,7 @@ function initializeCartonTooltip() {
     isCartonTooltipInitialized = true;
     cartonTooltipElement.setAttribute('aria-hidden', 'true');
 
-    const scrollContainer = document.querySelector('.table-scroll');
+    const scrollContainer = document.querySelector('.table-scroll__viewport');
     if (scrollContainer) {
         scrollContainer.addEventListener('scroll', hideCartonTooltip, { passive: true });
     }
@@ -188,8 +188,8 @@ function initializeCartonTooltip() {
     window.addEventListener('scroll', hideCartonTooltip, { passive: true });
     window.addEventListener('resize', hideCartonTooltip, { passive: true });
 
-    tbody.addEventListener('mouseenter', handleCartonRowEnter, true);
-    tbody.addEventListener('mouseleave', handleCartonRowLeave, true);
+    tbody.addEventListener('pointerover', handleCartonRowEnter);
+    tbody.addEventListener('pointerout', handleCartonRowLeave);
     tbody.addEventListener('focusin', handleCartonRowFocus);
     tbody.addEventListener('focusout', handleCartonRowBlur);
 }
