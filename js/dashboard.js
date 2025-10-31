@@ -279,7 +279,7 @@ export function computeCoverage(productRow, plannedMap, cfg, month, toggles) {
         segments.push({
             type: 'additional',
             label: 'Additional',
-            pairs: additionalPairs,
+            pairs: 0,
             plannedPairs: additionalPairs,
             hatched: hasSimulation || hasFuture
         });
@@ -300,7 +300,8 @@ export function computeCoverage(productRow, plannedMap, cfg, month, toggles) {
 
     if (weeklyDemand > 0) {
         segments.forEach(segment => {
-            segment.weeks = (segment.pairs + (segment.plannedPairs || 0)) / weeklyDemand;
+            const coveragePairs = segment.plannedPairs || segment.pairs || 0;
+            segment.weeks = coveragePairs / weeklyDemand;
         });
 
         result.totals.internalWeeks = internalPairs / weeklyDemand;
@@ -683,7 +684,8 @@ function createMetaChip(label, value) {
 }
 
 function buildTooltipContent(segment, weeklyDemand) {
-    const pairsText = `${pairsFormatter.format(segment.pairs || 0)} pairs`;
+    const pairsValue = segment.plannedPairs || segment.pairs || 0;
+    const pairsText = `${pairsFormatter.format(pairsValue)} pairs`;
     if (!weeklyDemand || weeklyDemand <= 0) {
         return `${segment.label}: ${pairsText}`;
     }
