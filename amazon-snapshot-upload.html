@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Amazon Snapshot Upload - WarehouseWrangler</title>
+    <title data-i18n="amazonSnapshotUpload.meta.title">Amazon Snapshot Upload - WarehouseWrangler</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -41,33 +41,33 @@
 <body>
     <header class="site-header" data-site-header>
         <div class="branding">
-            <img src="./assets/logo.png" alt="WarehouseWrangler Logo" class="brand-logo">
+            <img src="./assets/logo.png" alt="WarehouseWrangler Logo" class="brand-logo" data-i18n="app.brand.logoAlt" data-i18n-attr="alt">
             <div class="brand-copy">
-                <span class="brand-name">WarehouseWrangler</span>
-                <span class="brand-tagline">Fulfillment Control Center</span>
+                <span class="brand-name" data-i18n="app.brand.name">WarehouseWrangler</span>
+                <span class="brand-tagline" data-i18n="app.brand.tagline">Fulfillment Control Center</span>
             </div>
         </div>
 
         <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="primaryNav" data-nav-toggle>
             <span class="material-icons-outlined" aria-hidden="true">menu</span>
-            <span class="sr-only">Toggle navigation</span>
+            <span class="sr-only" data-i18n="app.header.toggleNavigation">Toggle navigation</span>
         </button>
 
-        <nav class="primary-nav" aria-label="Main navigation" data-primary-nav id="primaryNav">
+        <nav class="primary-nav" aria-label="Main navigation" data-primary-nav id="primaryNav" data-i18n="app.header.mainNavAria" data-i18n-attr="aria-label">
             <ul class="nav-list">
-                <li class="nav-item"><a class="nav-link" href="index.html"><span class="material-icons-outlined" aria-hidden="true">dashboard</span><span>Dashboard</span></a></li>
-                <li class="nav-item"><a class="nav-link" href="cartons.html"><span class="material-icons-outlined" aria-hidden="true">inventory_2</span><span>Cartons</span></a></li>
-                <li class="nav-item"><a class="nav-link" href="shipments.html"><span class="material-icons-outlined" aria-hidden="true">local_shipping</span><span>Shipments</span></a></li>
-                <li class="nav-item"><a class="nav-link" href="planned-stock.html"><span class="material-icons-outlined" aria-hidden="true">analytics</span><span>Planned Stock</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="index.html"><span class="material-icons-outlined" aria-hidden="true">dashboard</span><span data-i18n="nav.dashboard">Dashboard</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="cartons.html"><span class="material-icons-outlined" aria-hidden="true">inventory_2</span><span data-i18n="nav.cartons">Cartons</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="shipments.html"><span class="material-icons-outlined" aria-hidden="true">local_shipping</span><span data-i18n="nav.shipments">Shipments</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="planned-stock.html"><span class="material-icons-outlined" aria-hidden="true">analytics</span><span data-i18n="nav.plannedStock">Planned Stock</span></a></li>
                 <li class="nav-item nav-item--has-children nav-item--active" data-imports>
                     <button class="nav-link" type="button" data-imports-toggle aria-expanded="true">
                         <span class="material-icons-outlined" aria-hidden="true">dataset</span>
-                        <span>Data Imports</span>
+                        <span data-i18n="nav.dataImports.label">Data Imports</span>
                         <span class="material-icons-outlined nav-link__chevron" aria-hidden="true">expand_more</span>
                     </button>
                     <ul class="nav-submenu">
-                        <li><a class="nav-sublink" href="lc-upload.html"><span class="material-icons-outlined" aria-hidden="true">upload_file</span><span>LC Upload</span></a></li>
-                        <li><a class="nav-sublink is-active" href="amazon-snapshot-upload.html" aria-current="page"><span class="material-icons-outlined" aria-hidden="true">cloud_upload</span><span>Amazon Snapshot</span></a></li>
+                        <li><a class="nav-sublink" href="lc-upload.html"><span class="material-icons-outlined" aria-hidden="true">upload_file</span><span data-i18n="nav.dataImports.lcUpload">LC Upload</span></a></li>
+                        <li><a class="nav-sublink is-active" href="amazon-snapshot-upload.html" aria-current="page"><span class="material-icons-outlined" aria-hidden="true">cloud_upload</span><span data-i18n="nav.dataImports.amazonSnapshot">Amazon Snapshot</span></a></li>
                     </ul>
                 </li>
             </ul>
@@ -78,24 +78,24 @@
                 <button class="user-menu__trigger" type="button" aria-expanded="false" data-user-menu-trigger>
                     <span class="material-icons-outlined" aria-hidden="true">account_circle</span>
                     <span class="user-display-name-wrapper" aria-live="polite">
-                        <span id="userDisplay" class="user-display-name">Loading…</span>
+                        <span id="userDisplay" class="user-display-name" data-i18n="common.loading">Loading…</span>
                     </span>
                     <span class="material-icons-outlined user-menu__chevron" aria-hidden="true">expand_more</span>
                 </button>
                 <div class="user-menu__dropdown" role="menu">
                     <a class="user-menu__link" href="products.html" role="menuitem">
                         <span class="material-icons-outlined" aria-hidden="true">view_list</span>
-                        <span>Products</span>
+                        <span data-i18n="app.userMenu.products">Products</span>
                     </a>
                     <a class="user-menu__link" href="users.html" role="menuitem">
                         <span class="material-icons-outlined" aria-hidden="true">group</span>
-                        <span>Users</span>
+                        <span data-i18n="app.userMenu.users">Users</span>
                     </a>
                 </div>
             </div>
             <button id="logoutBtn" class="btn btn-logout" type="button">
                 <span class="material-icons-outlined" aria-hidden="true">logout</span>
-                <span>Logout</span>
+                <span data-i18n="app.userMenu.logout">Logout</span>
             </button>
         </div>
     </header>
@@ -106,8 +106,8 @@
             <div class="page-title">
                 <span class="material-icons-outlined" aria-hidden="true">inventory</span>
                 <div class="page-title-copy">
-                    <h1>Amazon Snapshot Upload</h1>
-                    <p>Upload the latest Amazon inventory report to keep FBA stock levels accurate.</p>
+                    <h1 data-i18n="amazonSnapshotUpload.header.title">Amazon Snapshot Upload</h1>
+                    <p data-i18n="amazonSnapshotUpload.header.subtitle">Upload the latest Amazon inventory report to keep FBA stock levels accurate.</p>
                 </div>
             </div>
         </section>
@@ -117,8 +117,8 @@
             <header class="upload-card-header">
                 <span class="material-icons-outlined upload-card-icon" aria-hidden="true">cloud_upload</span>
                 <div class="upload-card-copy">
-                    <h2 id="uploadCardTitle">Select Amazon Snapshot File</h2>
-                    <p>Import your "Manage FBA Inventory" CSV from Amazon Seller Central for processing.</p>
+                    <h2 id="uploadCardTitle" data-i18n="amazonSnapshotUpload.uploadCard.title">Select Amazon snapshot file</h2>
+                    <p data-i18n="amazonSnapshotUpload.uploadCard.description">Import your "Manage FBA Inventory" CSV from Amazon Seller Central for processing.</p>
                 </div>
             </header>
 
@@ -126,14 +126,14 @@
                 <input type="file" id="snapshotFileInput" accept=".csv" class="visually-hidden" aria-hidden="true">
                 <button id="selectFileBtn" class="btn btn-primary btn-lg" type="button">
                     <span class="material-icons-outlined" aria-hidden="true">attach_file</span>
-                    <span>Choose File</span>
+                    <span data-i18n="amazonSnapshotUpload.uploadCard.selectFile">Choose file</span>
                 </button>
             </div>
 
             <div id="selectedFileInfo" class="selected-file hidden" aria-live="polite">
                 <span class="material-icons-outlined" aria-hidden="true">description</span>
                 <span id="fileName" class="file-name"></span>
-                <button id="clearFileBtn" class="icon-button" type="button" aria-label="Remove selected file">
+                <button id="clearFileBtn" class="icon-button" type="button" data-i18n="amazonSnapshotUpload.uploadCard.clearFileAria" data-i18n-attr="aria-label">
                     <span class="material-icons-outlined" aria-hidden="true">close</span>
                 </button>
             </div>
@@ -141,26 +141,38 @@
             <div class="upload-hints" aria-labelledby="uploadHintsTitle">
                 <div class="upload-hints-header">
                     <span class="material-icons-outlined" aria-hidden="true">info</span>
-                    <h3 id="uploadHintsTitle">File Requirements</h3>
+                    <h3 id="uploadHintsTitle" data-i18n="amazonSnapshotUpload.uploadCard.requirements.title">File requirements</h3>
                 </div>
                 <ul class="upload-hints-list">
-                    <li><span class="material-icons-outlined" aria-hidden="true">check_circle</span><span>Format: CSV (comma-separated)</span></li>
-                    <li><span class="material-icons-outlined" aria-hidden="true">check_circle</span><span>Includes columns: <code>snapshot-date</code>, <code>fnsku</code>, <code>available</code></span></li>
-                    <li><span class="material-icons-outlined" aria-hidden="true">check_circle</span><span>Maximum file size: 5&nbsp;MB</span></li>
+                    <li><span class="material-icons-outlined" aria-hidden="true">check_circle</span><span data-i18n="amazonSnapshotUpload.uploadCard.requirements.items.format">Format: CSV (comma-separated)</span></li>
+                    <li>
+                        <span class="material-icons-outlined" aria-hidden="true">check_circle</span>
+                        <span>
+                            <span data-i18n="amazonSnapshotUpload.uploadCard.requirements.items.columns">Includes columns:</span>
+                            <code>snapshot-date</code>, <code>fnsku</code>, <code>available</code>
+                        </span>
+                    </li>
+                    <li><span class="material-icons-outlined" aria-hidden="true">check_circle</span><span data-i18n="amazonSnapshotUpload.uploadCard.requirements.items.size">Maximum file size: 5 MB</span></li>
                 </ul>
                 <div class="upload-hints-header">
                     <span class="material-icons-outlined" aria-hidden="true">warning</span>
-                    <h3>Important</h3>
+                    <h3 data-i18n="amazonSnapshotUpload.uploadCard.important.title">Important</h3>
                 </div>
                 <ul class="upload-hints-list">
-                    <li><span class="material-icons-outlined" aria-hidden="true">priority_high</span><span>Uploading replaces snapshot data for matching dates.</span></li>
-                    <li><span class="material-icons-outlined" aria-hidden="true">priority_high</span><span>Confirm the file is the most recent export.</span></li>
-                    <li><span class="material-icons-outlined" aria-hidden="true">priority_high</span><span>Typical file name: <code>395561020016_Lagerbestand-Amazonlager.csv</code></span></li>
+                    <li><span class="material-icons-outlined" aria-hidden="true">priority_high</span><span data-i18n="amazonSnapshotUpload.uploadCard.important.items.replace">Uploading replaces snapshot data for matching dates.</span></li>
+                    <li><span class="material-icons-outlined" aria-hidden="true">priority_high</span><span data-i18n="amazonSnapshotUpload.uploadCard.important.items.latest">Confirm the file is the most recent export.</span></li>
+                    <li>
+                        <span class="material-icons-outlined" aria-hidden="true">priority_high</span>
+                        <span>
+                            <span data-i18n="amazonSnapshotUpload.uploadCard.important.items.example">Typical file name:</span>
+                            <code>395561020016_Lagerbestand-Amazonlager.csv</code>
+                        </span>
+                    </li>
                 </ul>
             </div>
 
             <button id="uploadBtn" class="btn btn-primary btn-lg hidden" type="button">
-                <span id="uploadBtnText">Parse &amp; Preview</span>
+                <span id="uploadBtnText" data-i18n="amazonSnapshotUpload.uploadCard.parse">Parse &amp; Preview</span>
                 <span id="uploadSpinner" class="spinner hidden" aria-hidden="true"></span>
             </button>
         </section>
@@ -172,32 +184,36 @@
                 <header class="summary-header">
                     <span class="material-icons-outlined" aria-hidden="true">analytics</span>
                     <div>
-                        <h2 id="summaryTitle">Upload Summary</h2>
-                        <p>Review totals before importing the snapshot to the database.</p>
+                        <h2 id="summaryTitle" data-i18n="amazonSnapshotUpload.summary.title">Upload summary</h2>
+                        <p data-i18n="amazonSnapshotUpload.summary.description">Review totals before importing the snapshot to the database.</p>
                     </div>
                 </header>
                 <dl class="summary-grid">
                     <div class="summary-item">
-                        <dt>Snapshot Date</dt>
+                        <dt data-i18n="amazonSnapshotUpload.summary.metrics.date">Snapshot date</dt>
                         <dd id="summaryDate">—</dd>
                     </div>
                     <div class="summary-item">
-                        <dt>Products Found</dt>
+                        <dt data-i18n="amazonSnapshotUpload.summary.metrics.products">Products found</dt>
                         <dd id="summaryProducts">0</dd>
                     </div>
                     <div class="summary-item">
-                        <dt>Total Available Boxes</dt>
+                        <dt data-i18n="amazonSnapshotUpload.summary.metrics.boxes">Total available boxes</dt>
                         <dd id="summaryBoxes">0</dd>
                     </div>
                     <div class="summary-item">
-                        <dt>Rows Processed</dt>
+                        <dt data-i18n="amazonSnapshotUpload.summary.metrics.rows">Rows processed</dt>
                         <dd id="summaryRows">0</dd>
                     </div>
                 </dl>
 
                 <div class="location-info">
                     <span class="material-icons-outlined" aria-hidden="true">warehouse</span>
-                    <p>This import will <span class="badge badge-location">replace</span> existing snapshot data for the selected date.</p>
+                    <p>
+                        <span data-i18n="amazonSnapshotUpload.summary.location.prefix">This import will</span>
+                        <span class="badge badge-location" data-i18n="amazonSnapshotUpload.summary.location.badge">replace</span>
+                        <span data-i18n="amazonSnapshotUpload.summary.location.suffix">existing snapshot data for the selected date.</span>
+                    </p>
                 </div>
             </article>
 
@@ -206,8 +222,8 @@
                 <header class="warnings-header">
                     <span class="material-icons-outlined" aria-hidden="true">warning</span>
                     <div>
-                        <h2 id="warningsTitle">Warnings</h2>
-                        <p>Investigate potential data issues prior to confirming the import.</p>
+                        <h2 id="warningsTitle" data-i18n="amazonSnapshotUpload.warnings.title">Warnings</h2>
+                        <p data-i18n="amazonSnapshotUpload.warnings.description">Investigate potential data issues prior to confirming the import.</p>
                     </div>
                 </header>
                 <ul id="warningsList" class="warnings-list"></ul>
@@ -219,22 +235,22 @@
                     <div class="preview-header-title">
                         <span class="material-icons-outlined" aria-hidden="true">table_view</span>
                         <div>
-                            <h2 id="previewTitle">Preview First 20 Products</h2>
-                            <p>Showing available inventory (boxes) at Amazon FBA.</p>
+                            <h2 id="previewTitle" data-i18n="amazonSnapshotUpload.preview.title">Preview first 20 products</h2>
+                            <p data-i18n="amazonSnapshotUpload.preview.description">Showing available inventory (boxes) at Amazon FBA.</p>
                         </div>
                     </div>
                 </div>
 
-                <div class="table-scroll" role="region" aria-live="polite" aria-label="Amazon snapshot preview">
+                <div class="table-scroll" role="region" aria-live="polite" aria-label="Amazon snapshot preview" data-i18n="amazonSnapshotUpload.preview.table.ariaLabel" data-i18n-attr="aria-label">
                     <div class="table-scroll__viewport">
                         <table class="preview-table table-sticky">
                             <thead>
                             <tr>
-                                <th scope="col">FNSKU</th>
-                                <th scope="col">SKU</th>
-                                <th scope="col">Product Name</th>
-                                <th scope="col" class="numeric">Available Boxes</th>
-                                <th scope="col">Status</th>
+                                <th scope="col" data-i18n="amazonSnapshotUpload.preview.table.headers.fnsku">FNSKU</th>
+                                <th scope="col" data-i18n="amazonSnapshotUpload.preview.table.headers.sku">SKU</th>
+                                <th scope="col" data-i18n="amazonSnapshotUpload.preview.table.headers.name">Product name</th>
+                                <th scope="col" class="numeric" data-i18n="amazonSnapshotUpload.preview.table.headers.available">Available boxes</th>
+                                <th scope="col" data-i18n="amazonSnapshotUpload.preview.table.headers.status">Status</th>
                             </tr>
                         </thead>
                             <tbody id="previewTableBody">
@@ -249,10 +265,10 @@
             <div class="action-buttons">
                 <button id="cancelBtn" class="btn btn-secondary btn-lg" type="button">
                     <span class="material-icons-outlined" aria-hidden="true">close</span>
-                    <span>Cancel</span>
+                    <span data-i18n="common.actions.cancel">Cancel</span>
                 </button>
                 <button id="confirmBtn" class="btn btn-primary btn-lg" type="button">
-                    <span id="confirmBtnText" class="btn-label">Confirm &amp; Import</span>
+                    <span id="confirmBtnText" class="btn-label" data-i18n="amazonSnapshotUpload.actions.confirm">Confirm &amp; import</span>
                     <span id="confirmSpinner" class="spinner hidden" aria-hidden="true"></span>
                 </button>
             </div>
@@ -262,25 +278,25 @@
         <section id="successSection" class="success-section hidden" aria-live="polite">
             <article class="surface-card success-card">
                 <span class="material-icons-outlined success-icon" aria-hidden="true">check_circle</span>
-                <h2>Import Successful</h2>
+                <h2 data-i18n="amazonSnapshotUpload.success.title">Import successful</h2>
                 <div class="success-stats">
                     <div class="stat-item">
                         <span class="stat-value" id="successProducts">0</span>
-                        <span class="stat-label">Products Updated</span>
+                        <span class="stat-label" data-i18n="amazonSnapshotUpload.success.products">Products updated</span>
                     </div>
                     <div class="stat-item">
                         <span class="stat-value" id="successDate">N/A</span>
-                        <span class="stat-label">Snapshot Date</span>
+                        <span class="stat-label" data-i18n="amazonSnapshotUpload.success.date">Snapshot date</span>
                     </div>
                 </div>
                 <div class="success-actions">
                     <button id="uploadAnotherBtn" class="btn btn-primary" type="button">
                         <span class="material-icons-outlined" aria-hidden="true">refresh</span>
-                        <span>Upload Another File</span>
+                        <span data-i18n="amazonSnapshotUpload.success.uploadAnother">Upload another file</span>
                     </button>
                     <button id="viewDashboardBtn" class="btn btn-secondary" type="button">
                         <span class="material-icons-outlined" aria-hidden="true">dashboard</span>
-                        <span>View Dashboard</span>
+                        <span data-i18n="amazonSnapshotUpload.success.viewDashboard">View dashboard</span>
                     </button>
                 </div>
             </article>
@@ -290,12 +306,12 @@
         <section id="errorSection" class="error-section hidden" aria-live="polite">
             <article class="surface-card error-card">
                 <span class="material-icons-outlined error-icon" aria-hidden="true">error</span>
-                <h2>Upload Failed</h2>
+                <h2 data-i18n="amazonSnapshotUpload.error.title">Upload failed</h2>
                 <p id="errorMessage" class="error-message"></p>
                 <div class="error-actions">
                     <button id="tryAgainBtn" class="btn btn-primary" type="button">
                         <span class="material-icons-outlined" aria-hidden="true">replay</span>
-                        <span>Try Again</span>
+                        <span data-i18n="amazonSnapshotUpload.error.retry">Try again</span>
                     </button>
                 </div>
             </article>
@@ -306,21 +322,30 @@
     <footer class="site-footer">
         <div class="site-footer__inner">
             <div class="site-footer__section">
-                <span class="site-footer__copyright">© <span class="site-footer__year" data-footer-year data-current-year="2024">2024</span> WarehouseWrangler</span>
+                <span class="site-footer__copyright">© <span class="site-footer__year" data-footer-year data-current-year="2024">2024</span> <span data-i18n="app.brand.name">WarehouseWrangler</span></span>
             </div>
             <div class="site-footer__section site-footer__created-by">
-                <span class="site-footer__label">Created by</span>
+                <span class="site-footer__label" data-i18n="app.footer.createdBy">Created by</span>
                 <a href="https://threegents.eu" class="site-footer__link" target="_blank" rel="noopener">
-                    <img src="https://threegents.eu/images/logo_light.svg" alt="ThreeGents logo" class="site-footer__logo">
-                    <span>ThreeGents</span>
+                    <img src="https://threegents.eu/images/logo_light.svg" alt="ThreeGents logo" class="site-footer__logo" data-i18n="app.footer.partnerLogoAlt" data-i18n-attr="alt">
+                    <span data-i18n="app.footer.partner">ThreeGents</span>
                 </a>
             </div>
             <div class="site-footer__section">
-                <a href="mailto:support@threegents.biz" class="site-footer__link">Support</a>
+                <a href="mailto:support@threegents.biz" class="site-footer__link" data-i18n="app.footer.support">Support</a>
             </div>
         </div>
     </footer>
 
+    <script src="./js/i18n.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var storedLocale = localStorage.getItem('ww_locale') || I18n.DEFAULT_LOCALE;
+            I18n.init({ locale: storedLocale }).then(function () {
+                I18n.translateTree();
+            });
+        });
+    </script>
     <script src="./js/header.js"></script>
     <script src="./js/amazon-snapshot-upload.js"></script>
     <script type="module" src="./js/footer.js"></script>
