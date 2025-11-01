@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LC File Upload - WarehouseWrangler</title>
+    <title data-i18n="lcUpload.meta.title">LC File Upload - WarehouseWrangler</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -42,31 +42,31 @@
         <div class="branding">
             <img src="./assets/logo.png" alt="WarehouseWrangler Logo" class="brand-logo">
             <div class="brand-copy">
-                <span class="brand-name">WarehouseWrangler</span>
-                <span class="brand-tagline">Fulfillment Control Center</span>
+                <span class="brand-name" data-i18n="app.brand.name">WarehouseWrangler</span>
+                <span class="brand-tagline" data-i18n="app.brand.tagline">Fulfillment Control Center</span>
             </div>
         </div>
 
         <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="primaryNav" data-nav-toggle>
             <span class="material-icons-outlined" aria-hidden="true">menu</span>
-            <span class="sr-only">Toggle navigation</span>
+            <span class="sr-only" data-i18n="app.header.toggleNavigation">Toggle navigation</span>
         </button>
 
-        <nav class="primary-nav" aria-label="Main navigation" data-primary-nav id="primaryNav">
+        <nav class="primary-nav" aria-label="Main navigation" data-primary-nav id="primaryNav" data-i18n-attr="aria-label" data-i18n="app.header.mainNavAria">
             <ul class="nav-list">
-                <li class="nav-item"><a class="nav-link" href="index.html"><span class="material-icons-outlined" aria-hidden="true">dashboard</span><span>Dashboard</span></a></li>
-                <li class="nav-item"><a class="nav-link" href="cartons.html"><span class="material-icons-outlined" aria-hidden="true">inventory_2</span><span>Cartons</span></a></li>
-                <li class="nav-item"><a class="nav-link" href="shipments.html"><span class="material-icons-outlined" aria-hidden="true">local_shipping</span><span>Shipments</span></a></li>
-                <li class="nav-item"><a class="nav-link" href="planned-stock.html"><span class="material-icons-outlined" aria-hidden="true">analytics</span><span>Planned Stock</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="index.html"><span class="material-icons-outlined" aria-hidden="true">dashboard</span><span data-i18n="nav.dashboard">Dashboard</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="cartons.html"><span class="material-icons-outlined" aria-hidden="true">inventory_2</span><span data-i18n="nav.cartons">Cartons</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="shipments.html"><span class="material-icons-outlined" aria-hidden="true">local_shipping</span><span data-i18n="nav.shipments">Shipments</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="planned-stock.html"><span class="material-icons-outlined" aria-hidden="true">analytics</span><span data-i18n="nav.plannedStock">Planned Stock</span></a></li>
                 <li class="nav-item nav-item--has-children nav-item--active" data-imports>
                     <button class="nav-link" type="button" data-imports-toggle aria-expanded="true">
                         <span class="material-icons-outlined" aria-hidden="true">dataset</span>
-                        <span>Data Imports</span>
+                        <span data-i18n="nav.dataImports.label">Data Imports</span>
                         <span class="material-icons-outlined nav-link__chevron" aria-hidden="true">expand_more</span>
                     </button>
                     <ul class="nav-submenu">
-                        <li><a class="nav-sublink is-active" href="lc-upload.html" aria-current="page"><span class="material-icons-outlined" aria-hidden="true">upload_file</span><span>LC Upload</span></a></li>
-                        <li><a class="nav-sublink" href="amazon-snapshot-upload.html"><span class="material-icons-outlined" aria-hidden="true">cloud_upload</span><span>Amazon Snapshot</span></a></li>
+                        <li><a class="nav-sublink is-active" href="lc-upload.html" aria-current="page"><span class="material-icons-outlined" aria-hidden="true">upload_file</span><span data-i18n="nav.dataImports.lcUpload">LC Upload</span></a></li>
+                        <li><a class="nav-sublink" href="amazon-snapshot-upload.html"><span class="material-icons-outlined" aria-hidden="true">cloud_upload</span><span data-i18n="nav.dataImports.amazonSnapshot">Amazon Snapshot</span></a></li>
                     </ul>
                 </li>
             </ul>
@@ -77,24 +77,24 @@
                 <button class="user-menu__trigger" type="button" aria-expanded="false" data-user-menu-trigger>
                     <span class="material-icons-outlined" aria-hidden="true">account_circle</span>
                     <span class="user-display-name-wrapper" aria-live="polite">
-                        <span id="userDisplay" class="user-display-name">Loading…</span>
+                        <span id="userDisplay" class="user-display-name" data-i18n="common.loading">Loading…</span>
                     </span>
                     <span class="material-icons-outlined user-menu__chevron" aria-hidden="true">expand_more</span>
                 </button>
                 <div class="user-menu__dropdown" role="menu">
                     <a class="user-menu__link" href="products.html" role="menuitem">
                         <span class="material-icons-outlined" aria-hidden="true">view_list</span>
-                        <span>Products</span>
+                        <span data-i18n="app.userMenu.products">Products</span>
                     </a>
                     <a class="user-menu__link" href="users.html" role="menuitem">
                         <span class="material-icons-outlined" aria-hidden="true">group</span>
-                        <span>Users</span>
+                        <span data-i18n="app.userMenu.users">Users</span>
                     </a>
                 </div>
             </div>
             <button id="logoutBtn" class="btn btn-logout" type="button">
                 <span class="material-icons-outlined" aria-hidden="true">logout</span>
-                <span>Logout</span>
+                <span data-i18n="app.userMenu.logout">Logout</span>
             </button>
         </div>
     </header>
@@ -104,8 +104,8 @@
             <div class="page-title">
                 <span class="material-icons-outlined" aria-hidden="true">upload_file</span>
                 <div class="page-title-copy">
-                    <h1>LC Upload</h1>
-                    <p>Importiere Lieferscheine, prüfe Warnungen und erstelle Cartons mit einem strukturierten Kontrollablauf.</p>
+                    <h1 data-i18n="lcUpload.header.title">LC Upload</h1>
+                    <p data-i18n="lcUpload.header.subtitle">Import delivery notes, review warnings, and create cartons with a structured control flow.</p>
                 </div>
             </div>
         </section>
@@ -114,8 +114,8 @@
             <header class="upload-card-header">
                 <span class="material-icons-outlined upload-card-icon" aria-hidden="true">cloud_upload</span>
                 <div class="upload-card-copy">
-                    <h2 id="uploadCardTitle">LC Datei auswählen</h2>
-                    <p>Lade die CSV des Herstellers hoch, um neue Cartons vorzubereiten und vor dem Import zu prüfen.</p>
+                    <h2 id="uploadCardTitle" data-i18n="lcUpload.uploadCard.title">Select LC file</h2>
+                    <p data-i18n="lcUpload.uploadCard.description">Upload the supplier CSV to prepare new cartons and validate data before importing.</p>
                 </div>
             </header>
 
@@ -123,14 +123,14 @@
                 <input type="file" id="lcFileInput" accept=".csv" class="visually-hidden" aria-hidden="true">
                 <button id="selectFileBtn" class="btn btn-primary btn-lg" type="button">
                     <span class="material-icons-outlined" aria-hidden="true">description</span>
-                    <span>Datei auswählen</span>
+                    <span data-i18n="lcUpload.uploadCard.selectFile">Select file</span>
                 </button>
             </div>
 
             <div id="selectedFileInfo" class="selected-file hidden" aria-live="polite">
                 <span class="material-icons-outlined" aria-hidden="true">article</span>
                 <span id="fileName" class="file-name"></span>
-                <button id="clearFileBtn" class="icon-button" type="button" aria-label="Ausgewählte Datei entfernen">
+                <button id="clearFileBtn" class="icon-button" type="button" aria-label="Remove selected file" data-i18n-attr="aria-label" data-i18n="lcUpload.uploadCard.clearFileAria">
                     <span class="material-icons-outlined" aria-hidden="true">close</span>
                 </button>
             </div>
@@ -138,18 +138,18 @@
             <div class="upload-hints" aria-labelledby="uploadHintsTitle">
                 <div class="upload-hints-header">
                     <span class="material-icons-outlined" aria-hidden="true">info</span>
-                    <h3 id="uploadHintsTitle">Datei-Anforderungen</h3>
+                    <h3 id="uploadHintsTitle" data-i18n="lcUpload.uploadCard.requirements.title">File requirements</h3>
                 </div>
                 <ul class="upload-hints-list">
-                    <li><span class="material-icons-outlined" aria-hidden="true">check_circle</span><span>Format: CSV mit Semikolon als Trenner</span></li>
-                    <li><span class="material-icons-outlined" aria-hidden="true">check_circle</span><span>Carton-Präfix vorhanden (z.&nbsp;B. 24SVS88)</span></li>
-                    <li><span class="material-icons-outlined" aria-hidden="true">check_circle</span><span>Pflichtspalten: FNSKU, CTN NO, BOX/CARTON</span></li>
-                    <li><span class="material-icons-outlined" aria-hidden="true">check_circle</span><span>Maximale Dateigröße: 5&nbsp;MB</span></li>
+                    <li><span class="material-icons-outlined" aria-hidden="true">check_circle</span><span data-i18n="lcUpload.uploadCard.requirements.format">Format: CSV with semicolon delimiter</span></li>
+                    <li><span class="material-icons-outlined" aria-hidden="true">check_circle</span><span data-i18n="lcUpload.uploadCard.requirements.prefix">Carton prefix present (e.g., 24SVS88)</span></li>
+                    <li><span class="material-icons-outlined" aria-hidden="true">check_circle</span><span data-i18n="lcUpload.uploadCard.requirements.columns">Required columns: FNSKU, CTN NO, BOX/CARTON</span></li>
+                    <li><span class="material-icons-outlined" aria-hidden="true">check_circle</span><span data-i18n="lcUpload.uploadCard.requirements.size">Maximum file size: 5&nbsp;MB</span></li>
                 </ul>
             </div>
 
             <button id="uploadBtn" class="btn btn-primary btn-lg hidden" type="button">
-                <span id="uploadBtnText">Parse &amp; Preview</span>
+                <span id="uploadBtnText" data-i18n="lcUpload.uploadCard.parse">Parse &amp; Preview</span>
                 <span id="uploadSpinner" class="spinner hidden" aria-hidden="true"></span>
             </button>
         </section>
@@ -159,35 +159,39 @@
                 <header class="summary-header">
                     <span class="material-icons-outlined" aria-hidden="true">analytics</span>
                     <div>
-                        <h2 id="summaryTitle">Upload Übersicht</h2>
-                        <p>Validiere Kennzahlen, bevor die Cartons importiert werden.</p>
+                        <h2 id="summaryTitle" data-i18n="lcUpload.summary.title">Upload summary</h2>
+                        <p data-i18n="lcUpload.summary.description">Review key metrics before importing cartons.</p>
                     </div>
                 </header>
                 <dl class="summary-grid">
                     <div class="summary-item">
-                        <dt>Shipment</dt>
+                        <dt data-i18n="lcUpload.summary.metrics.shipment">Shipment</dt>
                         <dd id="summaryPrefix">–</dd>
                     </div>
                     <div class="summary-item">
-                        <dt>Cartons gesamt</dt>
+                        <dt data-i18n="lcUpload.summary.metrics.totalCartons">Total cartons</dt>
                         <dd id="summaryCartons">0</dd>
                     </div>
                     <div class="summary-item">
-                        <dt>Produkte</dt>
+                        <dt data-i18n="lcUpload.summary.metrics.products">Products</dt>
                         <dd id="summaryProducts">0</dd>
                     </div>
                     <div class="summary-item">
-                        <dt>Verarbeitete Zeilen</dt>
+                        <dt data-i18n="lcUpload.summary.metrics.rows">Rows processed</dt>
                         <dd id="summaryRows">0</dd>
                     </div>
                     <div class="summary-item">
-                        <dt>Warnungen</dt>
+                        <dt data-i18n="lcUpload.summary.metrics.warnings">Warnings</dt>
                         <dd id="summaryWarnings">0</dd>
                     </div>
                 </dl>
                 <div class="location-info">
                     <span class="material-icons-outlined" aria-hidden="true">warehouse</span>
-                    <p>Alle Cartons werden in den Bereich <span class="badge badge-location">Incoming</span> importiert.</p>
+                    <p>
+                        <span data-i18n="lcUpload.summary.location.prefix">All cartons will be imported into the</span>
+                        <span class="badge badge-location" data-i18n="lcUpload.summary.location.badge">Incoming</span>
+                        <span data-i18n="lcUpload.summary.location.suffix">area.</span>
+                    </p>
                 </div>
             </article>
 
@@ -195,8 +199,8 @@
                 <header class="warnings-header">
                     <span class="material-icons-outlined" aria-hidden="true">warning</span>
                     <div>
-                        <h2 id="warningsTitle">Warnungen</h2>
-                        <p>Überprüfe Auffälligkeiten, bevor der Import bestätigt wird.</p>
+                        <h2 id="warningsTitle" data-i18n="lcUpload.warnings.title">Warnings</h2>
+                        <p data-i18n="lcUpload.warnings.description">Review anomalies before confirming the import.</p>
                     </div>
                 </header>
                 <ul id="warningsList" class="warnings-list"></ul>
@@ -207,25 +211,25 @@
                     <div class="preview-header-title">
                         <span class="material-icons-outlined" aria-hidden="true">table_view</span>
                         <div>
-                            <h2 id="previewTitle">Vorschau der ersten 20 Cartons</h2>
-                            <p>Nutze die Filter, um Mischkartons schnell zu erkennen.</p>
+                            <h2 id="previewTitle" data-i18n="lcUpload.preview.title">Preview first 20 cartons</h2>
+                            <p data-i18n="lcUpload.preview.description">Use the filters to quickly spot mixed cartons.</p>
                         </div>
                     </div>
                     <label class="preview-filter" for="showMixedOnly">
                         <input type="checkbox" id="showMixedOnly" class="checkbox">
-                        <span>Nur Mischkartons anzeigen</span>
+                        <span data-i18n="lcUpload.preview.filters.mixedOnly">Show mixed cartons only</span>
                     </label>
                 </div>
-                <div class="table-scroll" role="region" aria-label="Carton Vorschau">
+                <div class="table-scroll" role="region" aria-label="Carton preview" data-i18n-attr="aria-label" data-i18n="lcUpload.preview.table.ariaLabel">
                     <div class="table-scroll__viewport">
                         <table class="preview-table table-sticky">
                             <thead>
                             <tr>
-                                <th scope="col">Carton</th>
-                                <th scope="col">FNSKU</th>
-                                <th scope="col">Produkt</th>
-                                <th scope="col" class="numeric">Boxes</th>
-                                <th scope="col">Typ</th>
+                                <th scope="col" data-i18n="lcUpload.preview.table.headers.carton">Carton</th>
+                                <th scope="col" data-i18n="lcUpload.preview.table.headers.fnsku">FNSKU</th>
+                                <th scope="col" data-i18n="lcUpload.preview.table.headers.product">Product</th>
+                                <th scope="col" class="numeric" data-i18n="lcUpload.preview.table.headers.boxes">Boxes</th>
+                                <th scope="col" data-i18n="lcUpload.preview.table.headers.type">Type</th>
                             </tr>
                         </thead>
                             <tbody id="previewTableBody"></tbody>
@@ -237,10 +241,10 @@
             <div class="action-buttons">
                 <button id="cancelBtn" class="btn btn-secondary btn-lg" type="button">
                     <span class="material-icons-outlined" aria-hidden="true">close</span>
-                    <span>Abbrechen</span>
+                    <span data-i18n="common.actions.cancel">Cancel</span>
                 </button>
                 <button id="confirmBtn" class="btn btn-primary btn-lg" type="button">
-                    <span id="confirmBtnText">Import bestätigen</span>
+                    <span id="confirmBtnText" data-i18n="lcUpload.actions.confirm">Confirm import</span>
                     <span id="confirmSpinner" class="spinner hidden" aria-hidden="true"></span>
                 </button>
             </div>
@@ -249,25 +253,25 @@
         <section id="successSection" class="success-section hidden" aria-live="polite">
             <article class="surface-card success-card" aria-labelledby="successTitle">
                 <span class="material-icons-outlined success-icon" aria-hidden="true">task_alt</span>
-                <h2 id="successTitle">Import erfolgreich</h2>
+                <h2 id="successTitle" data-i18n="lcUpload.success.title">Import successful</h2>
                 <div class="success-stats">
                     <div class="stat-item">
                         <span class="stat-value" id="successCartons">0</span>
-                        <span class="stat-label">Cartons erstellt</span>
+                        <span class="stat-label" data-i18n="lcUpload.success.cartons">Cartons created</span>
                     </div>
                     <div class="stat-item">
                         <span class="stat-value" id="successProducts">0</span>
-                        <span class="stat-label">Produkte aktualisiert</span>
+                        <span class="stat-label" data-i18n="lcUpload.success.products">Products updated</span>
                     </div>
                 </div>
                 <div class="success-actions">
                     <button id="uploadAnotherBtn" class="btn btn-primary" type="button">
                         <span class="material-icons-outlined" aria-hidden="true">upload_file</span>
-                        <span>Weitere Datei hochladen</span>
+                        <span data-i18n="lcUpload.success.uploadAnother">Upload another file</span>
                     </button>
                     <button id="viewInventoryBtn" class="btn btn-secondary" type="button">
                         <span class="material-icons-outlined" aria-hidden="true">inventory_2</span>
-                        <span>Zum Dashboard</span>
+                        <span data-i18n="lcUpload.success.goToDashboard">Go to dashboard</span>
                     </button>
                 </div>
             </article>
@@ -276,12 +280,12 @@
         <section id="errorSection" class="error-section hidden" aria-live="assertive">
             <article class="surface-card error-card" aria-labelledby="errorTitle">
                 <span class="material-icons-outlined error-icon" aria-hidden="true">error</span>
-                <h2 id="errorTitle">Upload fehlgeschlagen</h2>
+                <h2 id="errorTitle" data-i18n="lcUpload.error.title">Upload failed</h2>
                 <p id="errorMessage" class="error-message"></p>
                 <div class="error-actions">
                     <button id="tryAgainBtn" class="btn btn-primary" type="button">
                         <span class="material-icons-outlined" aria-hidden="true">refresh</span>
-                        <span>Erneut versuchen</span>
+                        <span data-i18n="lcUpload.error.retry">Try again</span>
                     </button>
                 </div>
             </article>
@@ -291,21 +295,30 @@
     <footer class="site-footer">
         <div class="site-footer__inner">
             <div class="site-footer__section">
-                <span class="site-footer__copyright">© <span class="site-footer__year" data-footer-year data-current-year="2024">2024</span> WarehouseWrangler</span>
+                <span class="site-footer__copyright">© <span class="site-footer__year" data-footer-year data-current-year="2024">2024</span> <span data-i18n="app.brand.name">WarehouseWrangler</span></span>
             </div>
             <div class="site-footer__section site-footer__created-by">
-                <span class="site-footer__label">Created by</span>
+                <span class="site-footer__label" data-i18n="app.footer.createdBy">Created by</span>
                 <a href="https://threegents.eu" class="site-footer__link" target="_blank" rel="noopener">
                     <img src="https://threegents.eu/images/logo_light.svg" alt="ThreeGents logo" class="site-footer__logo">
-                    <span>ThreeGents</span>
+                    <span data-i18n="app.footer.partner">ThreeGents</span>
                 </a>
             </div>
             <div class="site-footer__section">
-                <a href="mailto:support@threegents.biz" class="site-footer__link">Support</a>
+                <a href="mailto:support@threegents.biz" class="site-footer__link" data-i18n="app.footer.support">Support</a>
             </div>
         </div>
     </footer>
 
+    <script src="./js/i18n.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var storedLocale = localStorage.getItem('ww_locale') || I18n.DEFAULT_LOCALE;
+            I18n.init({ locale: storedLocale }).then(function () {
+                I18n.translateTree();
+            });
+        });
+    </script>
     <script src="./js/header.js"></script>
     <script src="./js/lc-upload.js"></script>
     <script type="module" src="./js/footer.js"></script>
