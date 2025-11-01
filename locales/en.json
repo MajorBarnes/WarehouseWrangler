@@ -231,7 +231,7 @@
         "ariaLabel": "Coverage table",
         "regionLabel": "Coverage table data",
         "headers": {
-          "artikel": "Artikel",
+          "artikel": "Article",
           "minCover": "Min Cover (w)",
           "targetCover": "Target Cover (w)",
           "toOrderBoxes": "To-Order (boxes)",
@@ -312,7 +312,7 @@
     "header": {
       "title": "Product Management",
       "subtitle": "Manage product catalog details, identification codes, and seasonal demand factors.",
-      "primaryAction": "Create product"
+      "primaryAction": "Create article"
     },
     "search": {
       "sectionLabel": "Search products",
@@ -323,8 +323,8 @@
     },
     "loading": "Loading products…",
     "modal": {
-      "createTitle": "New product",
-      "editTitle": "Edit product"
+      "createTitle": "New article",
+      "editTitle": "Edit article"
     },
     "table": {
       "fallbackName": "Product",
@@ -350,8 +350,8 @@
     },
     "aria": {
       "editFactors": "Edit seasonal factors for {product}",
-      "editProduct": "Edit product {product}",
-      "deleteProduct": "Delete product {product}"
+      "editProduct": "Edit article {product}",
+      "deleteProduct": "Delete article {product}"
     },
     "form": {
       "article": {
@@ -418,7 +418,7 @@
     "factorsModal": {
       "heading": "Seasonal factors",
       "title": "Seasonal factors - {artikel}",
-      "productLabel": "Product: {name}"
+      "productLabel": "Article: {name}"
     },
     "alerts": {
       "success": "Success: {message}",
@@ -429,14 +429,14 @@
       "loadFailed": "Failed to load products.",
       "unknown": "Unknown error.",
       "loadError": "Error loading products: {message}",
-      "updateSuccess": "Product updated successfully!",
+      "updateSuccess": "Article updated successfully!",
       "updateFailure": "Failed to update product.",
-      "createSuccess": "Product created successfully!",
+      "createSuccess": "Article created successfully!",
       "createFailure": "Failed to create product.",
       "connectionError": "Connection error: {message}",
       "factorsUpdateSuccess": "Seasonal factors updated!",
       "factorsUpdateFailure": "Failed to update seasonal factors.",
-      "deleteSuccess": "Product deleted successfully!",
+      "deleteSuccess": "Article deleted successfully!",
       "deleteFailure": "Failed to delete product."
     }
   },
@@ -631,7 +631,7 @@
         "carton": "Carton",
         "location": "Location",
         "status": "Status",
-        "products": "Products",
+        "products": "Articles",
         "boxesCurrent": "Boxes (current)",
         "boxesInitial": "Boxes (initial)",
         "sentToAmz": "Sent to AMZ",
@@ -640,8 +640,8 @@
       }
     },
     "tooltip": {
-      "header": "Products ({count})",
-      "unnamedProduct": "Unnamed product",
+      "header": "Articles ({count})",
+      "unnamedProduct": "Unnamed article",
       "artikel": "Article",
       "fnsku": "FNSKU"
     },
@@ -683,7 +683,7 @@
         "inventory": {
           "title": "Inventory overview",
           "labels": {
-            "products": "Products",
+            "products": "Articles",
             "boxesCurrent": "Boxes (current)",
             "boxesInitial": "Boxes (initial)",
             "pairsCurrent": "Pairs (current)",
@@ -691,9 +691,9 @@
           }
         },
         "contents": {
-          "title": "Products in carton",
+          "title": "Articles in carton",
           "headers": {
-            "product": "Product",
+            "product": "Article",
             "fnsku": "FNSKU",
             "boxesInitial": "Boxes (initial)",
             "boxesCurrent": "Boxes (current)",
@@ -807,7 +807,7 @@
         "date": "Date",
         "status": "Status",
         "cartons": "Cartons",
-        "products": "Products",
+        "products": "Articles",
         "totalBoxes": "Total boxes",
         "createdBy": "Created by",
         "actions": "Actions"
@@ -832,17 +832,17 @@
       "summaryTitle": "Selected boxes:",
       "totalBoxes": "Total boxes:",
       "cartons": "Cartons:",
-      "products": "Products:",
+      "products": "Articles:",
       "availableTitle": "Available cartons (WML & GMR):",
       "loading": "Loading available cartons...",
       "selectedTitle": "Boxes added to shipment:",
       "emptyCartons": "No cartons with available inventory found.",
-      "cartonProductsAria": "Products in this carton",
-      "emptyProducts": "No products with available inventory",
-      "cartonSummary": "{count} products • {boxes} boxes available",
+      "cartonProductsAria": "Articles in this carton",
+      "emptyProducts": "No articles with available inventory",
+      "cartonSummary": "{count} articles • {boxes} boxes available",
       "table": {
         "carton": "Carton",
-        "product": "Product",
+        "product": "Article",
         "boxes": "Boxes",
         "pairs": "Pairs",
         "action": "Action"
@@ -881,7 +881,7 @@
         "totalBoxes": "Total boxes:",
         "totalPairs": "Total pairs:",
         "cartons": "Cartons affected:",
-        "products": "Products:",
+        "products": "Articles:",
         "breakdown": "Breakdown by carton:"
       }
     },
@@ -905,7 +905,7 @@
           "totalBoxes": "Total boxes",
           "totalPairs": "Total pairs",
           "cartons": "Cartons",
-          "products": "Products"
+          "products": "Articles"
         },
         "contents": {
           "title": "Contents"
@@ -914,7 +914,7 @@
       "table": {
         "headers": {
           "carton": "Carton",
-          "product": "Product",
+          "product": "Article",
           "fnsku": "FNSKU",
           "boxesSent": "Boxes sent",
           "pairsSent": "Pairs sent"
@@ -1145,7 +1145,7 @@
     },
     "header": {
       "title": "Planned Stock",
-      "subtitle": "Manage additional inventory and simulations for each product, including ETA and activation status.",
+      "subtitle": "Manage additional inventory and simulations for each article and product group, including ETA and activation status.",
       "create": "Create plan"
     },
     "metrics": {
@@ -1166,12 +1166,12 @@
     "filters": {
       "ariaLabel": "Planned stock filter",
       "product": {
-        "label": "Product",
-        "all": "All products"
+        "label": "Article",
+        "all": "All articles"
       },
       "search": {
         "label": "Search",
-        "placeholder": "Search by label, product, or scope"
+        "placeholder": "Search by label, article, or product group"
       },
       "advanced": {
         "label": "Advanced view",
@@ -1218,10 +1218,10 @@
     "empty": "No planned stock entries found.",
     "modal": {
       "title": "New plan",
-      "subtitle": "Define additional boxes for a product.",
+      "subtitle": "Define additional boxes for an article.",
       "closeAria": "Close dialog",
-      "productLabel": "Product *",
-      "productPlaceholder": "Select product",
+      "productLabel": "Article *",
+      "productPlaceholder": "Select article",
       "scopeLabel": "Scope *",
       "boxesLabel": "Boxes *",
       "boxesHelp": "Whole boxes, minimum 1",
@@ -1248,7 +1248,7 @@
       "statusChanged": "Status updated."
     },
     "errors": {
-      "loadProducts": "Failed to load products.",
+      "loadProducts": "Failed to load articles.",
       "unknown": "Unknown error",
       "loadFailed": "Failed to load planned stock.",
       "saveFailed": "Unable to save plan.",
@@ -1265,7 +1265,7 @@
       "delete": "Delete plan? This marks the entry inactive."
     },
     "validation": {
-      "productRequired": "Please select a product.",
+      "productRequired": "Please select an article.",
       "boxesInvalid": "Please enter a valid number of boxes.",
       "createMinimumBoxes": "New plans require at least one box.",
       "scopeInvalid": "Invalid scope selected.",
