@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - WarehouseWrangler</title>
+    <title data-i18n="dashboard.meta.title">Dashboard - WarehouseWrangler</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -50,41 +50,41 @@
     <div id="loadingScreen" class="loading-screen" role="status" aria-live="polite">
         <div class="loading-content">
             <span class="material-icons-outlined loading-icon" aria-hidden="true">warehouse</span>
-            <h1 class="loading-title">WarehouseWrangler</h1>
-            <p class="loading-text">Preparing your fulfillment control center…</p>
+            <h1 class="loading-title" data-i18n="app.brand.name">WarehouseWrangler</h1>
+            <p class="loading-text" data-i18n="dashboard.loading.message">Preparing your fulfillment control center…</p>
         </div>
     </div>
 
     <div id="mainApp" class="hidden">
         <header class="site-header" data-site-header>
             <div class="branding">
-                <img src="../assets/logo.png" alt="WarehouseWrangler Logo" class="brand-logo">
+                <img src="../assets/logo.png" alt="WarehouseWrangler Logo" class="brand-logo" data-i18n="app.brand.logoAlt" data-i18n-attr="alt">
                 <div class="brand-copy">
-                    <span class="brand-name">WarehouseWrangler</span>
-                    <span class="brand-tagline">Fulfillment Control Center</span>
+                    <span class="brand-name" data-i18n="app.brand.name">WarehouseWrangler</span>
+                    <span class="brand-tagline" data-i18n="app.brand.tagline">Fulfillment Control Center</span>
                 </div>
             </div>
 
             <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="primaryNav" data-nav-toggle>
                 <span class="material-icons-outlined" aria-hidden="true">menu</span>
-                <span class="sr-only">Toggle navigation</span>
+                <span class="sr-only" data-i18n="app.header.toggleNavigation">Toggle navigation</span>
             </button>
 
-            <nav class="primary-nav" aria-label="Main navigation" data-primary-nav id="primaryNav">
+            <nav class="primary-nav" aria-label="Main navigation" data-primary-nav id="primaryNav" data-i18n="app.header.mainNavAria" data-i18n-attr="aria-label">
                 <ul class="nav-list">
-                    <li class="nav-item"><a class="nav-link is-active" href="../index.html" aria-current="page"><span class="material-icons-outlined" aria-hidden="true">dashboard</span><span>Dashboard</span></a></li>
-                    <li class="nav-item"><a class="nav-link" href="../cartons.html"><span class="material-icons-outlined" aria-hidden="true">inventory_2</span><span>Cartons</span></a></li>
-                    <li class="nav-item"><a class="nav-link" href="../shipments.html"><span class="material-icons-outlined" aria-hidden="true">local_shipping</span><span>Shipments</span></a></li>
-                    <li class="nav-item"><a class="nav-link" href="../planned-stock.html"><span class="material-icons-outlined" aria-hidden="true">analytics</span><span>Planned Stock</span></a></li>
+                    <li class="nav-item"><a class="nav-link is-active" href="../index.html" aria-current="page"><span class="material-icons-outlined" aria-hidden="true">dashboard</span><span data-i18n="nav.dashboard">Dashboard</span></a></li>
+                    <li class="nav-item"><a class="nav-link" href="../cartons.html"><span class="material-icons-outlined" aria-hidden="true">inventory_2</span><span data-i18n="nav.cartons">Cartons</span></a></li>
+                    <li class="nav-item"><a class="nav-link" href="../shipments.html"><span class="material-icons-outlined" aria-hidden="true">local_shipping</span><span data-i18n="nav.shipments">Shipments</span></a></li>
+                    <li class="nav-item"><a class="nav-link" href="../planned-stock.html"><span class="material-icons-outlined" aria-hidden="true">analytics</span><span data-i18n="nav.plannedStock">Planned Stock</span></a></li>
                     <li class="nav-item nav-item--has-children" data-imports>
                         <button class="nav-link" type="button" data-imports-toggle aria-expanded="false">
                             <span class="material-icons-outlined" aria-hidden="true">dataset</span>
-                            <span>Data Imports</span>
+                            <span data-i18n="nav.dataImports.label">Data Imports</span>
                             <span class="material-icons-outlined nav-link__chevron" aria-hidden="true">expand_more</span>
                         </button>
                         <ul class="nav-submenu">
-                            <li><a class="nav-sublink" href="../lc-upload.html"><span class="material-icons-outlined" aria-hidden="true">upload_file</span><span>LC Upload</span></a></li>
-                            <li><a class="nav-sublink" href="../amazon-snapshot-upload.html"><span class="material-icons-outlined" aria-hidden="true">cloud_upload</span><span>Amazon Snapshot</span></a></li>
+                            <li><a class="nav-sublink" href="../lc-upload.html"><span class="material-icons-outlined" aria-hidden="true">upload_file</span><span data-i18n="nav.dataImports.lcUpload">LC Upload</span></a></li>
+                            <li><a class="nav-sublink" href="../amazon-snapshot-upload.html"><span class="material-icons-outlined" aria-hidden="true">cloud_upload</span><span data-i18n="nav.dataImports.amazonSnapshot">Amazon Snapshot</span></a></li>
                         </ul>
                     </li>
                 </ul>
@@ -95,24 +95,24 @@
                     <button class="user-menu__trigger" type="button" aria-expanded="false" data-user-menu-trigger>
                         <span class="material-icons-outlined" aria-hidden="true">account_circle</span>
                         <span class="user-display-name-wrapper" aria-live="polite">
-                            <span id="userDisplay" class="user-display-name">Loading…</span>
+                            <span id="userDisplay" class="user-display-name" data-i18n="common.loading">Loading…</span>
                         </span>
                         <span class="material-icons-outlined user-menu__chevron" aria-hidden="true">expand_more</span>
                     </button>
                     <div class="user-menu__dropdown" role="menu">
                         <a class="user-menu__link" href="../products.html" role="menuitem">
                             <span class="material-icons-outlined" aria-hidden="true">view_list</span>
-                            <span>Products</span>
+                            <span data-i18n="app.userMenu.products">Products</span>
                         </a>
                         <a class="user-menu__link" href="../users.html" role="menuitem">
                             <span class="material-icons-outlined" aria-hidden="true">group</span>
-                            <span>Users</span>
+                            <span data-i18n="app.userMenu.users">Users</span>
                         </a>
                     </div>
                 </div>
                 <button id="logoutBtn" class="btn btn-logout" type="button">
                     <span class="material-icons-outlined" aria-hidden="true">logout</span>
-                    <span>Logout</span>
+                    <span data-i18n="app.userMenu.logout">Logout</span>
                 </button>
             </div>
         </header>
@@ -123,61 +123,86 @@
                     <article class="card">
                         <header class="card-header">
                             <span class="material-icons-outlined" aria-hidden="true">bolt</span>
-                            <h3>Quick Actions</h3>
+                            <h3 data-i18n="dashboard.home.quickActions.title">Quick Actions</h3>
                         </header>
                         <ul class="action-list">
                             <li>
                                 <a class="action-link" href="products.html">
                                     <span class="material-icons-outlined" aria-hidden="true">category</span>
-                                    <span>Organize product catalog for inbound shipments.</span>
+                                    <span data-i18n="dashboard.home.quickActions.links.products">Organize product catalog for inbound shipments.</span>
                                 </a>
                             </li>
                             <li>
                                 <a class="action-link" href="cartons.html">
                                     <span class="material-icons-outlined" aria-hidden="true">qr_code_scanner</span>
-                                    <span>Validate carton IDs before labeling.</span>
+                                    <span data-i18n="dashboard.home.quickActions.links.cartons">Validate carton IDs before labeling.</span>
                                 </a>
                             </li>
                             <li>
                                 <a class="action-link" href="amazon-snapshot-upload.html">
                                     <span class="material-icons-outlined" aria-hidden="true">compare_arrows</span>
-                                    <span>Upload the latest Amazon inventory snapshot.</span>
+                                    <span data-i18n="dashboard.home.quickActions.links.amazonSnapshot">Upload the latest Amazon inventory snapshot.</span>
                                 </a>
                             </li>
                         </ul>
                     </article>
                 </div>
-                <div class="hero-highlights" aria-label="Operational highlights">
+                <div class="hero-highlights" aria-label="Operational highlights" data-i18n="dashboard.home.highlights.ariaLabel" data-i18n-attr="aria-label">
                     <article class="highlight-card">
                         <span class="material-icons-outlined highlight-icon success" aria-hidden="true">task_alt</span>
                         <div class="highlight-copy">
-                            <h3>Authentication Secure</h3>
-                            <p>Session tokens validated with real-time expiry checks.</p>
+                            <h3 data-i18n="dashboard.home.highlights.authentication.title">Authentication Secure</h3>
+                            <p data-i18n="dashboard.home.highlights.authentication.body">Session tokens validated with real-time expiry checks.</p>
                         </div>
                     </article>
                     <article class="highlight-card">
                         <span class="material-icons-outlined highlight-icon warning" aria-hidden="true">inventory</span>
                         <div class="highlight-copy">
-                            <h3>Carton Intake</h3>
-                            <p>Configure carton verification flows before the next shipment arrives.</p>
+                            <h3 data-i18n="dashboard.home.highlights.cartonIntake.title">Carton Intake</h3>
+                            <p data-i18n="dashboard.home.highlights.cartonIntake.body">Configure carton verification flows before the next shipment arrives.</p>
                         </div>
                     </article>
                 </div>
             </section>
             <section id="dashboard" aria-labelledby="dashboardTitle">
-                <h2 id="dashboardTitle">Dashboard</h2>
+                <h2 id="dashboardTitle" data-i18n="dashboard.home.sectionTitle">Dashboard</h2>
                 <div class="controls">
-                    <label>Target date <input type="date" id="coverageTarget"></label>
-                    <label><input type="checkbox" id="toggleAmazon" checked> Include Amazon</label>
-                    <label><input type="checkbox" id="toggleAdditional" checked> Include Additional</label>
-                    <label><input type="checkbox" id="toggleSim"> Include simulations</label>
-                    <label><input type="checkbox" id="toggleFuture"> Include future ETAs</label>
-                    <span>Min cover: <strong id="leadTimeWeeks"></strong> weeks</span>
-                    <span>Internal: <strong id="totalsInternal"></strong> | All: <strong id="totalsAll"></strong></span>
+                    <label>
+                        <span data-i18n="dashboard.home.controls.targetDate">Target date</span>
+                        <input type="date" id="coverageTarget">
+                    </label>
+                    <label>
+                        <input type="checkbox" id="toggleAmazon" checked>
+                        <span data-i18n="dashboard.home.controls.includeAmazon">Include Amazon</span>
+                    </label>
+                    <label>
+                        <input type="checkbox" id="toggleAdditional" checked>
+                        <span data-i18n="dashboard.home.controls.includeAdditional">Include Additional</span>
+                    </label>
+                    <label>
+                        <input type="checkbox" id="toggleSim">
+                        <span data-i18n="dashboard.home.controls.includeSimulations">Include simulations</span>
+                    </label>
+                    <label>
+                        <input type="checkbox" id="toggleFuture">
+                        <span data-i18n="dashboard.home.controls.includeFutureEtas">Include future ETAs</span>
+                    </label>
+                    <span>
+                        <span data-i18n="dashboard.home.controls.minCoverLabel">Min cover:</span>
+                        <strong id="leadTimeWeeks"></strong>
+                        <span data-i18n="dashboard.home.controls.weeksSuffix">weeks</span>
+                    </span>
+                    <span>
+                        <span data-i18n="dashboard.home.controls.internalLabel">Internal:</span>
+                        <strong id="totalsInternal"></strong>
+                        <span aria-hidden="true"> | </span>
+                        <span data-i18n="dashboard.home.controls.allLabel">All:</span>
+                        <strong id="totalsAll"></strong>
+                    </span>
                 </div>
-                <div id="dashboard-view-tabs" class="dashboard-view-tabs" role="tablist" aria-label="Dashboard views">
-                    <button type="button" class="dashboard-tab is-active" id="dashboard-tab-bars" role="tab" aria-selected="true" aria-controls="dashboard-bars-panel" data-view="bars">Bar view</button>
-                    <button type="button" class="dashboard-tab" id="dashboard-tab-table" role="tab" aria-selected="false" aria-controls="dashboard-table-panel" data-view="table">Table view</button>
+                <div id="dashboard-view-tabs" class="dashboard-view-tabs" role="tablist" aria-label="Dashboard views" data-i18n="dashboard.home.views.ariaLabel" data-i18n-attr="aria-label">
+                    <button type="button" class="dashboard-tab is-active" id="dashboard-tab-bars" role="tab" aria-selected="true" aria-controls="dashboard-bars-panel" data-view="bars" data-i18n="dashboard.home.views.bar">Bar view</button>
+                    <button type="button" class="dashboard-tab" id="dashboard-tab-table" role="tab" aria-selected="false" aria-controls="dashboard-table-panel" data-view="table" data-i18n="dashboard.home.views.table">Table view</button>
                 </div>
                 <section id="dashboard-bars-panel" class="dashboard-panel" role="tabpanel"
                     aria-labelledby="dashboard-tab-bars" aria-hidden="false" tabindex="0">
@@ -185,26 +210,26 @@
                 </section>
                 <section id="dashboard-table-panel" class="dashboard-panel hidden" role="tabpanel"
                     aria-labelledby="dashboard-tab-table" aria-hidden="true" tabindex="-1">
-                    <div class="surface-card table-card" aria-label="Coverage table">
-                        <div class="table-scroll" role="region" aria-live="polite" aria-label="Coverage table data">
+                    <div class="surface-card table-card" aria-label="Coverage table" data-i18n="dashboard.home.table.ariaLabel" data-i18n-attr="aria-label">
+                        <div class="table-scroll" role="region" aria-live="polite" aria-label="Coverage table data" data-i18n="dashboard.home.table.regionLabel" data-i18n-attr="aria-label">
                             <div class="table-scroll__viewport">
                                 <table id="dashboard-table" class="dashboard-table table-sticky">
                                     <thead>
                                         <tr>
-                                            <th scope="col">Artikel</th>
-                                            <th scope="col">Min Cover (w)</th>
-                                            <th scope="col">Target Cover (w)</th>
-                                            <th scope="col">To-Order (boxes)</th>
-                                            <th scope="col">To-Order (pairs)</th>
-                                            <th scope="col">Incoming</th>
-                                            <th scope="col">WML</th>
-                                            <th scope="col">GMR</th>
-                                            <th scope="col">Amazon</th>
-                                            <th scope="col">Additional</th>
-                                            <th scope="col">Internal Pairs</th>
-                                            <th scope="col">Internal Weeks</th>
-                                            <th scope="col">All Pairs</th>
-                                            <th scope="col">All Weeks</th>
+                                            <th scope="col" data-i18n="dashboard.home.table.headers.artikel">Artikel</th>
+                                            <th scope="col" data-i18n="dashboard.home.table.headers.minCover">Min Cover (w)</th>
+                                            <th scope="col" data-i18n="dashboard.home.table.headers.targetCover">Target Cover (w)</th>
+                                            <th scope="col" data-i18n="dashboard.home.table.headers.toOrderBoxes">To-Order (boxes)</th>
+                                            <th scope="col" data-i18n="dashboard.home.table.headers.toOrderPairs">To-Order (pairs)</th>
+                                            <th scope="col" data-i18n="dashboard.home.table.headers.incoming">Incoming</th>
+                                            <th scope="col" data-i18n="dashboard.home.table.headers.wml">WML</th>
+                                            <th scope="col" data-i18n="dashboard.home.table.headers.gmr">GMR</th>
+                                            <th scope="col" data-i18n="dashboard.home.table.headers.amazon">Amazon</th>
+                                            <th scope="col" data-i18n="dashboard.home.table.headers.additional">Additional</th>
+                                            <th scope="col" data-i18n="dashboard.home.table.headers.internalPairs">Internal Pairs</th>
+                                            <th scope="col" data-i18n="dashboard.home.table.headers.internalWeeks">Internal Weeks</th>
+                                            <th scope="col" data-i18n="dashboard.home.table.headers.allPairs">All Pairs</th>
+                                            <th scope="col" data-i18n="dashboard.home.table.headers.allWeeks">All Weeks</th>
                                         </tr>
                                     </thead>
                                     <tbody></tbody>
@@ -220,21 +245,30 @@
     <footer class="site-footer">
         <div class="site-footer__inner">
             <div class="site-footer__section">
-                <span class="site-footer__copyright">© <span class="site-footer__year" data-footer-year data-current-year="2024">2024</span> WarehouseWrangler</span>
+                <span class="site-footer__copyright">© <span class="site-footer__year" data-footer-year data-current-year="2024">2024</span> <span data-i18n="app.brand.name">WarehouseWrangler</span></span>
             </div>
             <div class="site-footer__section site-footer__created-by">
-                <span class="site-footer__label">Created by</span>
+                <span class="site-footer__label" data-i18n="app.footer.createdBy">Created by</span>
                 <a href="https://threegents.eu" class="site-footer__link" target="_blank" rel="noopener">
-                    <img src="https://threegents.eu/images/logo_light.svg" alt="ThreeGents logo" class="site-footer__logo">
-                    <span>ThreeGents</span>
+                    <img src="https://threegents.eu/images/logo_light.svg" alt="ThreeGents logo" class="site-footer__logo" data-i18n="app.footer.partnerLogoAlt" data-i18n-attr="alt">
+                    <span data-i18n="app.footer.partner">ThreeGents</span>
                 </a>
             </div>
             <div class="site-footer__section">
-                <a href="mailto:support@threegents.biz" class="site-footer__link">Support</a>
+                <a href="mailto:support@threegents.biz" class="site-footer__link" data-i18n="app.footer.support">Support</a>
             </div>
         </div>
     </footer>
 
+    <script src="js/i18n.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var storedLocale = localStorage.getItem('ww_locale') || I18n.DEFAULT_LOCALE;
+            I18n.init({ locale: storedLocale }).then(function () {
+                I18n.translateTree();
+            });
+        });
+    </script>
     <script src="js/header.js" defer></script>
     <script type="module" src="js/dashboard.js" defer></script>
     <script type="module" src="js/footer.js"></script>
