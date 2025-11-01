@@ -208,6 +208,77 @@ a {
 }
 
 /* ============================================================================
+   FOOTER
+   ============================================================================ */
+
+.site-footer {
+    background: var(--color-surface);
+    border-top: 1px solid var(--color-border);
+    margin-top: 2rem;
+    padding: 1.5rem 2.5rem;
+    color: var(--color-muted);
+    font-size: 0.875rem;
+}
+
+.site-footer__inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1rem 2rem;
+}
+
+.site-footer__section {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.site-footer__copyright {
+    font-weight: 500;
+}
+
+.site-footer__year {
+    color: var(--color-text);
+}
+
+.site-footer__created-by {
+    gap: 0.75rem;
+}
+
+.site-footer__logo {
+    height: 24px;
+    width: auto;
+    display: inline-block;
+    filter: brightness(0) saturate(100%) invert(15%) sepia(67%) saturate(2864%) hue-rotate(203deg) brightness(93%) contrast(95%);
+}
+
+.site-footer__link {
+    color: var(--color-primary);
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.site-footer__label {
+    color: var(--color-muted);
+    font-weight: 500;
+}
+
+@media (max-width: 720px) {
+    .site-footer {
+        padding: 1.5rem 1.5rem 2rem;
+    }
+
+    .site-footer__inner {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+}
+
+/* ============================================================================
    BUTTONS
    ============================================================================ */
 
