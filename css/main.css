@@ -419,6 +419,54 @@ a.nav-link {
     margin-left: auto;
 }
 
+.theme-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.45rem 0.75rem;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--color-border);
+    background: var(--color-surface-elevated);
+    color: var(--color-text);
+    cursor: pointer;
+    transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.theme-toggle:is(:hover, :focus-visible) {
+    border-color: var(--color-border-strong);
+    color: var(--color-primary);
+    box-shadow: 0 0 0 3px var(--focus-ring-color);
+    outline: none;
+}
+
+.theme-toggle.is-dark {
+    border-color: var(--color-border-strong);
+    background: rgba(76, 156, 255, 0.14);
+}
+
+.theme-toggle__icon {
+    font-size: 18px;
+}
+
+.theme-toggle__icon--dark {
+    display: none;
+}
+
+.theme-toggle.is-dark .theme-toggle__icon--dark {
+    display: inline-flex;
+}
+
+.theme-toggle.is-dark .theme-toggle__icon--light {
+    display: none;
+}
+
+.theme-toggle__label {
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+
 .user-menu {
     position: relative;
 }
