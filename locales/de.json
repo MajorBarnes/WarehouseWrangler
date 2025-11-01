@@ -312,7 +312,7 @@
     "header": {
       "title": "Produktverwaltung",
       "subtitle": "Verwalten Sie Produktkatalog, Identifikationscodes und saisonale Nachfragefaktoren.",
-      "primaryAction": "Produkt erstellen"
+      "primaryAction": "Artikel erstellen"
     },
     "search": {
       "sectionLabel": "Produkte suchen",
@@ -323,8 +323,8 @@
     },
     "loading": "Produkte werden geladen…",
     "modal": {
-      "createTitle": "Neues Produkt",
-      "editTitle": "Produkt bearbeiten"
+      "createTitle": "Neuer Artikel",
+      "editTitle": "Artikel bearbeiten"
     },
     "table": {
       "fallbackName": "Produkt",
@@ -350,8 +350,8 @@
     },
     "aria": {
       "editFactors": "Saisonfaktoren für {product} bearbeiten",
-      "editProduct": "Produkt {product} bearbeiten",
-      "deleteProduct": "Produkt {product} löschen"
+      "editProduct": "Artikel {product} bearbeiten",
+      "deleteProduct": "Artikel {product} löschen"
     },
     "form": {
       "article": {
@@ -418,7 +418,7 @@
     "factorsModal": {
       "heading": "Saisonfaktoren",
       "title": "Saisonfaktoren - {artikel}",
-      "productLabel": "Produkt: {name}"
+      "productLabel": "Artikel: {name}"
     },
     "alerts": {
       "success": "Erfolg: {message}",
@@ -429,14 +429,14 @@
       "loadFailed": "Produkte konnten nicht geladen werden.",
       "unknown": "Unbekannter Fehler.",
       "loadError": "Fehler beim Laden der Produkte: {message}",
-      "updateSuccess": "Produkt erfolgreich aktualisiert!",
+      "updateSuccess": "Artikel erfolgreich aktualisiert!",
       "updateFailure": "Produkt konnte nicht aktualisiert werden.",
-      "createSuccess": "Produkt erfolgreich erstellt!",
+      "createSuccess": "Artikel erfolgreich erstellt!",
       "createFailure": "Produkt konnte nicht erstellt werden.",
       "connectionError": "Verbindungsfehler: {message}",
       "factorsUpdateSuccess": "Saisonfaktoren aktualisiert!",
       "factorsUpdateFailure": "Saisonfaktoren konnten nicht aktualisiert werden.",
-      "deleteSuccess": "Produkt erfolgreich gelöscht!",
+      "deleteSuccess": "Artikel erfolgreich gelöscht!",
       "deleteFailure": "Produkt konnte nicht gelöscht werden."
     }
   },
@@ -631,7 +631,7 @@
         "carton": "Karton",
         "location": "Standort",
         "status": "Status",
-        "products": "Produkte",
+        "products": "Artikel",
         "boxesCurrent": "Boxen (aktuell)",
         "boxesInitial": "Boxen (initial)",
         "sentToAmz": "An AMZ gesendet",
@@ -640,8 +640,8 @@
       }
     },
     "tooltip": {
-      "header": "Produkte ({count})",
-      "unnamedProduct": "Unbenanntes Produkt",
+      "header": "Artikel ({count})",
+      "unnamedProduct": "Unbenannter Artikel",
       "artikel": "Artikel",
       "fnsku": "FNSKU"
     },
@@ -683,7 +683,7 @@
         "inventory": {
           "title": "Bestandsübersicht",
           "labels": {
-            "products": "Produkte",
+            "products": "Artikel",
             "boxesCurrent": "Boxen (aktuell)",
             "boxesInitial": "Boxen (initial)",
             "pairsCurrent": "Paare (aktuell)",
@@ -691,9 +691,9 @@
           }
         },
         "contents": {
-          "title": "Produkte im Karton",
+          "title": "Artikel im Karton",
           "headers": {
-            "product": "Produkt",
+            "product": "Artikel",
             "fnsku": "FNSKU",
             "boxesInitial": "Boxen (initial)",
             "boxesCurrent": "Boxen (aktuell)",
@@ -807,7 +807,7 @@
         "date": "Datum",
         "status": "Status",
         "cartons": "Kartons",
-        "products": "Produkte",
+        "products": "Artikel",
         "totalBoxes": "Boxen gesamt",
         "createdBy": "Erstellt von",
         "actions": "Aktionen"
@@ -832,17 +832,17 @@
       "summaryTitle": "Ausgewählte Boxen:",
       "totalBoxes": "Boxen gesamt:",
       "cartons": "Kartons:",
-      "products": "Produkte:",
+      "products": "Artikel:",
       "availableTitle": "Verfügbare Kartons (WML & GMR):",
       "loading": "Verfügbare Kartons werden geladen...",
       "selectedTitle": "Boxen zur Sendung hinzugefügt:",
       "emptyCartons": "Keine Kartons mit verfügbarem Bestand gefunden.",
-      "cartonProductsAria": "Produkte in diesem Karton",
-      "emptyProducts": "Keine Produkte mit verfügbarem Bestand",
-      "cartonSummary": "{count} Produkte • {boxes} Boxen verfügbar",
+      "cartonProductsAria": "Artikel in diesem Karton",
+      "emptyProducts": "Keine Artikel mit verfügbarem Bestand",
+      "cartonSummary": "{count} Artikel • {boxes} Boxen verfügbar",
       "table": {
         "carton": "Karton",
-        "product": "Produkt",
+        "product": "Artikel",
         "boxes": "Boxen",
         "pairs": "Paare",
         "action": "Aktion"
@@ -881,7 +881,7 @@
         "totalBoxes": "Boxen gesamt:",
         "totalPairs": "Paare gesamt:",
         "cartons": "Betroffene Kartons:",
-        "products": "Produkte:",
+        "products": "Artikel:",
         "breakdown": "Aufschlüsselung nach Karton:"
       }
     },
@@ -905,7 +905,7 @@
           "totalBoxes": "Boxen gesamt",
           "totalPairs": "Paare gesamt",
           "cartons": "Kartons",
-          "products": "Produkte"
+          "products": "Artikel"
         },
         "contents": {
           "title": "Inhalt"
@@ -914,7 +914,7 @@
       "table": {
         "headers": {
           "carton": "Karton",
-          "product": "Produkt",
+          "product": "Artikel",
           "fnsku": "FNSKU",
           "boxesSent": "Boxen gesendet",
           "pairsSent": "Paare gesendet"
@@ -1145,7 +1145,7 @@
     },
     "header": {
       "title": "Geplanter Bestand",
-      "subtitle": "Verwalten Sie Zusatzbestände und Simulationen pro Produkt, inklusive ETA und Aktivierungsstatus.",
+      "subtitle": "Verwalten Sie Zusatzbestände und Simulationen pro Artikel und Produktgruppe, inklusive ETA und Aktivierungsstatus.",
       "create": "Plan erstellen"
     },
     "metrics": {
@@ -1166,12 +1166,12 @@
     "filters": {
       "ariaLabel": "Filter geplanter Bestand",
       "product": {
-        "label": "Produkt",
-        "all": "Alle Produkte"
+        "label": "Artikel",
+        "all": "Alle Artikel"
       },
       "search": {
         "label": "Suche",
-        "placeholder": "Suche nach Label, Produkt oder Scope"
+        "placeholder": "Suche nach Label, Artikel oder Produktgruppe"
       },
       "advanced": {
         "label": "Erweiterte Ansicht",
@@ -1218,10 +1218,10 @@
     "empty": "Keine Einträge für geplanten Bestand gefunden.",
     "modal": {
       "title": "Neuer Plan",
-      "subtitle": "Definieren Sie zusätzliche Boxen für ein Produkt.",
+      "subtitle": "Definieren Sie zusätzliche Boxen für einen Artikel.",
       "closeAria": "Dialog schließen",
-      "productLabel": "Produkt *",
-      "productPlaceholder": "Produkt auswählen",
+      "productLabel": "Artikel *",
+      "productPlaceholder": "Artikel auswählen",
       "scopeLabel": "Scope *",
       "boxesLabel": "Boxen *",
       "boxesHelp": "Ganze Boxen, mindestens 1",
@@ -1248,7 +1248,7 @@
       "statusChanged": "Status aktualisiert."
     },
     "errors": {
-      "loadProducts": "Produkte konnten nicht geladen werden.",
+      "loadProducts": "Artikel konnten nicht geladen werden.",
       "unknown": "Unbekannter Fehler",
       "loadFailed": "Geplanter Bestand konnte nicht geladen werden.",
       "saveFailed": "Plan konnte nicht gespeichert werden.",
@@ -1265,7 +1265,7 @@
       "delete": "Plan löschen? Der Eintrag wird als inaktiv markiert."
     },
     "validation": {
-      "productRequired": "Bitte wählen Sie ein Produkt aus.",
+      "productRequired": "Bitte wählen Sie einen Artikel aus.",
       "boxesInvalid": "Bitte geben Sie eine gültige Anzahl an Boxen ein.",
       "createMinimumBoxes": "Neue Pläne erfordern mindestens eine Box.",
       "scopeInvalid": "Ungültiger Scope ausgewählt.",
