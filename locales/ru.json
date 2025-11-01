@@ -1,16 +1,1275 @@
 {
   "app": {
+    "brand": {
+      "name": "WarehouseWrangler",
+      "tagline": "Fulfillment Control Center",
+      "logoAlt": "WarehouseWrangler Logo"
+    },
+    "header": {
+      "toggleNavigation": "Toggle navigation",
+      "mainNavAria": "Main navigation",
+      "navToggle": {
+        "open": "Open navigation menu",
+        "close": "Close navigation menu"
+      },
+      "importsMenu": {
+        "open": "Expand data imports menu",
+        "close": "Collapse data imports menu"
+      },
+      "userMenu": {
+        "open": "Open user menu",
+        "close": "Close user menu"
+      }
+    },
     "userMenu": {
-      "products": "Товары",
-      "users": "Пользователи",
-      "logout": "Выйти",
-      "languageLabel": "Язык",
-      "languageDescription": "Выберите язык интерфейса WarehouseWrangler.",
+      "products": "Products",
+      "users": "Users",
+      "logout": "Logout",
+      "languageLabel": "Language",
+      "languageDescription": "Choose how WarehouseWrangler appears.",
       "languageOptions": {
-        "en": "Английский",
-        "de": "Немецкий",
+        "en": "English",
+        "de": "Deutsch",
         "ru": "Русский"
       }
+    },
+    "footer": {
+      "createdBy": "Created by",
+      "partner": "ThreeGents",
+      "support": "Support",
+      "partnerLogoAlt": "ThreeGents logo",
+      "yearRange": "{startYear}\u2013{endYear}",
+      "singleYear": "{year}"
+    }
+  },
+  "landing": {
+    "login": {
+      "pageTitle": "Login - WarehouseWrangler",
+      "closeModal": "Close sign-in form",
+      "modalEyebrow": "Secure access",
+      "modalTitle": "Sign in to continue",
+      "modalDescription": "Use your WarehouseWrangler username and password to enter the dashboard.",
+      "usernameLabel": "Username",
+      "usernamePlaceholder": "Enter your username",
+      "passwordLabel": "Password",
+      "passwordPlaceholder": "Enter your password",
+      "rememberMe": "Remember me on this device",
+      "needHelp": "Need help?",
+      "submit": "Sign In",
+      "version": "WarehouseWrangler v1.0.0"
+    },
+    "header": {
+      "signInCta": "Existing user sign-in"
+    },
+    "hero": {
+      "eyebrow": "Fulfillment Control Center",
+      "description": "Bring inbound receipts, carton movements, and Marketplace reconciliation together in a single command center. WarehouseWrangler turns warehouse signals into clear actions so your team can focus on shipping instead of spreadsheets.",
+      "primaryCta": "Access control center",
+      "secondaryCta": "Book a walkthrough"
+    },
+    "metrics": {
+      "ariaLabel": "Operational highlights",
+      "carton": {
+        "title": "Realtime carton oversight",
+        "copy": "Follow every carton from Incoming to your warehouse locations without losing track of box counts."
+      },
+      "reconciliation": {
+        "title": "Marketplace reconciliation",
+        "copy": "Upload marketplace snapshots or connect, compare deltas, and keep shipment records audit ready."
+      },
+      "planning": {
+        "title": "Planning intelligence",
+        "copy": "Blend planned stock, simulations, and product sales factors to protect coverage."
+      },
+      "integrations": {
+        "title": "Connect to other platforms",
+        "copy": "Secure APIs enable integration with WMS, ERP, and 3PL systems for seamless data flow."
+      }
+    },
+    "highlights": {
+      "ariaLabel": "Platform modules",
+      "inventory": {
+        "title": "Inventory guardrails",
+        "copy": "Carton checks, movement logs, and secured APIs protect every stock move."
+      },
+      "outbound": {
+        "title": "Outbound confidence",
+        "copy": "Marketplace shipment summaries keep carton and product traceability crystal clear."
+      },
+      "forecast": {
+        "title": "Forecast clarity",
+        "copy": "Toggle LC uploads, additional stock, and sales factors to spot coverage gaps early."
+      }
+    },
+    "features": {
+      "eyebrow": "Why teams choose WarehouseWrangler",
+      "title": "All fulfillment signals, zero guesswork",
+      "description": "Purpose-built workflows replace ad-hoc spreadsheets so every stakeholder works from the same truth.",
+      "snapshot": {
+        "title": "Snapshot uploader",
+        "copy": "Validate Marketplace-reported stock by comparing historical snapshots with live carton data.",
+        "points": {
+          "status": "Automated status tracking per upload.",
+          "audit": "Audit-ready history of every product ID."
+        }
+      },
+      "cartons": {
+        "title": "Carton command",
+        "copy": "Search cartons, drill into contents, and initiate moves with transactional safeguards.",
+        "points": {
+          "filters": "Inline filters for location and status.",
+          "log": "Movement log for every box."
+        }
+      },
+      "planning": {
+        "title": "Planning canvas",
+        "copy": "Layer planned stock, simulations, and sales factors to forecast coverage by weeks and pairs.",
+        "points": {
+          "toggles": "Scope toggles for additional and future ETAs.",
+          "dashboards": "Instant bar and table dashboards."
+        }
+      }
+    },
+    "cta": {
+      "title": "Ready to wrangle your warehouse?",
+      "copy": "Sign in with your WarehouseWrangler credentials to join your team’s fulfillment hub.",
+      "primaryCta": "Sign in securely",
+      "secondaryCta": "Talk to support"
+    }
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "cartons": "Cartons",
+    "shipments": "Shipments",
+    "plannedStock": "Planned Stock",
+    "dataImports": {
+      "label": "Data Imports",
+      "lcUpload": "LC Upload",
+      "amazonSnapshot": "Amazon Snapshot"
+    }
+  },
+  "common": {
+    "loading": "Loading…",
+    "actions": {
+      "refresh": "Refresh",
+      "applyFilters": "Apply filters",
+      "reset": "Reset",
+      "cancel": "Cancel",
+      "close": "Close",
+      "back": "Back",
+      "save": "Save"
+    },
+    "units": {
+      "boxes": "Boxes",
+      "pairs": "Pairs"
+    },
+    "placeholders": {
+      "notAvailable": "N/A",
+      "emDash": "—"
+    },
+    "errors": {
+      "connection": "Connection error. Please try again.",
+      "missingAuthToken": "Missing authentication token",
+      "unauthorized": "Unauthorized"
+    },
+    "alerts": {
+      "success": "Success: {message}",
+      "error": "Error: {message}"
+    },
+    "prompts": {
+      "logoutConfirm": "Are you sure you want to log out?"
+    },
+    "user": {
+      "anonymous": "User"
+    }
+  },
+  "dashboard": {
+    "meta": {
+      "title": "Dashboard - WarehouseWrangler"
+    },
+    "loading": {
+      "message": "Preparing your fulfillment control center…"
+    },
+    "home": {
+      "sectionTitle": "Dashboard",
+      "quickActions": {
+        "title": "Quick Actions",
+        "links": {
+          "products": "Organize product catalog for inbound shipments.",
+          "cartons": "Validate carton IDs before labeling.",
+          "amazonSnapshot": "Upload the latest Amazon inventory snapshot."
+        }
+      },
+      "highlights": {
+        "ariaLabel": "Operational highlights",
+        "authentication": {
+          "title": "Authentication Secure",
+          "body": "Session tokens validated with real-time expiry checks."
+        },
+        "cartonIntake": {
+          "title": "Carton Intake",
+          "body": "Configure carton verification flows before the next shipment arrives."
+        }
+      },
+      "controls": {
+        "targetDate": "Target date",
+        "includeAmazon": "Include Amazon",
+        "includeAdditional": "Include Additional",
+        "includeSimulations": "Include simulations",
+        "includeFutureEtas": "Include future ETAs",
+        "minCoverLabel": "Min cover:",
+        "weeksSuffix": "weeks",
+        "internalLabel": "Internal:",
+        "allLabel": "All:"
+      },
+      "views": {
+        "ariaLabel": "Dashboard views",
+        "bar": "Bar view",
+        "table": "Table view"
+      },
+      "table": {
+        "ariaLabel": "Coverage table",
+        "regionLabel": "Coverage table data",
+        "headers": {
+          "artikel": "Artikel",
+          "minCover": "Min Cover (w)",
+          "targetCover": "Target Cover (w)",
+          "toOrderBoxes": "To-Order (boxes)",
+          "toOrderPairs": "To-Order (pairs)",
+          "incoming": "Incoming",
+          "wml": "WML",
+          "gmr": "GMR",
+          "amazon": "Amazon",
+          "additional": "Additional",
+          "internalPairs": "Internal Pairs",
+          "internalWeeks": "Internal Weeks",
+          "allPairs": "All Pairs",
+          "allWeeks": "All Weeks"
+        }
+      }
+    },
+    "product": {
+      "fallbackName": "Product {id}"
+    },
+    "aria": {
+      "productGroup": "Product {product}",
+      "minCoverage": "{weeks} week minimum coverage",
+      "targetCoverage": "Target coverage of {weeks} weeks"
+    },
+    "bars": {
+      "noDemand": "No demand recorded",
+      "weeklyDemand": "{demand} pairs/week",
+      "meta": {
+        "demand": "Demand",
+        "stockout": "Stockout",
+        "toOrder": "To-order"
+      },
+      "stockoutLabel": "{date} ({weeks}w)",
+      "toOrderValue": "{boxes} boxes",
+      "stock": {
+        "boxesUnknown": "— boxes",
+        "boxesValue": "{boxes} boxes",
+        "pairsValue": "{pairs} pairs",
+        "combined": "{boxes} / {pairs}"
+      }
+    },
+    "table": {
+      "empty": "No products to display.",
+      "stock": {
+        "boxesValue": "{boxes} boxes",
+        "pairsValue": "{pairs} pairs",
+        "combined": "{boxes} / {pairs}"
+      },
+      "additional": {
+        "pairs": "{pairs} pairs",
+        "withTags": "{base} ({tags})",
+        "tags": {
+          "sim": "Sim",
+          "future": "Future",
+          "separator": " · "
+        }
+      }
+    },
+    "totals": {
+      "summary": "{weeks}w / {pairs} pairs"
+    },
+    "errors": {
+      "loadFailure": "Unable to load dashboard data: {message}",
+      "requestFailed": "Request failed {status} for {url}. Body: {body}",
+      "invalidJson": "Invalid JSON from {url}: {error}. Body: {body}"
+    },
+    "tooltips": {
+      "pairs": "{pairs} pairs",
+      "basic": "{label}: {pairs}",
+      "detailed": "{label}: {pairs} · {weeks}",
+      "weeks": "{weeks}w"
+    }
+  },
+  "products": {
+    "meta": {
+      "title": "Product Management - WarehouseWrangler"
+    },
+    "header": {
+      "title": "Product Management",
+      "subtitle": "Manage product catalog details, identification codes, and seasonal demand factors.",
+      "primaryAction": "Create product"
+    },
+    "search": {
+      "sectionLabel": "Search products",
+      "title": "Browse product catalog",
+      "description": "Filter by product name, article, or identification codes.",
+      "placeholder": "Search by article, product, FNSKU, ASIN, SKU, or EAN",
+      "ariaLabel": "Search products"
+    },
+    "loading": "Loading products…",
+    "modal": {
+      "createTitle": "New product",
+      "editTitle": "Edit product"
+    },
+    "table": {
+      "fallbackName": "Product",
+      "regionLabel": "Product list",
+      "headers": {
+        "productGroup": "Product (Group)",
+        "articleNote": "Article",
+        "article": "Article",
+        "fnsku": "FNSKU",
+        "asin": "ASIN",
+        "sku": "SKU",
+        "ean": "EAN",
+        "pairsPerBox": "Pairs/Box",
+        "color": "Color",
+        "seasonality": "Seasonality",
+        "actions": "Actions"
+      },
+      "empty": "No products found"
+    },
+    "tooltips": {
+      "edit": "Edit",
+      "delete": "Delete"
+    },
+    "aria": {
+      "editFactors": "Edit seasonal factors for {product}",
+      "editProduct": "Edit product {product}",
+      "deleteProduct": "Delete product {product}"
+    },
+    "form": {
+      "article": {
+        "label": "Article *",
+        "help": "(e.g., \"Sneaker Black 43-46\")"
+      },
+      "productName": {
+        "label": "Product (Group) *",
+        "help": "(e.g., \"Sneaker Bamboo\")"
+      },
+      "fnsku": {
+        "label": "FNSKU *"
+      },
+      "asin": {
+        "label": "ASIN"
+      },
+      "sku": {
+        "label": "SKU"
+      },
+      "ean": {
+        "label": "EAN"
+      },
+      "pairsPerBox": {
+        "label": "Pairs/Box *"
+      },
+      "color": {
+        "label": "Color",
+        "placeholder": "Black, White, ..."
+      },
+      "avgWeeklySales": {
+        "label": "Avg. weekly sales",
+        "placeholder": "0.00"
+      }
+    },
+    "factors": {
+      "empty": "No factors",
+      "helper": {
+        "intro": "Seasonal factors influence the sales forecast.",
+        "normal": "= Normal",
+        "higher": "= Higher",
+        "lower": "= Lower"
+      },
+      "actions": {
+        "reset": "Set all to 1.0",
+        "increase": "Set all to 1.5",
+        "decrease": "Set all to 0.8",
+        "save": "Save factors"
+      },
+      "months": {
+        "jan": "January",
+        "feb": "February",
+        "mar": "March",
+        "apr": "April",
+        "may": "May",
+        "jun": "June",
+        "jul": "July",
+        "aug": "August",
+        "sep": "September",
+        "oct": "October",
+        "nov": "November",
+        "dec": "December"
+      }
+    },
+    "factorsModal": {
+      "heading": "Seasonal factors",
+      "title": "Seasonal factors - {artikel}",
+      "productLabel": "Product: {name}"
+    },
+    "alerts": {
+      "success": "Success: {message}",
+      "deleteConfirm": "Delete article \"{artikel}\"?\n\nThis cannot be undone!",
+      "resetConfirm": "Reset all factors to 1.0?"
+    },
+    "messages": {
+      "loadFailed": "Failed to load products.",
+      "unknown": "Unknown error.",
+      "loadError": "Error loading products: {message}",
+      "updateSuccess": "Product updated successfully!",
+      "updateFailure": "Failed to update product.",
+      "createSuccess": "Product created successfully!",
+      "createFailure": "Failed to create product.",
+      "connectionError": "Connection error: {message}",
+      "factorsUpdateSuccess": "Seasonal factors updated!",
+      "factorsUpdateFailure": "Failed to update seasonal factors.",
+      "deleteSuccess": "Product deleted successfully!",
+      "deleteFailure": "Failed to delete product."
+    }
+  },
+  "users": {
+    "page": {
+      "title": "User Management",
+      "description": "Control roles, activation status, and credentials for WarehouseWrangler accounts."
+    },
+    "actions": {
+      "add": "Add User",
+      "save": "Save User"
+    },
+    "directory": {
+      "title": "Active Accounts",
+      "description": "Review account access, recent sign-ins, and change permissions instantly.",
+      "ariaLabel": "User directory"
+    },
+    "table": {
+      "empty": "No users found",
+      "loading": "Loading users…",
+      "headers": {
+        "username": "Username",
+        "email": "Email",
+        "role": "Role",
+        "status": "Status",
+        "lastLogin": "Last Login",
+        "actions": "Actions"
+      },
+      "status": {
+        "active": "Active",
+        "inactive": "Inactive"
+      },
+      "lastLogin": {
+        "never": "Never"
+      },
+      "actions": {
+        "protected": "Protected account",
+        "edit": "Edit user",
+        "changePassword": "Change password",
+        "activate": "Activate user",
+        "deactivate": "Deactivate user"
+      }
+    },
+    "form": {
+      "passwordHint": "Minimum 8 characters",
+      "fields": {
+        "username": {
+          "label": "Username *"
+        },
+        "email": {
+          "label": "Email *"
+        },
+        "password": {
+          "label": "Password *"
+        },
+        "role": {
+          "label": "Role *",
+          "options": {
+            "user": "User",
+            "admin": "Admin"
+          }
+        },
+        "active": {
+          "label": "Active"
+        }
+      }
+    },
+    "modals": {
+      "addTitle": "Add New User",
+      "editTitle": "Edit User"
+    },
+    "passwordModal": {
+      "title": "Change Password",
+      "fields": {
+        "currentPassword": "Current Password *",
+        "newPassword": "New Password *",
+        "confirmPassword": "Confirm New Password *"
+      },
+      "actions": {
+        "submit": "Change Password"
+      }
+    },
+    "notifications": {
+      "loadFailed": "Failed to load users: {error}",
+      "loadFailedGeneric": "Failed to load users.",
+      "updateSuccess": "User updated successfully!",
+      "updateError": "Failed to update user.",
+      "createSuccess": "User created successfully!",
+      "createError": "Failed to create user.",
+      "passwordMismatch": "New passwords do not match!",
+      "passwordChangeSuccess": "Password changed successfully!",
+      "passwordChangeError": "Failed to change password.",
+      "activateSuccess": "User activated successfully!",
+      "deactivateSuccess": "User deactivated successfully!",
+      "activateError": "Failed to activate user.",
+      "deactivateError": "Failed to deactivate user."
+    },
+    "prompts": {
+      "activateConfirm": "Are you sure you want to activate this user?",
+      "deactivateConfirm": "Are you sure you want to deactivate this user?"
+    }
+  },
+  "cartons": {
+    "meta": {
+      "title": "Carton Management - WarehouseWrangler"
+    },
+    "header": {
+      "title": "Carton Management",
+      "subtitle": "Monitor inventory, location changes, and shipping readiness for every carton ID."
+    },
+    "metrics": {
+      "ariaLabel": "Carton overview",
+      "total": {
+        "label": "Total"
+      },
+      "incoming": {
+        "label": "Incoming"
+      },
+      "wml": {
+        "label": "WML"
+      },
+      "gmr": {
+        "label": "GMR"
+      }
+    },
+    "filters": {
+      "ariaLabel": "Carton filter",
+      "location": {
+        "label": "Location",
+        "all": "All locations",
+        "incoming": "Incoming",
+        "wml": "WML",
+        "gmr": "GMR"
+      },
+      "status": {
+        "label": "Status",
+        "all": "All statuses",
+        "inStock": "In stock",
+        "empty": "Empty",
+        "archived": "Archived"
+      },
+      "search": {
+        "label": "Search",
+        "placeholder": "Search carton, product or FNSKU",
+        "clearAria": "Clear search"
+      }
+    },
+    "bulk": {
+      "summary": {
+        "noneSelected": "No cartons selected",
+        "countSingle": "{count} carton selected",
+        "countPlural": "{count} cartons selected"
+      },
+      "actions": {
+        "moveSelection": "Move selection"
+      }
+    },
+    "notifications": {
+      "success": "Success: {message}",
+      "error": "Error: {message}"
+    },
+    "errors": {
+      "loadFailed": "Failed to load cartons: {error}",
+      "detailsFailed": "Failed to load carton details: {error}",
+      "selectionUnavailable": "Selected cartons are no longer available.",
+      "missingLocation": "Please choose a new location.",
+      "sameLocation": "Carton is already in {location}.",
+      "moveFailed": "Unable to move cartons."
+    },
+    "prompts": {
+      "confirmSingleMove": "Move carton {number} to {location}?",
+      "confirmBulkMove": "Move {count} cartons to {location}?"
+    },
+    "messages": {
+      "movedNone": "No cartons were moved.",
+      "movedOne": "1 carton was moved to {location}.",
+      "movedMany": "{count} cartons were moved to {location}.",
+      "skippedCount": "({count} skipped)"
+    },
+    "loading": "Loading cartons...",
+    "table": {
+      "ariaLabel": "Carton table",
+      "regionLabel": "Carton data table",
+      "selectAll": "Select all cartons",
+      "selectCartonAria": "Select carton {number}",
+      "rowActions": {
+        "view": "View details",
+        "move": "Move carton",
+        "archived": "Carton archived"
+      },
+      "headers": {
+        "carton": "Carton",
+        "location": "Location",
+        "status": "Status",
+        "products": "Products",
+        "boxesCurrent": "Boxes (current)",
+        "boxesInitial": "Boxes (initial)",
+        "sentToAmz": "Sent to AMZ",
+        "updated": "Updated",
+        "actions": "Actions"
+      }
+    },
+    "tooltip": {
+      "header": "Products ({count})",
+      "unnamedProduct": "Unnamed product",
+      "artikel": "Article",
+      "fnsku": "FNSKU"
+    },
+    "empty": "No cartons found. Adjust the filters or refresh the list.",
+    "move": {
+      "title": "Move carton",
+      "subtitle": "Choose a new location for this carton.",
+      "closeAria": "Close dialog",
+      "cartonLabel": "Carton",
+      "currentLocationLabel": "Current location",
+      "selectionLabel": "Selection",
+      "selectionSuffix": "cartons selected",
+      "selectionHint": "Archived or unchanged cartons are skipped automatically.",
+      "newLocationLabel": "New location *",
+      "newLocationPlaceholder": "Select location",
+      "notesLabel": "Note (optional)",
+      "notesPlaceholder": "Add reason for the move",
+      "confirm": "Move carton",
+      "bulkTitle": "Move cartons",
+      "bulkSubtitle": "Choose a new location for the selected cartons.",
+      "bulkConfirm": "Move cartons"
+    },
+    "details": {
+      "title": "Carton details",
+      "subtitle": "Overview of contents, movements, and stock changes.",
+      "closeAria": "Close dialog",
+      "loading": "Loading details...",
+      "sections": {
+        "basic": {
+          "title": "Basic information",
+          "labels": {
+            "carton": "Carton",
+            "location": "Location",
+            "status": "Status",
+            "created": "Created",
+            "updated": "Updated"
+          }
+        },
+        "inventory": {
+          "title": "Inventory overview",
+          "labels": {
+            "products": "Products",
+            "boxesCurrent": "Boxes (current)",
+            "boxesInitial": "Boxes (initial)",
+            "pairsCurrent": "Pairs (current)",
+            "sentToAmazon": "Sent to Amazon"
+          }
+        },
+        "contents": {
+          "title": "Products in carton",
+          "headers": {
+            "product": "Product",
+            "fnsku": "FNSKU",
+            "boxesInitial": "Boxes (initial)",
+            "boxesCurrent": "Boxes (current)",
+            "sentToAmazon": "Sent to Amazon",
+            "pairsPerBox": "Pairs / box",
+            "pairsCurrent": "Pairs (current)"
+          }
+        },
+        "history": {
+          "title": "Movement history"
+        }
+      }
+    },
+    "history": {
+      "boxChange": "{signed} boxes",
+      "byUser": "by {user}",
+      "shipmentReference": "Shipment {reference}",
+      "types": {
+        "received": "Received",
+        "sent_to_amazon": "Sent to Amazon",
+        "recalled": "Recalled",
+        "adjusted": "Adjusted",
+        "damaged": "Damaged",
+        "sold": "Sold"
+      }
+    }
+  },
+  "shipments": {
+    "meta": {
+      "title": "Shipment Management - WarehouseWrangler"
+    },
+    "header": {
+      "title": "Amazon Shipments",
+      "subtitle": "Coordinate outbound shipments, track carton allocations, and manage recall workflows.",
+      "create": "Create shipment"
+    },
+    "metrics": {
+      "ariaLabel": "Shipment overview",
+      "total": {
+        "label": "Total shipments",
+        "subtext": "All time"
+      },
+      "prepared": {
+        "label": "Prepared",
+        "subtext": "Ready to send"
+      },
+      "sent": {
+        "label": "Sent",
+        "subtext": "Handed over to Amazon"
+      },
+      "recalled": {
+        "label": "Recalled",
+        "subtext": "Returned to inventory"
+      }
+    },
+    "filters": {
+      "ariaLabel": "Shipments filter",
+      "status": {
+        "label": "Status",
+        "all": "All statuses"
+      },
+      "from": "From",
+      "to": "To"
+    },
+    "actions": {
+      "view": "View details",
+      "continue": "Resume shipment",
+      "recall": "Recall shipment"
+    },
+    "statuses": {
+      "prepared": "Prepared",
+      "sent": "Sent",
+      "recalled": "Recalled",
+      "unknown": "Unknown ({status})"
+    },
+    "prompts": {
+      "deletePrepared": "Delete prepared shipment \"{reference}\"?\n\nThis will remove the shipment and free up all reserved boxes.",
+      "removeBoxes": "Remove these boxes from the shipment?"
+    },
+    "delete": {
+      "success": "Shipment deleted successfully.",
+      "error": "Failed to delete shipment: {error}"
+    },
+    "notifications": {
+      "success": "Success: {message}",
+      "error": "Error: {message}",
+      "warningsTitle": "Warnings:"
+    },
+    "errors": {
+      "loadFailed": "Failed to load shipments: {error}",
+      "create": "Failed to create shipment: {error}",
+      "cartonNotFound": "Carton not found",
+      "shipmentRequired": "Please select or create a shipment first.",
+      "noAvailableBoxes": "No available boxes in this carton.",
+      "addBoxes": "Failed to add boxes to shipment: {error}",
+      "selectBoxes": "Please select at least one box.",
+      "missingContext": "Shipment context missing. Please reload and try again.",
+      "removeBoxes": "Failed to remove boxes from shipment. Please try again.",
+      "removeBoxesGeneric": "Failed to remove boxes from shipment: {error}",
+      "selectBoxesBeforeSend": "Please select boxes before proceeding.",
+      "send": "Failed to send shipment: {error}",
+      "loadDetails": "Failed to load shipment details.",
+      "loadShipment": "Failed to load shipment."
+    },
+    "loading": "Loading shipments...",
+    "table": {
+      "ariaLabel": "Shipments table",
+      "regionLabel": "Shipment data table",
+      "headers": {
+        "reference": "Reference",
+        "date": "Date",
+        "status": "Status",
+        "cartons": "Cartons",
+        "products": "Products",
+        "totalBoxes": "Total boxes",
+        "createdBy": "Created by",
+        "actions": "Actions"
+      }
+    },
+    "empty": "No shipments found. Adjust the filters or create a new shipment.",
+    "create": {
+      "title": "Create shipment",
+      "closeAria": "Close dialog",
+      "referenceLabel": "Shipment reference *",
+      "referencePlaceholder": "e.g., AMZ-2025-10-001",
+      "referenceHelp": "Unique identifier for this shipment",
+      "dateLabel": "Shipment date *",
+      "notesLabel": "Notes (optional)",
+      "notesPlaceholder": "Add any notes about this shipment...",
+      "submit": "Create & add boxes",
+      "success": "Shipment created successfully!"
+    },
+    "addBoxes": {
+      "titlePrefix": "Add boxes to shipment:",
+      "closeAria": "Close dialog",
+      "summaryTitle": "Selected boxes:",
+      "totalBoxes": "Total boxes:",
+      "cartons": "Cartons:",
+      "products": "Products:",
+      "availableTitle": "Available cartons (WML & GMR):",
+      "loading": "Loading available cartons...",
+      "selectedTitle": "Boxes added to shipment:",
+      "emptyCartons": "No cartons with available inventory found.",
+      "cartonProductsAria": "Products in this carton",
+      "emptyProducts": "No products with available inventory",
+      "cartonSummary": "{count} products • {boxes} boxes available",
+      "table": {
+        "carton": "Carton",
+        "product": "Product",
+        "boxes": "Boxes",
+        "pairs": "Pairs",
+        "action": "Action"
+      },
+      "proceed": "Review & send",
+      "proceedWithCount": "Review & send ({count})",
+      "actions": {
+        "select": "Select boxes",
+        "addAll": "Add all boxes",
+        "remove": "Remove"
+      },
+      "success": {
+        "addAll": "Added all available boxes ({count}).",
+        "added": "Added {count} box selection(s) to shipment.",
+        "removed": "Boxes removed from shipment."
+      }
+    },
+    "steps": {
+      "created": "Created",
+      "addBoxes": "Add boxes",
+      "boxesAdded": "Boxes added",
+      "send": "Send"
+    },
+    "send": {
+      "title": "Confirm shipment send",
+      "closeAria": "Close dialog",
+      "warningTitle": "Important:",
+      "warning": "This action updates inventory. Boxes are removed from their cartons and marked as sent to Amazon. You can undo this via \"Recall\".",
+      "confirm": "Send shipment",
+      "progress": "Sending…",
+      "success": "Shipment sent successfully.",
+      "summary": {
+        "heading": "Shipment: {reference}",
+        "date": "Date: {date}",
+        "notes": "Notes: {notes}",
+        "totalBoxes": "Total boxes:",
+        "totalPairs": "Total pairs:",
+        "cartons": "Cartons affected:",
+        "products": "Products:",
+        "breakdown": "Breakdown by carton:"
+      }
+    },
+    "details": {
+      "title": "Shipment details",
+      "closeAria": "Close dialog",
+      "loading": "Loading shipment details...",
+      "sections": {
+        "info": {
+          "title": "Shipment information",
+          "reference": "Reference:",
+          "date": "Date:",
+          "status": "Status:",
+          "createdBy": "Created by:",
+          "createdAt": "Created:",
+          "updatedAt": "Last updated:",
+          "notes": "Notes:"
+        },
+        "summary": {
+          "title": "Summary",
+          "totalBoxes": "Total boxes",
+          "totalPairs": "Total pairs",
+          "cartons": "Cartons",
+          "products": "Products"
+        },
+        "contents": {
+          "title": "Contents"
+        }
+      },
+      "table": {
+        "headers": {
+          "carton": "Carton",
+          "product": "Product",
+          "fnsku": "FNSKU",
+          "boxesSent": "Boxes sent",
+          "pairsSent": "Pairs sent"
+        }
+      }
+    },
+    "boxSelection": {
+      "title": "Select boxes – {carton}",
+      "quantityLabel": "Boxes to send:",
+      "confirm": "Add to shipment",
+      "meta": "FNSKU: {fnsku} • Available: {boxes} boxes ({pairs} pairs)"
+    },
+    "recall": {
+      "title": "Recall shipment",
+      "closeAria": "Close dialog",
+      "confirmation": "Are you sure you want to recall shipment",
+      "warningTitle": "The following steps will occur:",
+      "steps": {
+        "returnBoxes": "All boxes are booked back into their original cartons.",
+        "updateInventory": "Carton inventory is updated (boxes_current increases).",
+        "markRecalled": "The shipment is marked as \"recalled\".",
+        "logHistory": "The recall is logged in the movement history."
+      },
+      "notesLabel": "Reason for recall *",
+      "notesPlaceholder": "Why are you recalling this shipment?",
+      "confirm": "Recall shipment",
+      "confirmPrompt": "Are you absolutely sure you want to recall this shipment?",
+      "success": "Shipment recalled successfully.",
+      "error": "Failed to recall shipment: {error}",
+      "errors": {
+        "notesRequired": "Please provide a reason for recall."
+      }
+    }
+  },
+  "lcUpload": {
+    "meta": {
+      "title": "LC File Upload - WarehouseWrangler"
+    },
+    "header": {
+      "title": "LC Upload",
+      "subtitle": "Import delivery notes, review warnings, and create cartons with a structured control flow."
+    },
+    "uploadCard": {
+      "title": "Select LC file",
+      "description": "Upload the supplier CSV to prepare new cartons and validate data before importing.",
+      "selectFile": "Select file",
+      "clearFileAria": "Remove selected file",
+      "requirements": {
+        "title": "File requirements",
+        "format": "Format: CSV with semicolon delimiter",
+        "prefix": "Carton prefix present (e.g., 24SVS88)",
+        "columns": "Required columns: FNSKU, CTN NO, BOX/CARTON",
+        "size": "Maximum file size: 5 MB"
+      },
+      "parse": "Parse & Preview"
+    },
+    "summary": {
+      "title": "Upload summary",
+      "description": "Review key metrics before importing cartons.",
+      "metrics": {
+        "shipment": "Shipment",
+        "totalCartons": "Total cartons",
+        "products": "Products",
+        "rows": "Rows processed",
+        "warnings": "Warnings"
+      },
+      "location": {
+        "prefix": "All cartons will be imported into the ",
+        "badge": "Incoming",
+        "suffix": " area."
+      }
+    },
+    "warnings": {
+      "title": "Warnings",
+      "description": "Review anomalies before confirming the import.",
+      "lineLabel": "Line {line}"
+    },
+    "preview": {
+      "title": "Preview first 20 cartons",
+      "description": "Use the filters to quickly spot mixed cartons.",
+      "productFallback": "Unknown product",
+      "filters": {
+        "mixedOnly": "Show mixed cartons only"
+      },
+      "table": {
+        "ariaLabel": "Carton preview",
+        "headers": {
+          "carton": "Carton",
+          "fnsku": "FNSKU",
+          "product": "Product",
+          "boxes": "Boxes",
+          "type": "Type"
+        },
+        "empty": "No entries match the current filters.",
+        "truncated": "Showing only the first {shown} of {total} entries.",
+        "badges": {
+          "mixed": "Mixed carton",
+          "single": "Single carton"
+        }
+      }
+    },
+    "errors": {
+      "csvRequired": "Please select a CSV file.",
+      "fileTooLarge": "File is too large. Maximum size is {size}.",
+      "fileNotSelected": "Please select a file first.",
+      "parseFailed": "Failed to parse file. Please check the format.",
+      "noData": "No data to import.",
+      "importFailed": "Import failed. Please try again."
+    },
+    "actions": {
+      "confirm": "Confirm import"
+    },
+    "prompts": {
+      "confirmImport": "Are you sure you want to import {count} cartons to the Incoming warehouse?"
+    },
+    "success": {
+      "title": "Import successful",
+      "cartons": "Cartons created",
+      "products": "Products updated",
+      "uploadAnother": "Upload another file",
+      "goToDashboard": "Go to dashboard"
+    },
+    "error": {
+      "title": "Upload failed",
+      "retry": "Try again"
+    }
+  },
+  "amazonSnapshotUpload": {
+    "meta": {
+      "title": "Amazon Snapshot Upload - WarehouseWrangler"
+    },
+    "header": {
+      "title": "Amazon Snapshot Upload",
+      "subtitle": "Upload the latest Amazon inventory report to keep FBA stock levels accurate."
+    },
+    "uploadCard": {
+      "title": "Select Amazon snapshot file",
+      "description": "Import your \"Manage FBA Inventory\" CSV from Amazon Seller Central for processing.",
+      "selectFile": "Choose file",
+      "clearFileAria": "Remove selected file",
+      "parse": "Parse & Preview",
+      "requirements": {
+        "title": "File requirements",
+        "items": {
+          "format": "Format: CSV (comma-separated)",
+          "columns": "Includes columns:",
+          "size": "Maximum file size: 5 MB"
+        }
+      },
+      "important": {
+        "title": "Important",
+        "items": {
+          "replace": "Uploading replaces snapshot data for matching dates.",
+          "latest": "Confirm the file is the most recent export.",
+          "example": "Typical file name:"
+        }
+      }
+    },
+    "summary": {
+      "title": "Upload summary",
+      "description": "Review totals before importing the snapshot to the database.",
+      "metrics": {
+        "date": "Snapshot date",
+        "products": "Products found",
+        "boxes": "Total available boxes",
+        "rows": "Rows processed"
+      },
+      "location": {
+        "prefix": "This import will",
+        "badge": "replace",
+        "suffix": "existing snapshot data for the selected date."
+      }
+    },
+    "warnings": {
+      "title": "Warnings",
+      "description": "Investigate potential data issues prior to confirming the import.",
+      "lineLabel": "Line {line}"
+    },
+    "preview": {
+      "title": "Preview first 20 products",
+      "description": "Showing available inventory (boxes) at Amazon FBA.",
+      "productFallback": "Unknown",
+      "status": {
+        "inStock": "In Stock",
+        "outOfStock": "Out of Stock"
+      },
+      "table": {
+        "ariaLabel": "Amazon snapshot preview",
+        "headers": {
+          "fnsku": "FNSKU",
+          "sku": "SKU",
+          "name": "Product name",
+          "available": "Available boxes",
+          "status": "Status"
+        },
+        "truncated": "Showing first {shown} of {total} products…"
+      }
+    },
+    "errors": {
+      "csvRequired": "Please select a CSV file.",
+      "fileTooLarge": "File is too large. Maximum size is {size}.",
+      "fileNotSelected": "Please select a file first.",
+      "parseFailed": "Failed to parse file. Please check the format.",
+      "importFailed": "Import failed. Please try again.",
+      "noData": "No data to import."
+    },
+    "prompts": {
+      "confirmImport": "Are you sure you want to import this snapshot?\n\nDate: {date}\nProducts: {products}\n\nThis will replace existing data for this date."
+    },
+    "actions": {
+      "confirm": "Confirm & import"
+    },
+    "success": {
+      "title": "Import successful",
+      "products": "Products updated",
+      "date": "Snapshot date",
+      "uploadAnother": "Upload another file",
+      "viewDashboard": "View dashboard"
+    },
+    "error": {
+      "title": "Upload failed",
+      "retry": "Try again"
+    }
+  },
+  "plannedStock": {
+    "meta": {
+      "title": "Planned Stock - WarehouseWrangler"
+    },
+    "header": {
+      "title": "Planned Stock",
+      "subtitle": "Manage additional inventory and simulations for each product, including ETA and activation status.",
+      "create": "Create plan"
+    },
+    "metrics": {
+      "ariaLabel": "Planned stock overview",
+      "active": {
+        "label": "Active planning",
+        "totalSuffix": "in total"
+      },
+      "committed": {
+        "label": "Committed",
+        "totalSuffix": "planned"
+      },
+      "simulation": {
+        "label": "Simulations",
+        "totalSuffix": "simulated"
+      }
+    },
+    "filters": {
+      "ariaLabel": "Planned stock filter",
+      "product": {
+        "label": "Product",
+        "all": "All products"
+      },
+      "search": {
+        "label": "Search",
+        "placeholder": "Search by label, product, or scope"
+      },
+      "advanced": {
+        "label": "Advanced view",
+        "showSimulations": "Show simulations",
+        "includeFuture": "Include future ETAs",
+        "includeInactive": "Include inactive plans"
+      }
+    },
+    "products": {
+      "unknownArtikel": "Unknown"
+    },
+    "loading": "Loading planned stock...",
+    "table": {
+      "ariaLabel": "Planned stock table",
+      "regionLabel": "Planned stock data table",
+      "headers": {
+        "product": "Product",
+        "article": "Article",
+        "scope": "Scope",
+        "label": "Label",
+        "boxes": "Boxes",
+        "pairs": "Pairs",
+        "eta": "ETA",
+        "status": "Status",
+        "actions": "Actions"
+      },
+      "labels": {
+        "productUnknown": "Unknown product",
+        "articleValue": "Article {artikel}",
+        "articleUnknown": "Article unknown"
+      },
+      "status": {
+        "active": "Active",
+        "inactive": "Inactive"
+      },
+      "actions": {
+        "edit": "Edit",
+        "activate": "Activate",
+        "deactivate": "Deactivate",
+        "toggle": "Toggle status",
+        "delete": "Delete"
+      }
+    },
+    "empty": "No planned stock entries found.",
+    "modal": {
+      "title": "New plan",
+      "subtitle": "Define additional boxes for a product.",
+      "closeAria": "Close dialog",
+      "productLabel": "Product *",
+      "productPlaceholder": "Select product",
+      "scopeLabel": "Scope *",
+      "boxesLabel": "Boxes *",
+      "boxesHelp": "Whole boxes, minimum 1",
+      "etaLabel": "ETA",
+      "etaHelp": "Optional delivery date",
+      "labelLabel": "Label",
+      "labelPlaceholder": "e.g., Order #4711",
+      "activeLabel": "Active",
+      "activeHelp": "Inactive entries do not count toward totals",
+      "save": "Save",
+      "editTitle": "Edit plan",
+      "editSubtitle": "Update scope, quantity, or ETA for the existing plan.",
+      "createAction": "Create",
+      "updateAction": "Update"
+    },
+    "scope": {
+      "committed": "Committed",
+      "simulation": "Simulation"
+    },
+    "alerts": {
+      "created": "Plan created.",
+      "updated": "Plan updated.",
+      "deleted": "Plan deleted.",
+      "statusChanged": "Status updated."
+    },
+    "errors": {
+      "loadProducts": "Failed to load products.",
+      "unknown": "Unknown error",
+      "loadFailed": "Failed to load planned stock.",
+      "saveFailed": "Unable to save plan.",
+      "createFailed": "Failed to create plan.",
+      "updateFailed": "Failed to update plan.",
+      "deleteFailed": "Failed to delete plan.",
+      "toggleFailed": "Failed to change status.",
+      "entryNotFound": "Entry could not be found.",
+      "unknownEntry": "Unable to identify the plan entry."
+    },
+    "prompts": {
+      "deactivate": "Deactivate plan? It will be removed from totals.",
+      "activate": "Activate plan? It will count toward totals again.",
+      "delete": "Delete plan? This marks the entry inactive."
+    },
+    "validation": {
+      "productRequired": "Please select a product.",
+      "boxesInvalid": "Please enter a valid number of boxes.",
+      "createMinimumBoxes": "New plans require at least one box.",
+      "scopeInvalid": "Invalid scope selected.",
+      "etaInvalid": "ETA must use YYYY-MM-DD format."
     }
   }
 }
