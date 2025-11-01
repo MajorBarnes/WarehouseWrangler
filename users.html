@@ -47,31 +47,31 @@
         <div class="branding">
                 <img src="./assets/logo.png" alt="WarehouseWrangler Logo" class="brand-logo">
             <div class="brand-copy">
-                <span class="brand-name">WarehouseWrangler</span>
-                <span class="brand-tagline">Fulfillment Control Center</span>
+                <span class="brand-name" data-i18n="app.brand.name">WarehouseWrangler</span>
+                <span class="brand-tagline" data-i18n="app.brand.tagline">Fulfillment Control Center</span>
             </div>
         </div>
 
         <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="primaryNav" data-nav-toggle>
             <span class="material-icons-outlined" aria-hidden="true">menu</span>
-            <span class="sr-only">Toggle navigation</span>
+            <span class="sr-only" data-i18n="app.header.toggleNavigation">Toggle navigation</span>
         </button>
 
-        <nav class="primary-nav" aria-label="Main navigation" data-primary-nav id="primaryNav">
+        <nav class="primary-nav" aria-label="Main navigation" data-primary-nav id="primaryNav" data-i18n="app.header.mainNavAria" data-i18n-attr="aria-label">
             <ul class="nav-list">
-                <li class="nav-item"><a class="nav-link" href="index.html"><span class="material-icons-outlined" aria-hidden="true">dashboard</span><span>Dashboard</span></a></li>
-                <li class="nav-item"><a class="nav-link" href="cartons.html"><span class="material-icons-outlined" aria-hidden="true">inventory_2</span><span>Cartons</span></a></li>
-                <li class="nav-item"><a class="nav-link" href="shipments.html"><span class="material-icons-outlined" aria-hidden="true">local_shipping</span><span>Shipments</span></a></li>
-                <li class="nav-item"><a class="nav-link" href="planned-stock.html"><span class="material-icons-outlined" aria-hidden="true">analytics</span><span>Planned Stock</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="index.html"><span class="material-icons-outlined" aria-hidden="true">dashboard</span><span data-i18n="nav.dashboard">Dashboard</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="cartons.html"><span class="material-icons-outlined" aria-hidden="true">inventory_2</span><span data-i18n="nav.cartons">Cartons</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="shipments.html"><span class="material-icons-outlined" aria-hidden="true">local_shipping</span><span data-i18n="nav.shipments">Shipments</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="planned-stock.html"><span class="material-icons-outlined" aria-hidden="true">analytics</span><span data-i18n="nav.plannedStock">Planned Stock</span></a></li>
                 <li class="nav-item nav-item--has-children" data-imports>
                     <button class="nav-link" type="button" data-imports-toggle aria-expanded="false">
                         <span class="material-icons-outlined" aria-hidden="true">dataset</span>
-                        <span>Data Imports</span>
+                        <span data-i18n="nav.dataImports.label">Data Imports</span>
                         <span class="material-icons-outlined nav-link__chevron" aria-hidden="true">expand_more</span>
                     </button>
                     <ul class="nav-submenu">
-                        <li><a class="nav-sublink" href="lc-upload.html"><span class="material-icons-outlined" aria-hidden="true">upload_file</span><span>LC Upload</span></a></li>
-                        <li><a class="nav-sublink" href="amazon-snapshot-upload.html"><span class="material-icons-outlined" aria-hidden="true">cloud_upload</span><span>Amazon Snapshot</span></a></li>
+                        <li><a class="nav-sublink" href="lc-upload.html"><span class="material-icons-outlined" aria-hidden="true">upload_file</span><span data-i18n="nav.dataImports.lcUpload">LC Upload</span></a></li>
+                        <li><a class="nav-sublink" href="amazon-snapshot-upload.html"><span class="material-icons-outlined" aria-hidden="true">cloud_upload</span><span data-i18n="nav.dataImports.amazonSnapshot">Amazon Snapshot</span></a></li>
                     </ul>
                 </li>
             </ul>
@@ -82,24 +82,24 @@
                 <button class="user-menu__trigger" type="button" aria-expanded="false" data-user-menu-trigger>
                     <span class="material-icons-outlined" aria-hidden="true">account_circle</span>
                     <span class="user-display-name-wrapper" aria-live="polite">
-                        <span id="userDisplay" class="user-display-name">Loading…</span>
+                        <span id="userDisplay" class="user-display-name" data-i18n="common.loading">Loading…</span>
                     </span>
                     <span class="material-icons-outlined user-menu__chevron" aria-hidden="true">expand_more</span>
                 </button>
                 <div class="user-menu__dropdown" role="menu">
                     <a class="user-menu__link" href="products.html" role="menuitem">
                         <span class="material-icons-outlined" aria-hidden="true">view_list</span>
-                        <span>Products</span>
+                        <span data-i18n="app.userMenu.products">Products</span>
                     </a>
                     <a class="user-menu__link is-active" href="users.html" role="menuitem" aria-current="page">
                         <span class="material-icons-outlined" aria-hidden="true">group</span>
-                        <span>Users</span>
+                        <span data-i18n="app.userMenu.users">Users</span>
                     </a>
                 </div>
             </div>
             <button id="logoutBtn" class="btn btn-logout" type="button">
                 <span class="material-icons-outlined" aria-hidden="true">logout</span>
-                <span>Logout</span>
+                <span data-i18n="app.userMenu.logout">Logout</span>
             </button>
         </div>
     </header>
@@ -110,13 +110,13 @@
             <div class="page-title">
                 <span class="material-icons-outlined" aria-hidden="true">group</span>
                 <div class="page-title-copy">
-                    <h1>User Management</h1>
-                    <p>Control roles, activation status, and credentials for WarehouseWrangler accounts.</p>
+                    <h1 data-i18n="users.page.title">User Management</h1>
+                    <p data-i18n="users.page.description">Control roles, activation status, and credentials for WarehouseWrangler accounts.</p>
                 </div>
             </div>
             <button id="addUserBtn" class="btn btn-primary" type="button">
                 <span class="material-icons-outlined" aria-hidden="true">person_add</span>
-                <span>Add User</span>
+                <span data-i18n="users.actions.add">Add User</span>
             </button>
         </section>
 
@@ -124,26 +124,26 @@
         <section class="surface-card user-directory" aria-labelledby="userDirectoryTitle">
             <header class="section-header">
                 <div class="section-header-copy">
-                    <h2 id="userDirectoryTitle">Active Accounts</h2>
-                    <p>Review account access, recent sign-ins, and change permissions instantly.</p>
+                    <h2 id="userDirectoryTitle" data-i18n="users.directory.title">Active Accounts</h2>
+                    <p data-i18n="users.directory.description">Review account access, recent sign-ins, and change permissions instantly.</p>
                 </div>
             </header>
-            <div class="table-scroll" role="region" aria-live="polite" aria-label="User directory">
+            <div class="table-scroll" role="region" aria-live="polite" aria-label="User directory" data-i18n="users.directory.ariaLabel" data-i18n-attr="aria-label">
                 <div class="table-scroll__viewport">
                     <table class="users-table table-sticky">
                         <thead>
                         <tr>
-                            <th scope="col">Username</th>
-                            <th scope="col">Email</th>
-                            <th scope="col">Role</th>
-                            <th scope="col">Status</th>
-                            <th scope="col">Last Login</th>
-                            <th scope="col" class="actions-column">Actions</th>
+                            <th scope="col" data-i18n="users.table.headers.username">Username</th>
+                            <th scope="col" data-i18n="users.table.headers.email">Email</th>
+                            <th scope="col" data-i18n="users.table.headers.role">Role</th>
+                            <th scope="col" data-i18n="users.table.headers.status">Status</th>
+                            <th scope="col" data-i18n="users.table.headers.lastLogin">Last Login</th>
+                            <th scope="col" class="actions-column" data-i18n="users.table.headers.actions">Actions</th>
                         </tr>
                     </thead>
                         <tbody id="usersTableBody">
                             <tr class="table-loading-row">
-                                <td colspan="6" class="table-loading">Loading users…</td>
+                                <td colspan="6" class="table-loading" data-i18n="users.table.loading">Loading users…</td>
                             </tr>
                         </tbody>
                     </table>
@@ -156,49 +156,49 @@
     <div id="userModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
         <div class="modal-content">
             <div class="modal-header">
-                <h3 id="modalTitle">Add New User</h3>
-                <button type="button" class="modal-close" data-modal-close="user" title="Close">
+                <h3 id="modalTitle" data-i18n="users.modals.addTitle">Add New User</h3>
+                <button type="button" class="modal-close" data-modal-close="user" title="Close" data-i18n="common.actions.close" data-i18n-attr="title">
                     <span class="material-icons-outlined" aria-hidden="true">close</span>
-                    <span class="visually-hidden">Close</span>
+                    <span class="visually-hidden" data-i18n="common.actions.close">Close</span>
                 </button>
             </div>
             <form id="userForm">
                 <input type="hidden" id="userId" name="user_id">
 
                 <div class="form-group">
-                    <label for="username">Username *</label>
+                    <label for="username" data-i18n="users.form.fields.username.label">Username *</label>
                     <input type="text" id="username" name="username" required minlength="3">
                 </div>
 
                 <div class="form-group">
-                    <label for="email">Email *</label>
+                    <label for="email" data-i18n="users.form.fields.email.label">Email *</label>
                     <input type="email" id="email" name="email" required>
                 </div>
 
                 <div class="form-group" id="passwordGroup">
-                    <label for="password">Password *</label>
+                    <label for="password" data-i18n="users.form.fields.password.label">Password *</label>
                     <input type="password" id="password" name="password" minlength="8">
-                    <small>Minimum 8 characters</small>
+                    <small data-i18n="users.form.passwordHint">Minimum 8 characters</small>
                 </div>
 
                 <div class="form-group">
-                    <label for="role">Role *</label>
+                    <label for="role" data-i18n="users.form.fields.role.label">Role *</label>
                     <select id="role" name="role" required>
-                        <option value="user">User</option>
-                        <option value="admin">Admin</option>
+                        <option value="user" data-i18n="users.form.fields.role.options.user">User</option>
+                        <option value="admin" data-i18n="users.form.fields.role.options.admin">Admin</option>
                     </select>
                 </div>
 
                 <div class="form-group">
                     <label class="checkbox-label" for="isActive">
                         <input type="checkbox" id="isActive" name="is_active" checked>
-                        <span>Active</span>
+                        <span data-i18n="users.form.fields.active.label">Active</span>
                     </label>
                 </div>
 
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-modal-close="user">Cancel</button>
-                    <button type="submit" class="btn btn-primary">Save User</button>
+                    <button type="button" class="btn btn-secondary" data-modal-close="user" data-i18n="common.actions.cancel">Cancel</button>
+                    <button type="submit" class="btn btn-primary" data-i18n="users.actions.save">Save User</button>
                 </div>
             </form>
         </div>
@@ -208,34 +208,34 @@
     <div id="passwordModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="passwordModalTitle">
         <div class="modal-content">
             <div class="modal-header">
-                <h3 id="passwordModalTitle">Change Password</h3>
-                <button type="button" class="modal-close" data-modal-close="password" title="Close">
+                <h3 id="passwordModalTitle" data-i18n="users.passwordModal.title">Change Password</h3>
+                <button type="button" class="modal-close" data-modal-close="password" title="Close" data-i18n="common.actions.close" data-i18n-attr="title">
                     <span class="material-icons-outlined" aria-hidden="true">close</span>
-                    <span class="visually-hidden">Close</span>
+                    <span class="visually-hidden" data-i18n="common.actions.close">Close</span>
                 </button>
             </div>
             <form id="passwordForm">
                 <input type="hidden" id="passwordUserId">
 
                 <div class="form-group" id="currentPasswordGroup">
-                    <label for="currentPassword">Current Password *</label>
+                    <label for="currentPassword" data-i18n="users.passwordModal.fields.currentPassword">Current Password *</label>
                     <input type="password" id="currentPassword" required>
                 </div>
 
                 <div class="form-group">
-                    <label for="newPassword">New Password *</label>
+                    <label for="newPassword" data-i18n="users.passwordModal.fields.newPassword">New Password *</label>
                     <input type="password" id="newPassword" required minlength="8">
-                    <small>Minimum 8 characters</small>
+                    <small data-i18n="users.form.passwordHint">Minimum 8 characters</small>
                 </div>
 
                 <div class="form-group">
-                    <label for="confirmPassword">Confirm New Password *</label>
+                    <label for="confirmPassword" data-i18n="users.passwordModal.fields.confirmPassword">Confirm New Password *</label>
                     <input type="password" id="confirmPassword" required minlength="8">
                 </div>
 
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-modal-close="password">Cancel</button>
-                    <button type="submit" class="btn btn-primary">Change Password</button>
+                    <button type="button" class="btn btn-secondary" data-modal-close="password" data-i18n="common.actions.cancel">Cancel</button>
+                    <button type="submit" class="btn btn-primary" data-i18n="users.passwordModal.actions.submit">Change Password</button>
                 </div>
             </form>
         </div>
@@ -245,21 +245,30 @@
     <footer class="site-footer">
         <div class="site-footer__inner">
             <div class="site-footer__section">
-                <span class="site-footer__copyright">© <span class="site-footer__year" data-footer-year data-current-year="2024">2024</span> WarehouseWrangler</span>
+                <span class="site-footer__copyright">© <span class="site-footer__year" data-footer-year data-current-year="2024">2024</span> <span data-i18n="app.brand.name">WarehouseWrangler</span></span>
             </div>
             <div class="site-footer__section site-footer__created-by">
-                <span class="site-footer__label">Created by</span>
+                <span class="site-footer__label" data-i18n="app.footer.createdBy">Created by</span>
                 <a href="https://threegents.eu" class="site-footer__link" target="_blank" rel="noopener">
                     <img src="https://threegents.eu/images/logo_light.svg" alt="ThreeGents logo" class="site-footer__logo">
-                    <span>ThreeGents</span>
+                    <span data-i18n="app.footer.partner">ThreeGents</span>
                 </a>
             </div>
             <div class="site-footer__section">
-                <a href="mailto:support@threegents.biz" class="site-footer__link">Support</a>
+                <a href="mailto:support@threegents.biz" class="site-footer__link" data-i18n="app.footer.support">Support</a>
             </div>
         </div>
     </footer>
 
+    <script src="./js/i18n.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var storedLocale = localStorage.getItem('ww_locale') || I18n.DEFAULT_LOCALE;
+            I18n.init({ locale: storedLocale }).then(function () {
+                I18n.translateTree();
+            });
+        });
+    </script>
     <script src="./js/header.js"></script>
     <script src="./js/users.js"></script>
     <script type="module" src="./js/footer.js"></script>

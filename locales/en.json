@@ -5,7 +5,8 @@
       "tagline": "Fulfillment Control Center"
     },
     "header": {
-      "toggleNavigation": "Toggle navigation"
+      "toggleNavigation": "Toggle navigation",
+      "mainNavAria": "Main navigation"
     },
     "userMenu": {
       "products": "Products",
@@ -257,8 +258,30 @@
     }
   },
   "users": {
+    "page": {
+      "title": "User Management",
+      "description": "Control roles, activation status, and credentials for WarehouseWrangler accounts."
+    },
+    "actions": {
+      "add": "Add User",
+      "save": "Save User"
+    },
+    "directory": {
+      "title": "Active Accounts",
+      "description": "Review account access, recent sign-ins, and change permissions instantly.",
+      "ariaLabel": "User directory"
+    },
     "table": {
       "empty": "No users found",
+      "loading": "Loading users…",
+      "headers": {
+        "username": "Username",
+        "email": "Email",
+        "role": "Role",
+        "status": "Status",
+        "lastLogin": "Last Login",
+        "actions": "Actions"
+      },
       "status": {
         "active": "Active",
         "inactive": "Inactive"
@@ -274,9 +297,44 @@
         "deactivate": "Deactivate user"
       }
     },
+    "form": {
+      "passwordHint": "Minimum 8 characters",
+      "fields": {
+        "username": {
+          "label": "Username *"
+        },
+        "email": {
+          "label": "Email *"
+        },
+        "password": {
+          "label": "Password *"
+        },
+        "role": {
+          "label": "Role *",
+          "options": {
+            "user": "User",
+            "admin": "Admin"
+          }
+        },
+        "active": {
+          "label": "Active"
+        }
+      }
+    },
     "modals": {
       "addTitle": "Add New User",
       "editTitle": "Edit User"
+    },
+    "passwordModal": {
+      "title": "Change Password",
+      "fields": {
+        "currentPassword": "Current Password *",
+        "newPassword": "New Password *",
+        "confirmPassword": "Confirm New Password *"
+      },
+      "actions": {
+        "submit": "Change Password"
+      }
     },
     "notifications": {
       "loadFailed": "Failed to load users: {error}",
