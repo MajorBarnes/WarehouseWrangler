@@ -37,6 +37,10 @@
       "createdBy": "Создано",
       "partner": "ThreeGents",
       "support": "Поддержка",
+      "supportEmail": "support@threegents.biz",
+      "copyEmail": "Скопировать адрес",
+      "copySuccess": "Адрес поддержки скопирован в буфер обмена.",
+      "copyFailure": "Не удалось скопировать адрес поддержки. Скопируйте его вручную.",
       "partnerLogoAlt": "Логотип ThreeGents",
       "yearRange": "{startYear}\u2013{endYear}",
       "singleYear": "{year}"
