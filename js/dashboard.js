@@ -5,6 +5,7 @@ const state = {
     products: [],
     planned: new Map(),
     rows: [],
+    activeView: 'bars',
     totals: {
         internalPairs: 0,
         internalWeeks: 0,
@@ -355,7 +356,7 @@ export function computeCoverage(productRow, plannedMap, cfg, month, toggles) {
     return result;
 }
 
-export function renderDashboard(currentState) {
+function renderDashboardBars(currentState) {
     const container = document.getElementById('dashboard-bars');
     if (!container) {
         return;
@@ -487,8 +488,198 @@ export function renderDashboard(currentState) {
         rowEl.appendChild(trackEl);
         container.appendChild(rowEl);
     });
+}
 
+function renderDashboardTable(currentState) {
+    const table = document.getElementById('dashboard-table');
+    if (!table) {
+        return;
+    }
+
+    const leadTimeWeeks = Number(currentState.config?.LEAD_TIME_WEEKS) || 0;
+    const includeAmazon = !!currentState.toggles?.includeAmazon;
+    const includeAdditional = !!currentState.toggles?.includeAdditional;
+
+    let tbody = table.tBodies[0];
+    if (!tbody) {
+        tbody = document.createElement('tbody');
+        table.appendChild(tbody);
+    }
+
+    tbody.innerHTML = '';
+
+    const columnCount = table.tHead?.rows?.[0]?.cells?.length || 14;
+
+    const formatWeeks = value => {
+        if (!Number.isFinite(value) || value < 0) {
+            return '—';
+        }
+        return numberFormatter.format(value);
+    };
+
+    const formatValue = (value, formatter) => {
+        if (!Number.isFinite(value)) {
+            return '—';
+        }
+        const safeValue = Math.max(0, value);
+        return formatter.format(safeValue);
+    };
+
+    const buildStockLabel = (pairs, pairsPerBox) => {
+        if (!Number.isFinite(pairs)) {
+            return '—';
+        }
+
+        const safePairs = Math.max(0, pairs);
+        if (pairsPerBox > 0) {
+            const boxes = safePairs / pairsPerBox;
+            return `${formatValue(boxes, numberFormatter)} boxes / ${formatValue(safePairs, pairsFormatter)} pairs`;
+        }
+
+        return `${formatValue(safePairs, pairsFormatter)} pairs`;
+    };
+
+    const appendCell = (rowEl, text, { numeric = false, muted = false } = {}) => {
+        const cell = document.createElement('td');
+        cell.textContent = text;
+        if (numeric) {
+            cell.classList.add('dashboard-table__cell--numeric');
+        }
+        if (muted) {
+            cell.classList.add('dashboard-table__cell--muted');
+        }
+        rowEl.appendChild(cell);
+        return cell;
+    };
+
+    if (!currentState.rows.length) {
+        const emptyRow = document.createElement('tr');
+        const emptyCell = document.createElement('td');
+        emptyCell.colSpan = columnCount;
+        emptyCell.className = 'dashboard-table__empty';
+        emptyCell.textContent = 'No products to display.';
+        emptyRow.appendChild(emptyCell);
+        tbody.appendChild(emptyRow);
+        return;
+    }
+
+    currentState.rows.forEach(row => {
+        const tr = document.createElement('tr');
+
+        const productCell = document.createElement('th');
+        productCell.scope = 'row';
+        productCell.textContent = row.name;
+        tr.appendChild(productCell);
+
+        appendCell(tr, formatWeeks(leadTimeWeeks), { numeric: true });
+        appendCell(tr, formatWeeks(row.toOrder.weeksToTarget), { numeric: true });
+
+        if (row.noDemand) {
+            appendCell(tr, '—', { numeric: true, muted: true });
+            appendCell(tr, '—', { numeric: true, muted: true });
+        } else {
+            appendCell(tr, formatValue(row.toOrder.boxes, numberFormatter), { numeric: true });
+            appendCell(tr, formatValue(row.toOrder.pairs, pairsFormatter), { numeric: true });
+        }
+
+        const breakdown = new Map();
+        if (Array.isArray(row.locationBreakdown)) {
+            row.locationBreakdown.forEach(item => {
+                breakdown.set(item.key, Number(item.pairs) || 0);
+            });
+        }
+
+        appendCell(tr, buildStockLabel(breakdown.get('incoming'), row.pairsPerBox), { numeric: true });
+        appendCell(tr, buildStockLabel(breakdown.get('wml'), row.pairsPerBox), { numeric: true });
+        appendCell(tr, buildStockLabel(breakdown.get('gmr'), row.pairsPerBox), { numeric: true });
+
+        const hasAmazon = includeAmazon && row.hasAmazonData;
+        appendCell(tr, hasAmazon ? buildStockLabel(breakdown.get('amz'), row.pairsPerBox) : '—', {
+            numeric: true,
+            muted: !hasAmazon
+        });
+
+        if (includeAdditional) {
+            const additionalPairs = Number(row.additionalDetails?.pairs) || 0;
+            let additionalText = `${formatValue(additionalPairs, pairsFormatter)} pairs`;
+            const tags = [];
+            if (row.additionalDetails?.hasSimulation) {
+                tags.push('Sim');
+            }
+            if (row.additionalDetails?.hasFuture) {
+                tags.push('Future');
+            }
+            if (tags.length) {
+                additionalText += ` (${tags.join(' · ')})`;
+            }
+            appendCell(tr, additionalText, {
+                numeric: true,
+                muted: additionalPairs === 0 && tags.length === 0
+            });
+        } else {
+            appendCell(tr, '—', { numeric: true, muted: true });
+        }
+
+        appendCell(tr, formatValue(row.totals.internalPairs, pairsFormatter), { numeric: true });
+        appendCell(tr, formatWeeks(row.totals.internalWeeks), { numeric: true });
+        appendCell(tr, formatValue(row.totals.allPairs, pairsFormatter), { numeric: true });
+        appendCell(tr, formatWeeks(row.totals.allWeeks), { numeric: true });
+
+        tbody.appendChild(tr);
+    });
+}
+
+export function renderDashboard(currentState, options = {}) {
+    renderDashboardBars(currentState);
+    renderDashboardTable(currentState);
+    syncActiveViewUI({ focusPanel: !!options.focusPanel });
     updateTotalsDisplay(currentState);
+}
+
+function syncActiveViewUI({ focusPanel = false } = {}) {
+    const activeView = state.activeView === 'table' ? 'table' : 'bars';
+    const tabs = {
+        bars: document.getElementById('dashboard-tab-bars'),
+        table: document.getElementById('dashboard-tab-table')
+    };
+    const panels = {
+        bars: document.getElementById('dashboard-bars-panel'),
+        table: document.getElementById('dashboard-table-panel')
+    };
+
+    Object.entries(tabs).forEach(([key, button]) => {
+        if (!button) {
+            return;
+        }
+        const isActive = key === activeView;
+        button.classList.toggle('is-active', isActive);
+        button.setAttribute('aria-selected', isActive ? 'true' : 'false');
+        button.setAttribute('tabindex', isActive ? '0' : '-1');
+    });
+
+    Object.entries(panels).forEach(([key, panel]) => {
+        if (!panel) {
+            return;
+        }
+        const isActive = key === activeView;
+        panel.classList.toggle('hidden', !isActive);
+        panel.setAttribute('aria-hidden', isActive ? 'false' : 'true');
+        panel.setAttribute('tabindex', isActive ? '0' : '-1');
+        if (isActive && focusPanel) {
+            panel.focus({ preventScroll: true });
+        }
+    });
+}
+
+function setActiveView(view, { focusPanel = false } = {}) {
+    const normalized = view === 'table' ? 'table' : 'bars';
+    if (state.activeView === normalized) {
+        syncActiveViewUI({ focusPanel });
+        return;
+    }
+
+    state.activeView = normalized;
+    renderDashboard(state, { focusPanel });
 }
 
 document.addEventListener('DOMContentLoaded', initializeDashboard);
@@ -680,6 +871,80 @@ function setupControls() {
             renderDashboard(state);
         });
     }
+
+    setupViewTabs();
+}
+
+function setupViewTabs() {
+    const tabList = document.getElementById('dashboard-view-tabs');
+    if (!tabList) {
+        return;
+    }
+
+    const tabButtons = Array.from(tabList.querySelectorAll('[role="tab"]'));
+    if (!tabButtons.length) {
+        return;
+    }
+
+    if (tabList.dataset.initialized === 'true') {
+        syncActiveViewUI();
+        return;
+    }
+    tabList.dataset.initialized = 'true';
+
+    tabButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            const view = button.dataset.view || 'bars';
+            setActiveView(view, { focusPanel: true });
+        });
+
+        button.addEventListener('keydown', event => {
+            if (event.key === ' ' || event.key === 'Enter') {
+                event.preventDefault();
+                const view = button.dataset.view || 'bars';
+                setActiveView(view, { focusPanel: true });
+            }
+        });
+    });
+
+    tabList.addEventListener('keydown', event => {
+        if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) {
+            return;
+        }
+
+        event.preventDefault();
+        const activeElement = document.activeElement;
+        const currentIndex = tabButtons.indexOf(activeElement);
+
+        if (event.key === 'Home') {
+            const first = tabButtons[0];
+            if (first) {
+                first.focus();
+                setActiveView(first.dataset.view || 'bars', { focusPanel: true });
+            }
+            return;
+        }
+
+        if (event.key === 'End') {
+            const last = tabButtons[tabButtons.length - 1];
+            if (last) {
+                last.focus();
+                setActiveView(last.dataset.view || 'table', { focusPanel: true });
+            }
+            return;
+        }
+
+        const direction = event.key === 'ArrowLeft' ? -1 : 1;
+        const baseIndex = currentIndex >= 0 ? currentIndex : 0;
+        const nextIndex = (baseIndex + direction + tabButtons.length) % tabButtons.length;
+        const nextButton = tabButtons[nextIndex];
+        if (nextButton) {
+            nextButton.focus();
+            setActiveView(nextButton.dataset.view || 'bars', { focusPanel: true });
+        }
+    });
+
+    syncActiveViewUI();
 }
 
 function updateTotalsDisplay(currentState) {
@@ -701,16 +966,34 @@ function updateTotalsDisplay(currentState) {
 
 function showDashboardError(error) {
     const container = document.getElementById('dashboard-bars');
-    if (!container) {
-        return;
+    if (container) {
+        const message = document.createElement('div');
+        message.className = 'dashboard-error';
+        message.setAttribute('role', 'alert');
+        message.textContent = `Unable to load dashboard data: ${error.message}`;
+        container.innerHTML = '';
+        container.appendChild(message);
     }
 
-    const message = document.createElement('div');
-    message.className = 'dashboard-error';
-    message.setAttribute('role', 'alert');
-    message.textContent = `Unable to load dashboard data: ${error.message}`;
-    container.innerHTML = '';
-    container.appendChild(message);
+    const table = document.getElementById('dashboard-table');
+    if (table) {
+        let tbody = table.tBodies[0];
+        if (!tbody) {
+            tbody = document.createElement('tbody');
+            table.appendChild(tbody);
+        }
+
+        const columnCount = table.tHead?.rows?.[0]?.cells?.length || 1;
+        tbody.innerHTML = '';
+
+        const tr = document.createElement('tr');
+        const cell = document.createElement('td');
+        cell.colSpan = columnCount;
+        cell.className = 'dashboard-table__empty';
+        cell.textContent = `Unable to load dashboard data: ${error.message}`;
+        tr.appendChild(cell);
+        tbody.appendChild(tr);
+    }
 }
 
 function createMetaChip(label, value, options = {}) {
