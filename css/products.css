@@ -227,14 +227,14 @@
 }
 
 .color-badge.color-black {
-    background: #333333;
-    color: #ffffff;
+    background: var(--badge-color-black-bg);
+    color: var(--badge-color-black-text);
 }
 
 .color-badge.color-white {
-    background: #f7f7f7;
-    color: #333333;
-    border: 1px solid var(--color-border);
+    background: var(--badge-color-white-bg);
+    color: var(--badge-color-white-text);
+    border: 1px solid var(--badge-color-white-border);
 }
 
 #errorMessage .error {
