@@ -4,78 +4,143 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - WarehouseWrangler</title>
-    <link rel="stylesheet" href="css/login.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
+    <link rel="stylesheet" href="./css/main.css">
+    <link rel="stylesheet" href="./css/login.css">
     <link rel="icon" type="image/png" sizes="32x32" href="./assets/favicon.png">
     <link rel="apple-touch-icon" sizes="180x180" href="./assets/apple-touch-icon.png">
 </head>
-<body>
-    <div class="login-container">
-        <div class="login-card">
-            <!-- Logo/Header -->
-            <div class="login-header">
-                <img src="./assets/logo.png" alt="WarehouseWrangler Logo" class="brand-logo">
-                <h1>WarehouseWrangler</h1>
-                <p>Inventory Management System</p>
-            </div>
-
-            <!-- Login Form -->
-            <form id="loginForm" class="login-form">
-                <!-- Error Message Display -->
-                <div id="errorMessage" class="error-message hidden"></div>
-
-                <!-- Username Field -->
-                <div class="form-group">
-                    <label for="username">Username</label>
-                    <input 
-                        type="text" 
-                        id="username" 
-                        name="username" 
-                        required 
-                        autocomplete="username"
-                        placeholder="Enter your username"
-                        autofocus
-                    >
-                </div>
-
-                <!-- Password Field -->
-                <div class="form-group">
-                    <label for="password">Password</label>
-                    <input 
-                        type="password" 
-                        id="password" 
-                        name="password" 
-                        required 
-                        autocomplete="current-password"
-                        placeholder="Enter your password"
-                    >
-                </div>
-
-                <!-- Remember Me -->
-                <div class="form-options">
-                    <label class="checkbox-label">
-                        <input type="checkbox" id="rememberMe" name="rememberMe">
-                        <span>Remember me</span>
-                    </label>
-                </div>
-
-                <!-- Submit Button -->
-                <button type="submit" id="loginButton" class="btn-login">
-                    <span id="buttonText">Sign In</span>
-                    <span id="buttonSpinner" class="spinner hidden">⏳</span>
-                </button>
-            </form>
-
-            <!-- Footer -->
-            <div class="login-footer">
-                <p>WarehouseWrangler v1.0.0</p>
-                <p class="footer-links">
-                    <a href="mailto:support@threegents.biz">Need help?</a>
-                </p>
+<body class="landing-body">
+    <header class="site-header landing-header">
+        <div class="branding">
+            <img src="./assets/logo.png" alt="WarehouseWrangler Logo" class="brand-logo">
+            <div class="brand-copy">
+                <span class="brand-name">WarehouseWrangler</span>
+                <span class="brand-tagline">Fulfillment Control Center</span>
             </div>
         </div>
-    </div>
+        <div class="landing-actions">
+            <button type="button" class="btn btn-secondary" data-open-login>
+                <span class="material-icons-outlined" aria-hidden="true">key</span>
+                <span>Existing user sign-in</span>
+            </button>
+        </div>
+    </header>
 
-    <!-- JavaScript -->
+    <main class="app-main landing-main">
+        <section class="hero landing-hero" aria-labelledby="landingTitle">
+            <div class="hero-content">
+                <span class="landing-eyebrow">Fulfillment Control Center</span>
+                <h1 id="landingTitle">WarehouseWrangler</h1>
+                <p>Bring inbound receipts, carton movements, and Amazon reconciliation together in a single command center. WarehouseWrangler turns warehouse signals into clear actions so your team can focus on shipping instead of spreadsheets.</p>
+                <div class="hero-actions">
+                    <button type="button" class="btn btn-primary" data-open-login>
+                        <span class="material-icons-outlined" aria-hidden="true">login</span>
+                        <span>Access control center</span>
+                    </button>
+                    <a class="btn btn-secondary" href="mailto:support@threegents.biz">
+                        <span class="material-icons-outlined" aria-hidden="true">support_agent</span>
+                        <span>Book a walkthrough</span>
+                    </a>
+                </div>
+                <dl class="landing-metrics" aria-label="Operational highlights">
+                    <div class="landing-metric">
+                        <dt>Realtime carton oversight</dt>
+                        <dd>Follow every carton from Incoming to WML and GMR without losing track of box counts.</dd>
+                    </div>
+                    <div class="landing-metric">
+                        <dt>Amazon reconciliation</dt>
+                        <dd>Upload marketplace snapshots, compare deltas, and keep shipment records audit ready.</dd>
+                    </div>
+                    <div class="landing-metric">
+                        <dt>Planning intelligence</dt>
+                        <dd>Blend planned stock, simulations, and product sales factors to protect coverage.</dd>
+                    </div>
+                </dl>
+            </div>
+            <div class="hero-highlights landing-highlights" aria-label="Platform modules">
+                <article class="highlight-card">
+                    <span class="material-icons-outlined highlight-icon success" aria-hidden="true">inventory_2</span>
+                    <div class="highlight-copy">
+                        <h3>Inventory guardrails</h3>
+                        <p>Carton checks, movement logs, and JWT-secured APIs protect every stock move.</p>
+                    </div>
+                </article>
+                <article class="highlight-card">
+                    <span class="material-icons-outlined highlight-icon warning" aria-hidden="true">local_shipping</span>
+                    <div class="highlight-copy">
+                        <h3>Outbound confidence</h3>
+                        <p>Amazon shipment summaries keep carton and product traceability crystal clear.</p>
+                    </div>
+                </article>
+                <article class="highlight-card">
+                    <span class="material-icons-outlined highlight-icon" aria-hidden="true">analytics</span>
+                    <div class="highlight-copy">
+                        <h3>Forecast clarity</h3>
+                        <p>Toggle LC uploads, additional stock, and sales factors to spot coverage gaps early.</p>
+                    </div>
+                </article>
+            </div>
+        </section>
+
+        <section class="landing-section" aria-labelledby="featureTitle">
+            <div class="landing-section-header">
+                <span class="landing-eyebrow">Why teams choose WarehouseWrangler</span>
+                <h2 id="featureTitle">All fulfillment signals, zero guesswork</h2>
+                <p>Purpose-built workflows replace ad-hoc spreadsheets so every stakeholder works from the same truth.</p>
+            </div>
+            <div class="landing-feature-grid">
+                <article class="card landing-feature-card">
+                    <span class="material-icons-outlined" aria-hidden="true">cloud_upload</span>
+                    <h3>Snapshot uploader</h3>
+                    <p>Validate Amazon-reported stock by comparing historical snapshots with live carton data.</p>
+                    <ul>
+                        <li>Automated status tracking per upload.</li>
+                        <li>Audit-ready history of every FNSKU.</li>
+                    </ul>
+                </article>
+                <article class="card landing-feature-card">
+                    <span class="material-icons-outlined" aria-hidden="true">qr_code_scanner</span>
+                    <h3>Carton command</h3>
+                    <p>Search cartons, drill into contents, and initiate moves with transactional safeguards.</p>
+                    <ul>
+                        <li>Inline filters for location and status.</li>
+                        <li>Movement log for every box.</li>
+                    </ul>
+                </article>
+                <article class="card landing-feature-card">
+                    <span class="material-icons-outlined" aria-hidden="true">dataset</span>
+                    <h3>Planning canvas</h3>
+                    <p>Layer planned stock, simulations, and sales factors to forecast coverage by weeks and pairs.</p>
+                    <ul>
+                        <li>Scope toggles for additional and future ETAs.</li>
+                        <li>Instant bar and table dashboards.</li>
+                    </ul>
+                </article>
+            </div>
+        </section>
+
+        <section class="surface-card landing-cta" aria-labelledby="ctaTitle">
+            <div class="landing-cta-copy">
+                <h2 id="ctaTitle">Ready to wrangle your warehouse?</h2>
+                <p>Sign in with your WarehouseWrangler credentials to join your team’s fulfillment hub.</p>
+            </div>
+            <div class="landing-cta-actions">
+                <button type="button" class="btn btn-primary" data-open-login>
+                    <span class="material-icons-outlined" aria-hidden="true">key</span>
+                    <span>Sign in securely</span>
+                </button>
+                <a class="btn btn-secondary" href="mailto:support@threegents.biz">
+                    <span class="material-icons-outlined" aria-hidden="true">help_outline</span>
+                    <span>Talk to support</span>
+                </a>
+            </div>
+        </section>
+    </main>
+
     <footer class="site-footer">
         <div class="site-footer__inner">
             <div class="site-footer__section">
@@ -93,6 +158,49 @@
             </div>
         </div>
     </footer>
+
+    <div id="loginModal" class="login-modal hidden" role="dialog" aria-modal="true" aria-labelledby="loginTitle" aria-describedby="loginDescription" aria-hidden="true">
+        <div id="loginModalOverlay" class="login-modal__overlay" data-close-login></div>
+        <div class="login-modal__content" role="document">
+            <button type="button" class="login-modal__close" data-close-login aria-label="Close sign-in form">
+                <span class="material-icons-outlined" aria-hidden="true">close</span>
+            </button>
+            <div class="login-card">
+                <div class="login-header">
+                    <img src="./assets/logo.png" alt="WarehouseWrangler logo" class="brand-logo">
+                    <div class="login-header__copy">
+                        <span class="landing-eyebrow">Secure access</span>
+                        <h2 id="loginTitle">Sign in to continue</h2>
+                        <p id="loginDescription">Use your WarehouseWrangler username and password to enter the dashboard.</p>
+                    </div>
+                </div>
+                <form id="loginForm" class="login-form" novalidate>
+                    <div id="errorMessage" class="login-alert hidden" role="alert"></div>
+                    <div class="form-group">
+                        <label for="username">Username</label>
+                        <input type="text" id="username" name="username" autocomplete="username" placeholder="Enter your username" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input type="password" id="password" name="password" autocomplete="current-password" placeholder="Enter your password" required>
+                    </div>
+                    <div class="form-options">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="rememberMe" name="rememberMe">
+                            <span>Remember me on this device</span>
+                        </label>
+                        <a href="mailto:support@threegents.biz" class="support-link">Need help?</a>
+                    </div>
+                    <button type="submit" id="loginButton" class="btn btn-primary login-submit">
+                        <span class="material-icons-outlined" aria-hidden="true">lock_open</span>
+                        <span id="buttonText">Sign In</span>
+                        <span id="buttonSpinner" class="spinner hidden" aria-hidden="true"></span>
+                    </button>
+                </form>
+                <p class="login-version">WarehouseWrangler v1.0.0</p>
+            </div>
+        </div>
+    </div>
 
     <script src="js/auth.js"></script>
     <script type="module" src="js/footer.js"></script>

@@ -28,8 +28,15 @@ const elements = {
     loginButton: null,
     buttonText: null,
     buttonSpinner: null,
-    errorMessage: null
+    errorMessage: null,
+    loginModal: null,
+    openLoginTriggers: null,
+    closeLoginTriggers: null
 };
+
+const FOCUSABLE_SELECTORS = 'a[href], button:not([disabled]), input:not([disabled]):not([type="hidden"]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+
+let lastFocusedElement = null;
 
 // ============================================================================
 // INITIALIZATION
@@ -58,6 +65,9 @@ function initializeElements() {
     elements.buttonText = document.getElementById('buttonText');
     elements.buttonSpinner = document.getElementById('buttonSpinner');
     elements.errorMessage = document.getElementById('errorMessage');
+    elements.loginModal = document.getElementById('loginModal');
+    elements.openLoginTriggers = document.querySelectorAll('[data-open-login]');
+    elements.closeLoginTriggers = document.querySelectorAll('[data-close-login]');
 }
 
 /**
@@ -94,6 +104,112 @@ function setupEventListeners() {
                 elements.loginForm.dispatchEvent(new Event('submit'));
             }
         });
+    }
+
+    setupModalControls();
+}
+
+function setupModalControls() {
+    if (!elements.loginModal) {
+        return;
+    }
+
+    const openButtons = Array.from(elements.openLoginTriggers || []);
+    const closeButtons = Array.from(elements.closeLoginTriggers || []);
+
+    openButtons.forEach(button => {
+        button.addEventListener('click', openLoginModal);
+    });
+
+    closeButtons.forEach(button => {
+        button.addEventListener('click', closeLoginModal);
+    });
+
+    document.addEventListener('keydown', handleModalKeyDown);
+}
+
+function openLoginModal() {
+    if (!elements.loginModal) {
+        return;
+    }
+
+    if (!elements.loginModal.classList.contains('hidden')) {
+        return;
+    }
+
+    lastFocusedElement = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+
+    elements.loginModal.classList.remove('hidden');
+    elements.loginModal.setAttribute('aria-hidden', 'false');
+    document.body.classList.add('modal-open');
+
+    window.requestAnimationFrame(() => {
+        if (elements.usernameInput) {
+            if (elements.usernameInput.value && elements.passwordInput) {
+                elements.passwordInput.focus();
+            } else {
+                elements.usernameInput.focus();
+            }
+        }
+    });
+}
+
+function closeLoginModal() {
+    if (!elements.loginModal) {
+        return;
+    }
+
+    if (elements.loginModal.classList.contains('hidden')) {
+        return;
+    }
+
+    elements.loginModal.classList.add('hidden');
+    elements.loginModal.setAttribute('aria-hidden', 'true');
+    document.body.classList.remove('modal-open');
+    hideError();
+
+    if (lastFocusedElement && typeof lastFocusedElement.focus === 'function') {
+        lastFocusedElement.focus();
+    }
+
+    lastFocusedElement = null;
+}
+
+function handleModalKeyDown(event) {
+    if (!elements.loginModal || elements.loginModal.classList.contains('hidden')) {
+        return;
+    }
+
+    if (event.key === 'Escape') {
+        event.preventDefault();
+        closeLoginModal();
+        return;
+    }
+
+    if (event.key === 'Tab') {
+        trapFocus(event);
+    }
+}
+
+function trapFocus(event) {
+    if (!elements.loginModal) {
+        return;
+    }
+
+    const focusableElements = elements.loginModal.querySelectorAll(FOCUSABLE_SELECTORS);
+    if (!focusableElements.length) {
+        return;
+    }
+
+    const firstElement = focusableElements[0];
+    const lastElement = focusableElements[focusableElements.length - 1];
+
+    if (event.shiftKey && document.activeElement === firstElement) {
+        event.preventDefault();
+        lastElement.focus();
+    } else if (!event.shiftKey && document.activeElement === lastElement) {
+        event.preventDefault();
+        firstElement.focus();
     }
 }
 
@@ -257,10 +373,6 @@ function loadRememberedUsername() {
     if (rememberedUsername && elements.usernameInput) {
         elements.usernameInput.value = rememberedUsername;
         elements.rememberCheckbox.checked = true;
-        // Focus password field instead
-        if (elements.passwordInput) {
-            elements.passwordInput.focus();
-        }
     }
 }
 
@@ -274,7 +386,9 @@ function loadRememberedUsername() {
 function showError(message) {
     if (elements.errorMessage) {
         elements.errorMessage.textContent = message;
-        elements.errorMessage.classList.remove('hidden');
+        elements.errorMessage.classList.remove('hidden', 'is-success');
+        elements.errorMessage.classList.add('is-error');
+        elements.errorMessage.removeAttribute('style');
     }
 }
 
@@ -284,6 +398,8 @@ function showError(message) {
 function hideError() {
     if (elements.errorMessage) {
         elements.errorMessage.classList.add('hidden');
+        elements.errorMessage.classList.remove('is-error', 'is-success');
+        elements.errorMessage.removeAttribute('style');
     }
 }
 
@@ -293,10 +409,9 @@ function hideError() {
 function showSuccess(message) {
     if (elements.errorMessage) {
         elements.errorMessage.textContent = message;
-        elements.errorMessage.classList.remove('hidden');
-        elements.errorMessage.style.background = '#d4edda';
-        elements.errorMessage.style.borderColor = '#c3e6cb';
-        elements.errorMessage.style.color = '#155724';
+        elements.errorMessage.classList.remove('hidden', 'is-error');
+        elements.errorMessage.classList.add('is-success');
+        elements.errorMessage.removeAttribute('style');
     }
 }
 
