@@ -102,7 +102,42 @@
                     <span>Min cover: <strong id="leadTimeWeeks"></strong> weeks</span>
                     <span>Internal: <strong id="totalsInternal"></strong> | All: <strong id="totalsAll"></strong></span>
                 </div>
-                <div id="dashboard-bars" class="bars" role="list"></div>
+                <div id="dashboard-view-tabs" class="dashboard-view-tabs" role="tablist" aria-label="Dashboard views">
+                    <button type="button" class="dashboard-tab is-active" id="dashboard-tab-bars" role="tab" aria-selected="true" aria-controls="dashboard-bars-panel" data-view="bars">Bar view</button>
+                    <button type="button" class="dashboard-tab" id="dashboard-tab-table" role="tab" aria-selected="false" aria-controls="dashboard-table-panel" data-view="table">Table view</button>
+                </div>
+                <section id="dashboard-bars-panel" class="dashboard-panel" role="tabpanel"
+                    aria-labelledby="dashboard-tab-bars" aria-hidden="false" tabindex="0">
+                    <div id="dashboard-bars" class="bars" role="list"></div>
+                </section>
+                <section id="dashboard-table-panel" class="dashboard-panel hidden" role="tabpanel"
+                    aria-labelledby="dashboard-tab-table" aria-hidden="true" tabindex="-1">
+                    <div class="dashboard-table-wrapper">
+                        <div class="dashboard-table-scroll">
+                            <table id="dashboard-table">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Product</th>
+                                        <th scope="col">Min Cover (w)</th>
+                                        <th scope="col">Target Cover (w)</th>
+                                        <th scope="col">To-Order (boxes)</th>
+                                        <th scope="col">To-Order (pairs)</th>
+                                        <th scope="col">Incoming</th>
+                                        <th scope="col">WML</th>
+                                        <th scope="col">GMR</th>
+                                        <th scope="col">Amazon</th>
+                                        <th scope="col">Additional</th>
+                                        <th scope="col">Internal Pairs</th>
+                                        <th scope="col">Internal Weeks</th>
+                                        <th scope="col">All Pairs</th>
+                                        <th scope="col">All Weeks</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
             </section>
         </main>
     </div>
