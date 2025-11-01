@@ -2,7 +2,8 @@
   "app": {
     "brand": {
       "name": "WarehouseWrangler",
-      "tagline": "Fulfillment Control Center"
+      "tagline": "Fulfillment Control Center",
+      "logoAlt": "WarehouseWrangler Logo"
     },
     "header": {
       "toggleNavigation": "Toggle navigation",
@@ -16,7 +17,8 @@
     "footer": {
       "createdBy": "Created by",
       "partner": "ThreeGents",
-      "support": "Support"
+      "support": "Support",
+      "partnerLogoAlt": "ThreeGents logo"
     }
   },
   "nav": {
@@ -65,6 +67,70 @@
     }
   },
   "dashboard": {
+    "meta": {
+      "title": "Dashboard - WarehouseWrangler"
+    },
+    "loading": {
+      "message": "Preparing your fulfillment control center…"
+    },
+    "home": {
+      "sectionTitle": "Dashboard",
+      "quickActions": {
+        "title": "Quick Actions",
+        "links": {
+          "products": "Organize product catalog for inbound shipments.",
+          "cartons": "Validate carton IDs before labeling.",
+          "amazonSnapshot": "Upload the latest Amazon inventory snapshot."
+        }
+      },
+      "highlights": {
+        "ariaLabel": "Operational highlights",
+        "authentication": {
+          "title": "Authentication Secure",
+          "body": "Session tokens validated with real-time expiry checks."
+        },
+        "cartonIntake": {
+          "title": "Carton Intake",
+          "body": "Configure carton verification flows before the next shipment arrives."
+        }
+      },
+      "controls": {
+        "targetDate": "Target date",
+        "includeAmazon": "Include Amazon",
+        "includeAdditional": "Include Additional",
+        "includeSimulations": "Include simulations",
+        "includeFutureEtas": "Include future ETAs",
+        "minCoverLabel": "Min cover:",
+        "weeksSuffix": "weeks",
+        "internalLabel": "Internal:",
+        "allLabel": "All:"
+      },
+      "views": {
+        "ariaLabel": "Dashboard views",
+        "bar": "Bar view",
+        "table": "Table view"
+      },
+      "table": {
+        "ariaLabel": "Coverage table",
+        "regionLabel": "Coverage table data",
+        "headers": {
+          "artikel": "Artikel",
+          "minCover": "Min Cover (w)",
+          "targetCover": "Target Cover (w)",
+          "toOrderBoxes": "To-Order (boxes)",
+          "toOrderPairs": "To-Order (pairs)",
+          "incoming": "Incoming",
+          "wml": "WML",
+          "gmr": "GMR",
+          "amazon": "Amazon",
+          "additional": "Additional",
+          "internalPairs": "Internal Pairs",
+          "internalWeeks": "Internal Weeks",
+          "allPairs": "All Pairs",
+          "allWeeks": "All Weeks"
+        }
+      }
+    },
     "product": {
       "fallbackName": "Product {id}"
     },
