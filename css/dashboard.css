@@ -83,22 +83,48 @@
     outline-offset: 4px;
 }
 
-.dashboard-table-wrapper {
-    background: var(--surface, #ffffff);
-    border-radius: 0.75rem;
-    border: 1px solid var(--border-subtle, #d8dee5);
-    box-shadow: 0 8px 18px rgba(20, 37, 63, 0.08);
-    padding: 1rem 1.5rem;
+.surface-card {
+    background: var(--color-surface, #ffffff);
+    border-radius: var(--radius-lg, 16px);
+    border: 1px solid var(--color-border, #dddddd);
+    box-shadow: var(--shadow-card, 0 8px 20px rgba(0, 30, 77, 0.06));
+    padding: 1.75rem;
 }
 
-.dashboard-table-scroll {
-    overflow-x: auto;
+.table-card {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.table-scroll {
+    border: 1px solid var(--color-border, #dddddd);
+    border-radius: var(--radius-md, 12px);
+    background: var(--color-surface, #ffffff);
+}
+
+.table-scroll__viewport {
+    max-height: 70vh;
+    overflow: auto;
+    border-radius: inherit;
+}
+
+.table-sticky thead th {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    background: var(--color-surface, #ffffff);
+    box-shadow: 0 1px 0 var(--color-border, #dddddd), 0 6px 12px rgba(12, 28, 53, 0.08);
+}
+
+.table-sticky thead th:first-child {
+    z-index: 2;
 }
 
 .dashboard-table {
     width: 100%;
     border-collapse: collapse;
-    min-width: 960px;
+    min-width: 1100px;
     font-size: 0.9rem;
 }
 
@@ -109,7 +135,7 @@
     font-weight: 600;
     text-align: left;
     color: var(--text-muted, #4a4a4a);
-    padding-bottom: 0.75rem;
+    padding: 0.85rem 1rem;
 }
 
 .dashboard-table thead th:not(:first-child) {
@@ -118,8 +144,8 @@
 
 .dashboard-table tbody th,
 .dashboard-table tbody td {
-    padding: 0.75rem 0.75rem 0.75rem 0;
-    border-top: 1px solid var(--border-subtle, #d8dee5);
+    padding: 0.85rem 1rem;
+    border-bottom: 1px solid var(--color-border, #dddddd);
     vertical-align: top;
 }
 
@@ -127,6 +153,10 @@
     font-weight: 600;
     color: var(--text-strong, #1c2333);
     white-space: nowrap;
+}
+
+.dashboard-table tbody tr:nth-child(even) {
+    background: rgba(0, 86, 179, 0.03);
 }
 
 .dashboard-table tbody tr:hover {
