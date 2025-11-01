@@ -4,20 +4,140 @@
  */
 
 :root {
+    --radius-lg: 16px;
+    --radius-md: 12px;
+    --radius-sm: 8px;
+}
+
+:root[data-theme="light"],
+:root:not([data-theme]) {
     --color-primary: #0056B3;
+    --color-accent: #0070D1;
     --color-neutral: #F7F7F7;
+    --color-surface: #FFFFFF;
+    --color-surface-alt: #F0F5FF;
+    --color-surface-elevated: #FFFFFF;
     --color-text: #333333;
     --color-muted: #666666;
     --color-border: #DDDDDD;
-    --color-surface: #FFFFFF;
+    --color-border-strong: #BFC8D2;
     --color-success: #28A745;
     --color-warning: #FFC107;
     --color-danger: #DC3545;
     --shadow-soft: 0 12px 24px rgba(0, 30, 77, 0.08);
     --shadow-card: 0 8px 20px rgba(0, 30, 77, 0.06);
-    --radius-lg: 16px;
-    --radius-md: 12px;
-    --radius-sm: 8px;
+    --shadow-modal: 0 20px 45px rgba(0, 52, 109, 0.18);
+    --modal-overlay: rgba(7, 33, 68, 0.45);
+    --modal-close-bg: rgba(255, 255, 255, 0.85);
+    --tooltip-background: rgba(15, 25, 40, 0.95);
+    --tooltip-text: #FFFFFF;
+    --focus-ring-color: rgba(0, 86, 179, 0.15);
+    --placeholder-color: rgba(51, 51, 51, 0.55);
+    --spinner-track-color: rgba(255, 255, 255, 0.6);
+    --spinner-cap-color: var(--color-surface);
+    --badge-color-black-bg: #333333;
+    --badge-color-black-text: #FFFFFF;
+    --badge-color-white-bg: #F7F7F7;
+    --badge-color-white-text: #333333;
+    --badge-color-white-border: var(--color-border);
+    --badge-success-bg: rgba(40, 167, 69, 0.15);
+    --badge-success-text: var(--color-success);
+    --badge-warning-bg: rgba(255, 193, 7, 0.2);
+    --badge-warning-text: #B77900;
+    --badge-danger-bg: rgba(220, 53, 69, 0.15);
+    --badge-danger-text: var(--color-danger);
+    --status-success-bg: rgba(40, 167, 69, 0.18);
+    --status-success-text: #0F5E27;
+    --status-warning-bg: rgba(255, 193, 7, 0.18);
+    --status-warning-text: #946200;
+    --status-danger-bg: rgba(220, 53, 69, 0.18);
+    --status-danger-text: #8C1B24;
+    --location-incoming-bg: rgba(0, 86, 179, 0.15);
+    --location-incoming-text: var(--color-primary);
+    --location-wml-bg: rgba(40, 167, 69, 0.15);
+    --location-wml-text: var(--color-success);
+    --location-gmr-bg: rgba(156, 39, 176, 0.15);
+    --location-gmr-text: #6D1E77;
+    --landing-background: radial-gradient(circle at top, rgba(0, 86, 179, 0.08), transparent 60%),
+        linear-gradient(135deg, #F0F5FF 0%, #F7F9FF 40%, #EEF3FF 100%);
+    --landing-hero-glow: radial-gradient(circle at center, rgba(0, 86, 179, 0.12), transparent 65%);
+    --landing-metric-bg: rgba(0, 86, 179, 0.06);
+    --landing-metric-border: rgba(0, 86, 179, 0.12);
+    --login-card-border: rgba(0, 86, 179, 0.18);
+    --login-card-shadow: 0 20px 45px rgba(0, 52, 109, 0.18);
+    --alert-error-bg: #FDE8E8;
+    --alert-error-border: #F1AEB5;
+    --alert-error-text: #B42318;
+    --alert-success-bg: #E7F6ED;
+    --alert-success-border: #A4DFB8;
+    --alert-success-text: #146C43;
+    --brand-gradient-start: #004A99;
+    --brand-gradient-end: #0070D1;
+}
+
+:root[data-theme="dark"] {
+    --color-primary: #4C9CFF;
+    --color-accent: #82C4FF;
+    --color-neutral: #16233B;
+    --color-surface: #111C2D;
+    --color-surface-alt: #0B1525;
+    --color-surface-elevated: #1A2840;
+    --color-text: #E2E8F0;
+    --color-muted: #9AA5B8;
+    --color-border: rgba(148, 163, 184, 0.28);
+    --color-border-strong: rgba(148, 163, 184, 0.42);
+    --color-success: #4ADE80;
+    --color-warning: #FACC15;
+    --color-danger: #F87171;
+    --shadow-soft: 0 16px 40px rgba(2, 6, 23, 0.45);
+    --shadow-card: 0 12px 32px rgba(2, 6, 23, 0.4);
+    --shadow-modal: 0 28px 56px rgba(2, 6, 23, 0.65);
+    --modal-overlay: rgba(2, 6, 23, 0.65);
+    --modal-close-bg: rgba(30, 41, 59, 0.85);
+    --tooltip-background: rgba(15, 23, 42, 0.95);
+    --tooltip-text: #E2E8F0;
+    --focus-ring-color: rgba(76, 156, 255, 0.35);
+    --placeholder-color: rgba(148, 163, 184, 0.65);
+    --spinner-track-color: rgba(226, 232, 240, 0.35);
+    --spinner-cap-color: var(--color-surface);
+    --badge-color-black-bg: #0B1220;
+    --badge-color-black-text: #F8FAFC;
+    --badge-color-white-bg: #E2E8F0;
+    --badge-color-white-text: #0B1220;
+    --badge-color-white-border: rgba(148, 163, 184, 0.4);
+    --badge-success-bg: rgba(74, 222, 128, 0.16);
+    --badge-success-text: #BBF7D0;
+    --badge-warning-bg: rgba(250, 204, 21, 0.2);
+    --badge-warning-text: #FCD34D;
+    --badge-danger-bg: rgba(248, 113, 113, 0.18);
+    --badge-danger-text: #FCA5A5;
+    --status-success-bg: rgba(74, 222, 128, 0.2);
+    --status-success-text: #BBF7D0;
+    --status-warning-bg: rgba(250, 204, 21, 0.22);
+    --status-warning-text: #FCD34D;
+    --status-danger-bg: rgba(248, 113, 113, 0.24);
+    --status-danger-text: #FCA5A5;
+    --location-incoming-bg: rgba(59, 130, 246, 0.22);
+    --location-incoming-text: #93C5FD;
+    --location-wml-bg: rgba(52, 211, 153, 0.22);
+    --location-wml-text: #A7F3D0;
+    --location-gmr-bg: rgba(192, 132, 252, 0.22);
+    --location-gmr-text: #E9D5FF;
+    --landing-background: radial-gradient(circle at top, rgba(76, 156, 255, 0.12), transparent 55%),
+        linear-gradient(135deg, #0B1220 0%, #0F172A 45%, #111C2D 100%);
+    --landing-hero-glow: radial-gradient(circle at center, rgba(76, 156, 255, 0.18), transparent 65%);
+    --landing-metric-bg: rgba(17, 28, 45, 0.8);
+    --landing-metric-border: rgba(148, 163, 184, 0.28);
+    --login-card-border: rgba(148, 163, 184, 0.28);
+    --login-card-shadow: 0 28px 56px rgba(2, 6, 23, 0.65);
+    --alert-error-bg: rgba(248, 113, 113, 0.16);
+    --alert-error-border: rgba(248, 113, 113, 0.32);
+    --alert-error-text: #FCA5A5;
+    --alert-success-bg: rgba(74, 222, 128, 0.16);
+    --alert-success-border: rgba(74, 222, 128, 0.32);
+    --alert-success-text: #BBF7D0;
+    --brand-gradient-start: #5B9BFF;
+    --brand-gradient-end: #7AC2FF;
 }
 
 * {
@@ -156,7 +276,7 @@ a {
     letter-spacing: 0.01em;
     color: var(--color-primary);
     text-transform: none;
-    background: linear-gradient(90deg, #004a99 0%, #0070d1 100%);
+    background: linear-gradient(90deg, var(--brand-gradient-start) 0%, var(--brand-gradient-end) 100%);
     background-clip: text;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;

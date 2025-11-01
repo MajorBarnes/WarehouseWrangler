@@ -4,8 +4,7 @@
  */
 
 body.landing-body {
-    background: radial-gradient(circle at top, rgba(0, 86, 179, 0.08), transparent 60%),
-        linear-gradient(135deg, #f0f5ff 0%, #f7f9ff 40%, #eef3ff 100%);
+    background: var(--landing-background);
     min-height: 100vh;
     display: flex;
     flex-direction: column;
@@ -48,7 +47,7 @@ body.modal-open {
     content: "";
     position: absolute;
     inset: -40% 40% 20% -30%;
-    background: radial-gradient(circle at center, rgba(0, 86, 179, 0.12), transparent 65%);
+    background: var(--landing-hero-glow);
     z-index: -1;
 }
 
@@ -78,10 +77,10 @@ body.modal-open {
 }
 
 .landing-metric {
-    background: rgba(0, 86, 179, 0.06);
+    background: var(--landing-metric-bg);
     border-radius: var(--radius-md);
     padding: 1rem 1.25rem;
-    border: 1px solid rgba(0, 86, 179, 0.12);
+    border: 1px solid var(--landing-metric-border);
 }
 
 .landing-metric dt {
@@ -210,7 +209,7 @@ body.modal-open {
 .login-modal__overlay {
     position: absolute;
     inset: 0;
-    background: rgba(7, 33, 68, 0.45);
+    background: var(--modal-overlay);
     backdrop-filter: blur(3px);
 }
 
@@ -237,7 +236,7 @@ body.modal-open {
     top: 1rem;
     right: 1rem;
     border: none;
-    background: rgba(255, 255, 255, 0.8);
+    background: var(--modal-close-bg);
     border-radius: 999px;
     width: 40px;
     height: 40px;
@@ -257,8 +256,8 @@ body.modal-open {
 .login-card {
     background: var(--color-surface);
     border-radius: var(--radius-lg);
-    border: 1px solid rgba(0, 86, 179, 0.18);
-    box-shadow: 0 20px 45px rgba(0, 52, 109, 0.18);
+    border: 1px solid var(--login-card-border);
+    box-shadow: var(--login-card-shadow);
     padding: 2.5rem 2.25rem 2.25rem;
     display: flex;
     flex-direction: column;
@@ -302,15 +301,15 @@ body.modal-open {
 }
 
 .login-alert.is-error {
-    background: #fde8e8;
-    border-color: #f1aeb5;
-    color: #b42318;
+    background: var(--alert-error-bg);
+    border-color: var(--alert-error-border);
+    color: var(--alert-error-text);
 }
 
 .login-alert.is-success {
-    background: #e7f6ed;
-    border-color: #a4dfb8;
-    color: #146c43;
+    background: var(--alert-success-bg);
+    border-color: var(--alert-success-border);
+    color: var(--alert-success-text);
 }
 
 .form-group {
@@ -336,12 +335,12 @@ body.modal-open {
 .form-group input:focus {
     border-color: var(--color-primary);
     background: var(--color-surface);
-    box-shadow: 0 0 0 3px rgba(0, 86, 179, 0.15);
+    box-shadow: 0 0 0 3px var(--focus-ring-color);
     outline: none;
 }
 
 .form-group input::placeholder {
-    color: rgba(51, 51, 51, 0.55);
+    color: var(--placeholder-color);
 }
 
 .form-options {
@@ -392,8 +391,8 @@ body.modal-open {
     width: 18px;
     height: 18px;
     border-radius: 50%;
-    border: 2px solid rgba(255, 255, 255, 0.6);
-    border-top-color: var(--color-surface);
+    border: 2px solid var(--spinner-track-color);
+    border-top-color: var(--spinner-cap-color);
     animation: spinnerRotate 0.8s linear infinite;
 }
 

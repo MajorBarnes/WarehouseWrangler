@@ -530,8 +530,8 @@ button.metric-card:is(:hover, :focus-visible) {
     bottom: calc(100% + 8px);
     left: 50%;
     transform: translateX(-50%);
-    background: rgba(15, 25, 40, 0.95);
-    color: #fff;
+    background: var(--tooltip-background);
+    color: var(--tooltip-text);
     padding: 0.35rem 0.6rem;
     border-radius: 4px;
     font-size: 0.75rem;
@@ -548,7 +548,7 @@ button.metric-card:is(:hover, :focus-visible) {
     left: 50%;
     transform: translateX(-50%);
     border: 6px solid transparent;
-    border-top-color: rgba(15, 25, 40, 0.95);
+    border-top-color: var(--tooltip-background);
     opacity: 0;
     transition: opacity 0.18s ease;
 }

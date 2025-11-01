@@ -361,18 +361,18 @@ button.metric-card:is(:hover, :focus-visible) {
 }
 
 .status-prepared {
-    background: rgba(255, 193, 7, 0.18);
-    color: #946200;
+    background: var(--status-warning-bg);
+    color: var(--status-warning-text);
 }
 
 .status-sent {
-    background: rgba(40, 167, 69, 0.18);
-    color: #0f5e27;
+    background: var(--status-success-bg);
+    color: var(--status-success-text);
 }
 
 .status-recalled {
-    background: rgba(220, 53, 69, 0.18);
-    color: #8c1b24;
+    background: var(--status-danger-bg);
+    color: var(--status-danger-text);
 }
 
 .location-badge {
@@ -386,18 +386,18 @@ button.metric-card:is(:hover, :focus-visible) {
 }
 
 .location-incoming {
-    background: rgba(0, 86, 179, 0.15);
-    color: var(--color-primary);
+    background: var(--location-incoming-bg);
+    color: var(--location-incoming-text);
 }
 
 .location-wml {
-    background: rgba(40, 167, 69, 0.15);
-    color: var(--color-success);
+    background: var(--location-wml-bg);
+    color: var(--location-wml-text);
 }
 
 .location-gmr {
-    background: rgba(156, 39, 176, 0.15);
-    color: #6d1e77;
+    background: var(--location-gmr-bg);
+    color: var(--location-gmr-text);
 }
 
 .action-buttons {

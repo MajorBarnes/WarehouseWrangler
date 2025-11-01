@@ -316,23 +316,23 @@
 }
 
 .scope-badge.scope-committed {
-    background: rgba(40, 167, 69, 0.15);
-    color: var(--color-success);
+    background: var(--badge-success-bg);
+    color: var(--badge-success-text);
 }
 
 .scope-badge.scope-simulation {
-    background: rgba(255, 193, 7, 0.2);
-    color: #b77900;
+    background: var(--badge-warning-bg);
+    color: var(--badge-warning-text);
 }
 
 .status-badge.is-active {
-    background: rgba(40, 167, 69, 0.15);
-    color: var(--color-success);
+    background: var(--badge-success-bg);
+    color: var(--badge-success-text);
 }
 
 .status-badge.is-inactive {
-    background: rgba(220, 53, 69, 0.15);
-    color: var(--color-danger);
+    background: var(--badge-danger-bg);
+    color: var(--badge-danger-text);
 }
 
 .actions-toolbar {
