@@ -1,0 +1,16 @@
+{
+  "app": {
+    "userMenu": {
+      "products": "Товары",
+      "users": "Пользователи",
+      "logout": "Выйти",
+      "languageLabel": "Язык",
+      "languageDescription": "Выберите язык интерфейса WarehouseWrangler.",
+      "languageOptions": {
+        "en": "Английский",
+        "de": "Немецкий",
+        "ru": "Русский"
+      }
+    }
+  }
+}

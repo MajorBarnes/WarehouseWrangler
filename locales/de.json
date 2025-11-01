@@ -1,0 +1,16 @@
+{
+  "app": {
+    "userMenu": {
+      "products": "Produkte",
+      "users": "Benutzer",
+      "logout": "Abmelden",
+      "languageLabel": "Sprache",
+      "languageDescription": "Wählen Sie die Sprache für WarehouseWrangler.",
+      "languageOptions": {
+        "en": "Englisch",
+        "de": "Deutsch",
+        "ru": "Russisch"
+      }
+    }
+  }
+}

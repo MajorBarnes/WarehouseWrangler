@@ -209,14 +209,7 @@
     </div>
 
     <script src="js/i18n.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            var storedLocale = localStorage.getItem('ww_locale') || I18n.DEFAULT_LOCALE;
-            I18n.init({ locale: storedLocale }).then(function () {
-                I18n.translateTree();
-            });
-        });
-    </script>
+    <script src="js/locale.js"></script>
     <script src="js/auth.js"></script>
     <script type="module" src="js/footer.js"></script>
 </body>

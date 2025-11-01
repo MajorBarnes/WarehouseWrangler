@@ -91,6 +91,7 @@
                         <span class="material-icons-outlined" aria-hidden="true">group</span>
                         <span data-i18n="app.userMenu.users">Users</span>
                     </a>
+                    <div class="user-menu__section" data-locale-selector role="none"></div>
                 </div>
             </div>
             <button id="logoutBtn" class="btn btn-logout" type="button">
@@ -338,14 +339,7 @@
     </footer>
 
     <script src="./js/i18n.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            var storedLocale = localStorage.getItem('ww_locale') || I18n.DEFAULT_LOCALE;
-            I18n.init({ locale: storedLocale }).then(function () {
-                I18n.translateTree();
-            });
-        });
-    </script>
+    <script src="./js/locale.js"></script>
     <script src="./js/header.js"></script>
     <script src="./js/amazon-snapshot-upload.js"></script>
     <script type="module" src="./js/footer.js"></script>

@@ -347,7 +347,42 @@ function isTokenValid(token) {
  * Save user data to localStorage
  */
 function saveUserData(user) {
-    localStorage.setItem(AUTH_CONFIG.userKey, JSON.stringify(user));
+    if (!user || typeof user !== 'object') {
+        localStorage.removeItem(AUTH_CONFIG.userKey);
+        return;
+    }
+
+    const payload = { ...user };
+
+    try {
+        const localeManager = window.LocaleManager;
+        let preferredLocale = null;
+
+        if (localeManager && typeof localeManager.normalizeLocale === 'function') {
+            preferredLocale =
+                localeManager.normalizeLocale(payload.locale) ||
+                localeManager.normalizeLocale(payload.preferredLocale) ||
+                localeManager.normalizeLocale(payload.preferred_locale) ||
+                localeManager.normalizeLocale(payload.language) ||
+                (typeof localeManager.getPreferredLocale === 'function'
+                    ? localeManager.getPreferredLocale()
+                    : null);
+        } else if (payload.locale && typeof payload.locale === 'string') {
+            preferredLocale = payload.locale;
+        }
+
+        if (preferredLocale && localeManager && typeof localeManager.setPreferredLocale === 'function') {
+            localeManager.setPreferredLocale(preferredLocale, { skipApply: true, skipUserUpdate: true });
+        }
+
+        if (preferredLocale) {
+            payload.locale = preferredLocale;
+        }
+    } catch (error) {
+        console.warn('Failed to persist locale preference on user record', error);
+    }
+
+    localStorage.setItem(AUTH_CONFIG.userKey, JSON.stringify(payload));
 }
 
 /**
