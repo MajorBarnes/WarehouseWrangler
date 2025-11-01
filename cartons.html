@@ -177,12 +177,24 @@
         </section>
 
         <section class="surface-card table-card" aria-label="Carton Tabelle">
+            <div id="cartonBulkActions" class="bulk-toolbar is-disabled" aria-live="polite">
+                <div class="bulk-summary" id="bulkSelectionCount">Keine Cartons ausgewählt</div>
+                <div class="bulk-actions">
+                    <button id="bulkMoveBtn" class="btn btn-primary" type="button" data-action="open-bulk-move" disabled>
+                        <span class="material-icons-outlined" aria-hidden="true">swap_horiz</span>
+                        <span>Auswahl bewegen</span>
+                    </button>
+                </div>
+            </div>
             <div id="cartonsLoading" class="loading-indicator">Cartons werden geladen…</div>
             <div class="table-scroll" role="region" aria-live="polite" aria-label="Carton Datentabelle">
                 <div class="table-scroll__viewport">
                     <table id="cartonsTable" class="cartons-table table-sticky is-hidden">
                         <thead>
                         <tr>
+                            <th scope="col" class="select-col">
+                                <input type="checkbox" id="selectAllCartons" aria-label="Alle Cartons auswählen">
+                            </th>
                             <th scope="col">Carton</th>
                             <th scope="col">Standort</th>
                             <th scope="col">Status</th>
@@ -213,7 +225,7 @@
                     <span class="material-icons-outlined" aria-hidden="true">swap_horiz</span>
                     <div>
                         <h3 id="moveCartonTitle">Carton verschieben</h3>
-                        <p class="modal-subtitle">Wähle einen neuen Standort für diesen Carton.</p>
+                        <p id="moveCartonSubtitle" class="modal-subtitle">Wähle einen neuen Standort für diesen Carton.</p>
                     </div>
                 </div>
                 <button class="modal-close" type="button" data-action="close-move-modal" aria-label="Dialog schließen">
@@ -221,13 +233,20 @@
                 </button>
             </div>
             <div class="modal-body">
-                <div class="info-block">
-                    <span class="info-label">Carton</span>
-                    <span id="moveCartonNumber" class="info-value"></span>
+                <div id="moveCartonSingleInfo" class="selection-context">
+                    <div class="info-block">
+                        <span class="info-label">Carton</span>
+                        <span id="moveCartonNumber" class="info-value"></span>
+                    </div>
+                    <div class="info-block">
+                        <span class="info-label">Aktueller Standort</span>
+                        <span id="currentLocationBadge" class="info-value"></span>
+                    </div>
                 </div>
-                <div class="info-block">
-                    <span class="info-label">Aktueller Standort</span>
-                    <span id="currentLocationBadge" class="info-value"></span>
+                <div id="moveCartonBulkInfo" class="info-block is-hidden">
+                    <span class="info-label">Auswahl</span>
+                    <span class="info-value"><strong id="moveCartonSelectionCount">0</strong> Cartons ausgewählt</span>
+                    <p class="info-hint">Archivierte oder unveränderte Cartons werden automatisch übersprungen.</p>
                 </div>
                 <div class="form-group">
                     <label for="newLocation">Neuer Standort *</label>
@@ -250,7 +269,7 @@
                 </button>
                 <button class="btn btn-primary" type="button" data-action="confirm-move">
                     <span class="material-icons-outlined" aria-hidden="true">check_circle</span>
-                    <span>Carton bewegen</span>
+                    <span id="moveConfirmLabel">Carton bewegen</span>
                 </button>
             </div>
         </div>

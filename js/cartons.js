@@ -9,7 +9,8 @@ let currentFilters = {
     status: '',
     search: ''
 };
-let selectedCarton = null;
+const selectedCartonIds = new Set();
+let moveContext = { type: 'single', cartons: [] };
 const cartonMetadataCache = new Map();
 let cartonTooltipElement = null;
 let isCartonTooltipInitialized = false;
@@ -208,6 +209,10 @@ function bindCartonControls() {
             }
         });
     }
+
+    document.getElementById('cartonsTableBody')?.addEventListener('change', handleRowSelectionChange);
+    document.getElementById('selectAllCartons')?.addEventListener('change', handleSelectAllChange);
+    document.getElementById('bulkMoveBtn')?.addEventListener('click', openBulkMoveModal);
 }
 
 // ---------------------------------------
@@ -238,6 +243,9 @@ function handleGlobalActionClick(event) {
                 actionElement.dataset.cartonNumber || '',
                 actionElement.dataset.cartonLocation || ''
             );
+            break;
+        case 'open-bulk-move':
+            openBulkMoveModal();
             break;
         case 'close-move-modal':
             closeMoveModal();
@@ -337,18 +345,20 @@ async function loadCartonDetails(cartonId) {
     }
 }
 
-async function moveCarton(cartonId, newLocation, notes) {
+async function moveCartonsRequest(cartonIds, newLocation, notes) {
+    const payload = {
+        carton_ids: Array.isArray(cartonIds) ? cartonIds : [],
+        location: newLocation,
+        notes: notes || ''
+    };
+
     const response = await fetch(`${API_BASE}/cartons/move_carton.php`, {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${getToken() || ''}`
         },
-        body: JSON.stringify({
-            carton_id: cartonId,
-            location: newLocation,
-            notes: notes || ''
-        })
+        body: JSON.stringify(payload)
     });
 
     return response.json();
@@ -414,14 +424,25 @@ function renderCartonsTable(cartons) {
     const tbody = document.getElementById('cartonsTableBody');
     if (!tbody) return;
 
+    currentCartons = Array.isArray(cartons) ? cartons : [];
     cartonMetadataCache.clear();
     if (!Array.isArray(cartons) || cartons.length === 0) {
         tbody.innerHTML = '';
         currentCartons = [];
+        selectedCartonIds.clear();
         setTableState({ isLoading: false, isEmpty: true });
         hideCartonTooltip();
+        updateBulkSelectionUI();
+        syncSelectAllState();
         return;
     }
+
+    const availableIds = new Set(cartons.map((carton) => Number(carton.carton_id)));
+    Array.from(selectedCartonIds).forEach((id) => {
+        if (!availableIds.has(id)) {
+            selectedCartonIds.delete(id);
+        }
+    });
 
     const rows = cartons.map((carton) => {
         const statusSlug = toStatusSlug(carton.status || '');
@@ -432,9 +453,13 @@ function renderCartonsTable(cartons) {
 
         const metadata = Array.isArray(carton.product_metadata) ? carton.product_metadata : [];
         cartonMetadataCache.set(Number(carton.carton_id), metadata);
+        const isSelected = selectedCartonIds.has(Number(carton.carton_id));
 
         return `
             <tr data-carton-id="${carton.carton_id}" data-has-products="${metadata.length > 0}" tabindex="0">
+                <td class="select-col">
+                    <input type="checkbox" class="row-select" data-carton-id="${carton.carton_id}" aria-label="Carton ${escapeHtml(carton.carton_number)} auswählen" ${isSelected ? 'checked' : ''}>
+                </td>
                 <td>
                     <div class="carton-identifier">
                         <strong>${escapeHtml(carton.carton_number)}</strong>
@@ -493,7 +518,98 @@ function renderCartonsTable(cartons) {
 
     tbody.innerHTML = rows;
     hideCartonTooltip();
+    syncSelectAllState();
+    updateBulkSelectionUI();
     setTableState({ isLoading: false, isEmpty: false });
+}
+
+function handleRowSelectionChange(event) {
+    const checkbox = event.target;
+    if (!checkbox || !checkbox.classList.contains('row-select')) {
+        return;
+    }
+
+    const cartonId = Number(checkbox.dataset.cartonId);
+    if (!cartonId) {
+        return;
+    }
+
+    if (checkbox.checked) {
+        selectedCartonIds.add(cartonId);
+    } else {
+        selectedCartonIds.delete(cartonId);
+    }
+
+    syncSelectAllState();
+    updateBulkSelectionUI();
+}
+
+function handleSelectAllChange(event) {
+    const selectAll = event.target;
+    if (!selectAll || selectAll.id !== 'selectAllCartons') {
+        return;
+    }
+
+    const shouldSelectAll = Boolean(selectAll.checked);
+    const checkboxes = document.querySelectorAll('#cartonsTableBody input.row-select');
+
+    checkboxes.forEach((checkbox) => {
+        const cartonId = Number(checkbox.dataset.cartonId);
+        if (!cartonId) {
+            return;
+        }
+
+        checkbox.checked = shouldSelectAll;
+        if (shouldSelectAll) {
+            selectedCartonIds.add(cartonId);
+        } else {
+            selectedCartonIds.delete(cartonId);
+        }
+    });
+
+    syncSelectAllState();
+    updateBulkSelectionUI();
+}
+
+function syncSelectAllState() {
+    const selectAll = document.getElementById('selectAllCartons');
+    if (!selectAll) {
+        return;
+    }
+
+    const checkboxes = Array.from(document.querySelectorAll('#cartonsTableBody input.row-select'));
+    if (checkboxes.length === 0) {
+        selectAll.checked = false;
+        selectAll.indeterminate = false;
+        return;
+    }
+
+    const checkedCount = checkboxes.filter((checkbox) => checkbox.checked).length;
+    selectAll.checked = checkedCount === checkboxes.length && checkedCount > 0;
+    selectAll.indeterminate = checkedCount > 0 && checkedCount < checkboxes.length;
+}
+
+function updateBulkSelectionUI() {
+    const bulkBar = document.getElementById('cartonBulkActions');
+    const summary = document.getElementById('bulkSelectionCount');
+    const moveBtn = document.getElementById('bulkMoveBtn');
+
+    const count = selectedCartonIds.size;
+    const hasSelection = count > 0;
+
+    if (summary) {
+        summary.textContent = hasSelection
+            ? `${count} Carton${count === 1 ? '' : 's'} ausgewählt`
+            : 'Keine Cartons ausgewählt';
+    }
+
+    if (moveBtn) {
+        moveBtn.disabled = !hasSelection;
+    }
+
+    if (bulkBar) {
+        bulkBar.classList.toggle('is-disabled', !hasSelection);
+    }
 }
 
 function handleCartonRowEnter(event) {
@@ -813,17 +929,32 @@ function updateLocationButtons(activeLocation) {
 function openMoveModal(cartonId, cartonNumber, currentLocation) {
     if (!cartonId) return;
 
-    selectedCarton = {
-        id: cartonId,
-        number: cartonNumber,
-        location: currentLocation
+    moveContext = {
+        type: 'single',
+        cartons: [{
+            id: Number(cartonId),
+            number: cartonNumber,
+            location: currentLocation
+        }]
     };
 
     const modal = document.getElementById('moveCartonModal');
     const numberEl = document.getElementById('moveCartonNumber');
     const currentLocationBadge = document.getElementById('currentLocationBadge');
-    const locationSelect = document.getElementById('newLocation');
-    const notesInput = document.getElementById('moveNotes');
+    const singleInfo = document.getElementById('moveCartonSingleInfo');
+    const bulkInfo = document.getElementById('moveCartonBulkInfo');
+    const title = document.getElementById('moveCartonTitle');
+    const subtitle = document.getElementById('moveCartonSubtitle');
+    const confirmLabel = document.getElementById('moveConfirmLabel');
+
+    prepareMoveModal();
+
+    if (title) title.textContent = 'Carton verschieben';
+    if (subtitle) subtitle.textContent = 'Wähle einen neuen Standort für diesen Carton.';
+    if (confirmLabel) confirmLabel.textContent = 'Carton bewegen';
+
+    singleInfo?.classList.remove('is-hidden');
+    bulkInfo?.classList.add('is-hidden');
 
     if (numberEl) numberEl.textContent = cartonNumber;
     if (currentLocationBadge) {
@@ -834,15 +965,72 @@ function openMoveModal(cartonId, cartonNumber, currentLocation) {
             </span>
         `;
     }
-    if (locationSelect) locationSelect.value = '';
-    if (notesInput) notesInput.value = '';
 
     modal?.classList.remove('hidden');
 }
 
+function openBulkMoveModal() {
+    if (selectedCartonIds.size === 0) {
+        return;
+    }
+
+    const selectedCartons = currentCartons
+        .filter((carton) => selectedCartonIds.has(Number(carton.carton_id)))
+        .map((carton) => ({
+            id: Number(carton.carton_id),
+            number: carton.carton_number,
+            location: carton.location
+        }));
+
+    if (selectedCartons.length === 0) {
+        showError('Die ausgewählten Cartons sind nicht mehr verfügbar.');
+        selectedCartonIds.clear();
+        updateBulkSelectionUI();
+        syncSelectAllState();
+        return;
+    }
+
+    moveContext = { type: 'bulk', cartons: selectedCartons };
+
+    const modal = document.getElementById('moveCartonModal');
+    const numberEl = document.getElementById('moveCartonNumber');
+    const currentLocationBadge = document.getElementById('currentLocationBadge');
+    const singleInfo = document.getElementById('moveCartonSingleInfo');
+    const bulkInfo = document.getElementById('moveCartonBulkInfo');
+    const title = document.getElementById('moveCartonTitle');
+    const subtitle = document.getElementById('moveCartonSubtitle');
+    const confirmLabel = document.getElementById('moveConfirmLabel');
+    const selectionCountEl = document.getElementById('moveCartonSelectionCount');
+
+    prepareMoveModal();
+
+    if (title) title.textContent = 'Cartons verschieben';
+    if (subtitle) subtitle.textContent = 'Wähle einen neuen Standort für die ausgewählten Cartons.';
+    if (confirmLabel) confirmLabel.textContent = 'Cartons bewegen';
+
+    singleInfo?.classList.add('is-hidden');
+    bulkInfo?.classList.remove('is-hidden');
+
+    if (selectionCountEl) {
+        selectionCountEl.textContent = String(selectedCartons.length);
+    }
+    if (numberEl) numberEl.textContent = '';
+    if (currentLocationBadge) currentLocationBadge.innerHTML = '';
+
+    modal?.classList.remove('hidden');
+}
+
+function prepareMoveModal() {
+    const locationSelect = document.getElementById('newLocation');
+    const notesInput = document.getElementById('moveNotes');
+
+    if (locationSelect) locationSelect.value = '';
+    if (notesInput) notesInput.value = '';
+}
+
 function closeMoveModal() {
     document.getElementById('moveCartonModal')?.classList.add('hidden');
-    selectedCarton = null;
+    moveContext = { type: 'single', cartons: [] };
 }
 
 function closeDetailsModal() {
@@ -850,7 +1038,9 @@ function closeDetailsModal() {
 }
 
 async function confirmMoveCarton() {
-    if (!selectedCarton) return;
+    if (!moveContext || moveContext.cartons.length === 0) {
+        return;
+    }
 
     const locationSelect = document.getElementById('newLocation');
     const notesInput = document.getElementById('moveNotes');
@@ -863,25 +1053,58 @@ async function confirmMoveCarton() {
         return;
     }
 
-    if (newLocation === selectedCarton.location) {
+    if (moveContext.type === 'single' && moveContext.cartons[0].location === newLocation) {
         showError(`Carton befindet sich bereits in ${newLocation}.`);
         return;
     }
 
-    if (!confirm(`Carton ${selectedCarton.number} nach ${newLocation} verschieben?`)) {
+    const selectedIds = moveContext.cartons.map((carton) => carton.id);
+    const selectionCount = selectedIds.length;
+
+    const confirmMessage = moveContext.type === 'single'
+        ? `Carton ${moveContext.cartons[0].number} nach ${newLocation} verschieben?`
+        : `${selectionCount} Cartons nach ${newLocation} verschieben?`;
+
+    if (!confirm(confirmMessage)) {
         return;
     }
 
     try {
-        const result = await moveCarton(selectedCarton.id, newLocation, notes);
+        const result = await moveCartonsRequest(selectedIds, newLocation, notes);
 
         if (result.success) {
-            showSuccess(result.message || 'Carton erfolgreich bewegt.');
+            const summary = result.summary || {};
+            const movedCount = typeof summary.moved !== 'undefined'
+                ? Number(summary.moved)
+                : selectionCount;
+            const skippedCount = Array.isArray(summary.skipped)
+                ? summary.skipped.length
+                : Number(summary.skipped_count ?? 0);
+
+            let message = result.message;
+            if (!message) {
+                if (movedCount === 0) {
+                    message = 'Keine Cartons wurden bewegt.';
+                } else if (movedCount === 1) {
+                    message = `1 Carton wurde nach ${newLocation} verschoben.`;
+                } else {
+                    message = `${movedCount} Cartons wurden nach ${newLocation} verschoben.`;
+                }
+            }
+
+            if (skippedCount > 0) {
+                message += ` (${skippedCount} übersprungen)`;
+            }
+
+            showSuccess(message);
             closeMoveModal();
+            selectedCartonIds.clear();
+            updateBulkSelectionUI();
+            syncSelectAllState();
             loadLocationsSummary();
             loadCartons();
         } else {
-            showError(result.error || 'Carton konnte nicht bewegt werden.');
+            showError(result.error || 'Cartons konnten nicht bewegt werden.');
         }
     } catch (error) {
         console.error('Move carton error:', error);
