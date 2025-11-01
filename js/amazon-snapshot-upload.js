@@ -54,9 +54,16 @@ document.addEventListener('DOMContentLoaded', function() {
     const userData = getCurrentUser();
     const userDisplay = document.getElementById('userDisplay');
     if (userDisplay) {
-        userDisplay.textContent = t('common.user.anonymous', undefined, 'User');
+        if (!userDisplay.dataset.userDisplayHydrated) {
+            userDisplay.textContent = t('common.user.anonymous', undefined, 'User');
+        }
+
         if (userData?.username) {
             userDisplay.textContent = userData.username;
+            userDisplay.removeAttribute('data-i18n');
+            userDisplay.removeAttribute('data-i18n-attr');
+            userDisplay.removeAttribute('data-i18n-args');
+            userDisplay.dataset.userDisplayHydrated = 'true';
         }
     }
 
