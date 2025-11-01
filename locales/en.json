@@ -275,6 +275,46 @@
       "from": "From",
       "to": "To"
     },
+    "actions": {
+      "view": "View details",
+      "continue": "Resume shipment",
+      "recall": "Recall shipment"
+    },
+    "statuses": {
+      "prepared": "Prepared",
+      "sent": "Sent",
+      "recalled": "Recalled",
+      "unknown": "Unknown ({status})"
+    },
+    "prompts": {
+      "deletePrepared": "Delete prepared shipment \"{reference}\"?\n\nThis will remove the shipment and free up all reserved boxes.",
+      "removeBoxes": "Remove these boxes from the shipment?"
+    },
+    "delete": {
+      "success": "Shipment deleted successfully.",
+      "error": "Failed to delete shipment: {error}"
+    },
+    "notifications": {
+      "success": "Success: {message}",
+      "error": "Error: {message}",
+      "warningsTitle": "Warnings:"
+    },
+    "errors": {
+      "loadFailed": "Failed to load shipments: {error}",
+      "create": "Failed to create shipment: {error}",
+      "cartonNotFound": "Carton not found",
+      "shipmentRequired": "Please select or create a shipment first.",
+      "noAvailableBoxes": "No available boxes in this carton.",
+      "addBoxes": "Failed to add boxes to shipment: {error}",
+      "selectBoxes": "Please select at least one box.",
+      "missingContext": "Shipment context missing. Please reload and try again.",
+      "removeBoxes": "Failed to remove boxes from shipment. Please try again.",
+      "removeBoxesGeneric": "Failed to remove boxes from shipment: {error}",
+      "selectBoxesBeforeSend": "Please select boxes before proceeding.",
+      "send": "Failed to send shipment: {error}",
+      "loadDetails": "Failed to load shipment details.",
+      "loadShipment": "Failed to load shipment."
+    },
     "loading": "Loading shipments...",
     "table": {
       "ariaLabel": "Shipments table",
@@ -300,7 +340,8 @@
       "dateLabel": "Shipment date *",
       "notesLabel": "Notes (optional)",
       "notesPlaceholder": "Add any notes about this shipment...",
-      "submit": "Create & add boxes"
+      "submit": "Create & add boxes",
+      "success": "Shipment created successfully!"
     },
     "addBoxes": {
       "titlePrefix": "Add boxes to shipment:",
@@ -312,6 +353,10 @@
       "availableTitle": "Available cartons (WML & GMR):",
       "loading": "Loading available cartons...",
       "selectedTitle": "Boxes added to shipment:",
+      "emptyCartons": "No cartons with available inventory found.",
+      "cartonProductsAria": "Products in this carton",
+      "emptyProducts": "No products with available inventory",
+      "cartonSummary": "{count} products • {boxes} boxes available",
       "table": {
         "carton": "Carton",
         "product": "Product",
@@ -319,7 +364,18 @@
         "pairs": "Pairs",
         "action": "Action"
       },
-      "proceed": "Review & send"
+      "proceed": "Review & send",
+      "proceedWithCount": "Review & send ({count})",
+      "actions": {
+        "select": "Select boxes",
+        "addAll": "Add all boxes",
+        "remove": "Remove"
+      },
+      "success": {
+        "addAll": "Added all available boxes ({count}).",
+        "added": "Added {count} box selection(s) to shipment.",
+        "removed": "Boxes removed from shipment."
+      }
     },
     "steps": {
       "created": "Created",
@@ -332,12 +388,61 @@
       "closeAria": "Close dialog",
       "warningTitle": "Important:",
       "warning": "This action updates inventory. Boxes are removed from their cartons and marked as sent to Amazon. You can undo this via \"Recall\".",
-      "confirm": "Send shipment"
+      "confirm": "Send shipment",
+      "progress": "Sending…",
+      "success": "Shipment sent successfully.",
+      "summary": {
+        "heading": "Shipment: {reference}",
+        "date": "Date: {date}",
+        "notes": "Notes: {notes}",
+        "totalBoxes": "Total boxes:",
+        "totalPairs": "Total pairs:",
+        "cartons": "Cartons affected:",
+        "products": "Products:",
+        "breakdown": "Breakdown by carton:"
+      }
     },
     "details": {
       "title": "Shipment details",
       "closeAria": "Close dialog",
-      "loading": "Loading shipment details..."
+      "loading": "Loading shipment details...",
+      "sections": {
+        "info": {
+          "title": "Shipment information",
+          "reference": "Reference:",
+          "date": "Date:",
+          "status": "Status:",
+          "createdBy": "Created by:",
+          "createdAt": "Created:",
+          "updatedAt": "Last updated:",
+          "notes": "Notes:"
+        },
+        "summary": {
+          "title": "Summary",
+          "totalBoxes": "Total boxes",
+          "totalPairs": "Total pairs",
+          "cartons": "Cartons",
+          "products": "Products"
+        },
+        "contents": {
+          "title": "Contents"
+        }
+      },
+      "table": {
+        "headers": {
+          "carton": "Carton",
+          "product": "Product",
+          "fnsku": "FNSKU",
+          "boxesSent": "Boxes sent",
+          "pairsSent": "Pairs sent"
+        }
+      }
+    },
+    "boxSelection": {
+      "title": "Select boxes – {carton}",
+      "quantityLabel": "Boxes to send:",
+      "confirm": "Add to shipment",
+      "meta": "FNSKU: {fnsku} • Available: {boxes} boxes ({pairs} pairs)"
     },
     "recall": {
       "title": "Recall shipment",
@@ -352,7 +457,13 @@
       },
       "notesLabel": "Reason for recall *",
       "notesPlaceholder": "Why are you recalling this shipment?",
-      "confirm": "Recall shipment"
+      "confirm": "Recall shipment",
+      "confirmPrompt": "Are you absolutely sure you want to recall this shipment?",
+      "success": "Shipment recalled successfully.",
+      "error": "Failed to recall shipment: {error}",
+      "errors": {
+        "notesRequired": "Please provide a reason for recall."
+      }
     }
   },
   "plannedStock": {
