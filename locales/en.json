@@ -42,6 +42,18 @@
     "units": {
       "boxes": "Boxes",
       "pairs": "Pairs"
+    },
+    "placeholders": {
+      "notAvailable": "N/A"
+    },
+    "errors": {
+      "connection": "Connection error. Please try again."
+    },
+    "prompts": {
+      "logoutConfirm": "Are you sure you want to log out?"
+    },
+    "user": {
+      "anonymous": "User"
     }
   },
   "cartons": {
@@ -91,17 +103,47 @@
     },
     "bulk": {
       "summary": {
-        "noneSelected": "No cartons selected"
+        "noneSelected": "No cartons selected",
+        "countSingle": "{count} carton selected",
+        "countPlural": "{count} cartons selected"
       },
       "actions": {
         "moveSelection": "Move selection"
       }
+    },
+    "notifications": {
+      "success": "Success: {message}",
+      "error": "Error: {message}"
+    },
+    "errors": {
+      "loadFailed": "Failed to load cartons: {error}",
+      "detailsFailed": "Failed to load carton details: {error}",
+      "selectionUnavailable": "Selected cartons are no longer available.",
+      "missingLocation": "Please choose a new location.",
+      "sameLocation": "Carton is already in {location}.",
+      "moveFailed": "Unable to move cartons."
+    },
+    "prompts": {
+      "confirmSingleMove": "Move carton {number} to {location}?",
+      "confirmBulkMove": "Move {count} cartons to {location}?"
+    },
+    "messages": {
+      "movedNone": "No cartons were moved.",
+      "movedOne": "1 carton was moved to {location}.",
+      "movedMany": "{count} cartons were moved to {location}.",
+      "skippedCount": "({count} skipped)"
     },
     "loading": "Loading cartons...",
     "table": {
       "ariaLabel": "Carton table",
       "regionLabel": "Carton data table",
       "selectAll": "Select all cartons",
+      "selectCartonAria": "Select carton {number}",
+      "rowActions": {
+        "view": "View details",
+        "move": "Move carton",
+        "archived": "Carton archived"
+      },
       "headers": {
         "carton": "Carton",
         "location": "Location",
@@ -113,6 +155,12 @@
         "updated": "Updated",
         "actions": "Actions"
       }
+    },
+    "tooltip": {
+      "header": "Products ({count})",
+      "unnamedProduct": "Unnamed product",
+      "artikel": "Article",
+      "fnsku": "FNSKU"
     },
     "empty": "No cartons found. Adjust the filters or refresh the list.",
     "move": {
@@ -128,13 +176,66 @@
       "newLocationPlaceholder": "Select location",
       "notesLabel": "Note (optional)",
       "notesPlaceholder": "Add reason for the move",
-      "confirm": "Move carton"
+      "confirm": "Move carton",
+      "bulkTitle": "Move cartons",
+      "bulkSubtitle": "Choose a new location for the selected cartons.",
+      "bulkConfirm": "Move cartons"
     },
     "details": {
       "title": "Carton details",
       "subtitle": "Overview of contents, movements, and stock changes.",
       "closeAria": "Close dialog",
-      "loading": "Loading details..."
+      "loading": "Loading details...",
+      "sections": {
+        "basic": {
+          "title": "Basic information",
+          "labels": {
+            "carton": "Carton",
+            "location": "Location",
+            "status": "Status",
+            "created": "Created",
+            "updated": "Updated"
+          }
+        },
+        "inventory": {
+          "title": "Inventory overview",
+          "labels": {
+            "products": "Products",
+            "boxesCurrent": "Boxes (current)",
+            "boxesInitial": "Boxes (initial)",
+            "pairsCurrent": "Pairs (current)",
+            "sentToAmazon": "Sent to Amazon"
+          }
+        },
+        "contents": {
+          "title": "Products in carton",
+          "headers": {
+            "product": "Product",
+            "fnsku": "FNSKU",
+            "boxesInitial": "Boxes (initial)",
+            "boxesCurrent": "Boxes (current)",
+            "sentToAmazon": "Sent to Amazon",
+            "pairsPerBox": "Pairs / box",
+            "pairsCurrent": "Pairs (current)"
+          }
+        },
+        "history": {
+          "title": "Movement history"
+        }
+      }
+    },
+    "history": {
+      "boxChange": "{signed} boxes",
+      "byUser": "by {user}",
+      "shipmentReference": "Shipment {reference}",
+      "types": {
+        "received": "Received",
+        "sent_to_amazon": "Sent to Amazon",
+        "recalled": "Recalled",
+        "adjusted": "Adjusted",
+        "damaged": "Damaged",
+        "sold": "Sold"
+      }
     }
   },
   "shipments": {
