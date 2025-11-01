@@ -8,6 +8,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
+    <script src="./js/theme.js"></script>
     <link rel="stylesheet" href="./css/main.css">
     <link rel="stylesheet" href="./css/products.css">
     <link rel="icon" type="image/png" sizes="32x32" href="./assets/favicon.png">
@@ -73,6 +74,12 @@
         </nav>
 
         <div class="header-actions">
+            <button class="theme-toggle" type="button" data-theme-toggle aria-pressed="false">
+                <span class="material-icons-outlined theme-toggle__icon theme-toggle__icon--light" aria-hidden="true">light_mode</span>
+                <span class="material-icons-outlined theme-toggle__icon theme-toggle__icon--dark" aria-hidden="true">dark_mode</span>
+                <span class="theme-toggle__label" data-theme-toggle-state>Light mode</span>
+                <span class="sr-only" data-theme-toggle-label>Switch to dark theme</span>
+            </button>
             <div class="user-menu" data-user-menu>
                 <button class="user-menu__trigger" type="button" aria-expanded="false" data-user-menu-trigger>
                     <span class="material-icons-outlined" aria-hidden="true">account_circle</span>
