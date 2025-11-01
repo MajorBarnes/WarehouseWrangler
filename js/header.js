@@ -20,14 +20,84 @@
         const userMenu = header.querySelector('[data-user-menu]');
         const userTrigger = header.querySelector('[data-user-menu-trigger]');
 
+        const labelKeys = {
+            nav: {
+                open: 'app.header.navToggle.open',
+                close: 'app.header.navToggle.close'
+            },
+            imports: {
+                open: 'app.header.importsMenu.open',
+                close: 'app.header.importsMenu.close'
+            },
+            user: {
+                open: 'app.header.userMenu.open',
+                close: 'app.header.userMenu.close'
+            }
+        };
+
+        const translate = (key) => {
+            if (!key) {
+                return '';
+            }
+
+            const i18n = window.I18n;
+            if (i18n && typeof i18n.t === 'function') {
+                return i18n.t(key);
+            }
+
+            return key;
+        };
+
+        const applyAriaLabel = (element, key) => {
+            if (!element) {
+                return;
+            }
+
+            const label = translate(key);
+            if (label !== undefined && label !== null) {
+                element.setAttribute('aria-label', label);
+            }
+        };
+
+        const updateNavToggleState = (isOpen) => {
+            if (!navToggle) {
+                return;
+            }
+
+            navToggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+            applyAriaLabel(navToggle, isOpen ? labelKeys.nav.close : labelKeys.nav.open);
+        };
+
+        const updateImportsToggleState = (isOpen) => {
+            if (!importsToggle) {
+                return;
+            }
+
+            importsToggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+            applyAriaLabel(importsToggle, isOpen ? labelKeys.imports.close : labelKeys.imports.open);
+        };
+
+        const updateUserMenuState = (isOpen) => {
+            if (!userTrigger) {
+                return;
+            }
+
+            userTrigger.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+            applyAriaLabel(userTrigger, isOpen ? labelKeys.user.close : labelKeys.user.open);
+        };
+
+        const refreshLocalizedLabels = () => {
+            updateNavToggleState(nav ? nav.classList.contains('is-open') : false);
+            updateImportsToggleState(importsItem ? importsItem.classList.contains('nav-item--open') : false);
+            updateUserMenuState(userMenu ? userMenu.classList.contains('is-open') : false);
+        };
+
         const closeNav = () => {
             if (!nav) {
                 return;
             }
             nav.classList.remove('is-open');
-            if (navToggle) {
-                navToggle.setAttribute('aria-expanded', 'false');
-            }
+            updateNavToggleState(false);
         };
 
         const closeImportsMenu = () => {
@@ -35,7 +105,7 @@
                 return;
             }
             importsItem.classList.remove('nav-item--open');
-            importsToggle.setAttribute('aria-expanded', 'false');
+            updateImportsToggleState(false);
         };
 
         const closeUserMenu = () => {
@@ -43,13 +113,13 @@
                 return;
             }
             userMenu.classList.remove('is-open');
-            userTrigger.setAttribute('aria-expanded', 'false');
+            updateUserMenuState(false);
         };
 
         if (navToggle && nav) {
             navToggle.addEventListener('click', () => {
                 const isOpen = nav.classList.toggle('is-open');
-                navToggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+                updateNavToggleState(isOpen);
 
                 if (!isOpen) {
                     closeImportsMenu();
@@ -63,19 +133,22 @@
             if (expanded) {
                 importsItem.classList.add('nav-item--open');
             }
+            updateImportsToggleState(expanded);
 
             importsToggle.addEventListener('click', () => {
                 const willOpen = !importsItem.classList.contains('nav-item--open');
                 importsItem.classList.toggle('nav-item--open', willOpen);
-                importsToggle.setAttribute('aria-expanded', willOpen ? 'true' : 'false');
+                updateImportsToggleState(willOpen);
             });
         }
 
         if (userMenu && userTrigger) {
+            updateUserMenuState(userMenu.classList.contains('is-open'));
+
             userTrigger.addEventListener('click', () => {
                 const willOpen = !userMenu.classList.contains('is-open');
                 userMenu.classList.toggle('is-open', willOpen);
-                userTrigger.setAttribute('aria-expanded', willOpen ? 'true' : 'false');
+                updateUserMenuState(willOpen);
             });
         }
 
@@ -126,6 +199,15 @@
                 closeNav();
             }
         };
+
+        refreshLocalizedLabels();
+
+        const i18n = window.I18n;
+        if (i18n && typeof i18n.onChange === 'function') {
+            i18n.onChange(() => {
+                refreshLocalizedLabels();
+            });
+        }
 
         if (mobileQuery.addEventListener) {
             mobileQuery.addEventListener('change', handleQueryChange);

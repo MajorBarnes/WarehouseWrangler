@@ -7,7 +7,19 @@
     },
     "header": {
       "toggleNavigation": "Toggle navigation",
-      "mainNavAria": "Main navigation"
+      "mainNavAria": "Main navigation",
+      "navToggle": {
+        "open": "Open navigation menu",
+        "close": "Close navigation menu"
+      },
+      "importsMenu": {
+        "open": "Expand data imports menu",
+        "close": "Collapse data imports menu"
+      },
+      "userMenu": {
+        "open": "Open user menu",
+        "close": "Close user menu"
+      }
     },
     "userMenu": {
       "products": "Products",
