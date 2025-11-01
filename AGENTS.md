@@ -2,6 +2,7 @@
 
 > **Core Principle:** Code readability, modularity, and consistency with database schema and CSS layout.
 > Every Codex commit must respect the data model and visual language of WarehouseWrangler.
+> Codex must follow the langauge and translation guidelines in language.md
 
 ---
 
