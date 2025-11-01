@@ -18,6 +18,20 @@ const PREVIEW_LIMIT = 20; // Show first 20 products in preview
 let selectedFile = null;
 let parsedData = null;
 
+function t(key, replacements, defaultValue) {
+    const i18n = window.I18n;
+    if (i18n?.t) {
+        const hasDefault = defaultValue !== undefined;
+        if (replacements !== undefined) {
+            return hasDefault
+                ? i18n.t(key, replacements, { defaultValue })
+                : i18n.t(key, replacements);
+        }
+        return hasDefault ? i18n.t(key, undefined, { defaultValue }) : i18n.t(key);
+    }
+    return defaultValue ?? key;
+}
+
 // ============================================================================
 // AUTH HELPERS (Same pattern as lc-upload.js)
 // ============================================================================
@@ -38,13 +52,22 @@ function getCurrentUser() {
 document.addEventListener('DOMContentLoaded', function() {
     // Setup header
     const userData = getCurrentUser();
-    if (userData) {
-        document.getElementById('userDisplay').textContent = userData.username;
+    const userDisplay = document.getElementById('userDisplay');
+    if (userDisplay) {
+        userDisplay.textContent = t('common.user.anonymous', undefined, 'User');
+        if (userData?.username) {
+            userDisplay.textContent = userData.username;
+        }
     }
 
     // Setup logout
     document.getElementById('logoutBtn').addEventListener('click', function() {
-        if (confirm('Are you sure you want to logout?')) {
+        const promptMessage = t(
+            'common.prompts.logoutConfirm',
+            undefined,
+            'Are you sure you want to log out?'
+        );
+        if (confirm(promptMessage)) {
             localStorage.removeItem('ww_auth_token');
             localStorage.removeItem('ww_user_data');
             window.location.href = 'login.html';
@@ -85,13 +108,22 @@ function handleFileSelect(event) {
 
     // Validate file type
     if (!file.name.toLowerCase().endsWith('.csv')) {
-        showError('Please select a CSV file.');
+        showError(
+            t('amazonSnapshotUpload.errors.csvRequired', undefined, 'Please select a CSV file.')
+        );
         return;
     }
 
     // Validate file size
     if (file.size > MAX_FILE_SIZE) {
-        showError(`File is too large. Maximum size is ${MAX_FILE_SIZE / 1024 / 1024}MB.`);
+        const maxSize = `${MAX_FILE_SIZE / 1024 / 1024}MB`;
+        showError(
+            t(
+                'amazonSnapshotUpload.errors.fileTooLarge',
+                { size: maxSize },
+                `File is too large. Maximum size is ${maxSize}.`
+            )
+        );
         return;
     }
 
@@ -116,7 +148,13 @@ function clearFile() {
 
 async function handleUpload() {
     if (!selectedFile) {
-        showError('Please select a file first.');
+        showError(
+            t(
+                'amazonSnapshotUpload.errors.fileNotSelected',
+                undefined,
+                'Please select a file first.'
+            )
+        );
         return;
     }
 
@@ -141,12 +179,21 @@ async function handleUpload() {
             parsedData = data.data;
             showPreview(data.data);
         } else {
-            showErrorSection(data.error || 'Failed to parse file. Please check the format.');
+            const errorMessage =
+                data.error ||
+                t(
+                    'amazonSnapshotUpload.errors.parseFailed',
+                    undefined,
+                    'Failed to parse file. Please check the format.'
+                );
+            showErrorSection(errorMessage);
         }
 
     } catch (error) {
         console.error('Upload error:', error);
-        showErrorSection('Connection error. Please try again.');
+        showErrorSection(
+            t('common.errors.connection', undefined, 'Connection error. Please try again.')
+        );
     } finally {
         setUploadLoading(false);
     }
@@ -164,7 +211,8 @@ function showPreview(data) {
     document.getElementById('previewSection').classList.remove('hidden');
 
     // Populate summary
-    document.getElementById('summaryDate').textContent = data.snapshotDate || 'N/A';
+    document.getElementById('summaryDate').textContent =
+        data.snapshotDate || t('common.placeholders.notAvailable', undefined, 'N/A');
     document.getElementById('summaryProducts').textContent = data.statistics.totalProducts || 0;
     document.getElementById('summaryBoxes').textContent = data.statistics.totalBoxes || 0;
     document.getElementById('summaryRows').textContent = data.statistics.rowsProcessed || 0;
@@ -178,7 +226,13 @@ function showPreview(data) {
             <li>
                 <span class="material-icons-outlined" aria-hidden="true">warning</span>
                 <div>
-                    <p class="warning-title">Line ${w.line}</p>
+                    <p class="warning-title">${escapeHtml(
+                        t(
+                            'amazonSnapshotUpload.warnings.lineLabel',
+                            { line: w.line },
+                            `Line ${w.line}`
+                        )
+                    )}</p>
                     <p>${escapeHtml(w.message)}</p>
                 </div>
             </li>
@@ -202,13 +256,20 @@ function renderPreviewTable(products) {
         const isAvailable = Number(item.available_boxes) > 0;
         const statusClass = isAvailable ? 'type-badge type-badge--single' : 'type-badge type-badge--mixed';
         const statusIcon = isAvailable ? 'check_circle' : 'report';
-        const statusText = isAvailable ? 'In Stock' : 'Out of Stock';
+        const statusText = isAvailable
+            ? t('amazonSnapshotUpload.preview.status.inStock', undefined, 'In Stock')
+            : t('amazonSnapshotUpload.preview.status.outOfStock', undefined, 'Out of Stock');
 
         return `
             <tr>
                 <td><strong>${escapeHtml(item.fnsku)}</strong></td>
-                <td>${escapeHtml(item.sku || 'N/A')}</td>
-                <td>${escapeHtml(item.product_name || 'Unknown')}</td>
+                <td>${escapeHtml(
+                    item.sku || t('common.placeholders.notAvailable', undefined, 'N/A')
+                )}</td>
+                <td>${escapeHtml(
+                    item.product_name ||
+                        t('amazonSnapshotUpload.preview.productFallback', undefined, 'Unknown')
+                )}</td>
                 <td class="numeric">${item.available_boxes}</td>
                 <td>
                     <span class="${statusClass}">
@@ -224,9 +285,14 @@ function renderPreviewTable(products) {
 
     // Add "showing X of Y" info if truncated
     if (products.length > limit) {
+        const truncatedMessage = t(
+            'amazonSnapshotUpload.preview.table.truncated',
+            { shown: limit, total: products.length },
+            `Showing first ${limit} of ${products.length} products…`
+        );
         tbody.innerHTML += `
             <tr>
-                <td colspan="5" class="table-footnote">Showing first ${limit} of ${products.length} products…</td>
+                <td colspan="5" class="table-footnote">${escapeHtml(truncatedMessage)}</td>
             </tr>
         `;
     }
@@ -238,14 +304,23 @@ function renderPreviewTable(products) {
 
 async function handleConfirm() {
     if (!parsedData) {
-        showError('No data to import.');
+        showError(
+            t('amazonSnapshotUpload.errors.noData', undefined, 'No data to import.')
+        );
         return;
     }
 
-    const confirmMessage = `Are you sure you want to import this snapshot?\n\n` +
-                          `Date: ${parsedData.snapshotDate}\n` +
-                          `Products: ${parsedData.statistics.totalProducts}\n\n` +
-                          `This will replace existing data for this date.`;
+    const confirmMessage = t(
+        'amazonSnapshotUpload.prompts.confirmImport',
+        {
+            date: parsedData.snapshotDate,
+            products: parsedData.statistics.totalProducts
+        },
+        `Are you sure you want to import this snapshot?\n\n` +
+            `Date: ${parsedData.snapshotDate}\n` +
+            `Products: ${parsedData.statistics.totalProducts}\n\n` +
+            `This will replace existing data for this date.`
+    );
 
     if (!confirm(confirmMessage)) {
         return;
@@ -271,12 +346,21 @@ async function handleConfirm() {
         if (data.success) {
             showSuccess(data.data);
         } else {
-            showErrorSection(data.error || 'Import failed. Please try again.');
+            const errorMessage =
+                data.error ||
+                t(
+                    'amazonSnapshotUpload.errors.importFailed',
+                    undefined,
+                    'Import failed. Please try again.'
+                );
+            showErrorSection(errorMessage);
         }
 
     } catch (error) {
         console.error('Import error:', error);
-        showErrorSection('Connection error. Please try again.');
+        showErrorSection(
+            t('common.errors.connection', undefined, 'Connection error. Please try again.')
+        );
     } finally {
         setConfirmLoading(false);
     }
@@ -295,7 +379,8 @@ function showSuccess(data) {
     
     // Populate stats
     document.getElementById('successProducts').textContent = data.productsImported || 0;
-    document.getElementById('successDate').textContent = data.snapshotDate || 'N/A';
+    document.getElementById('successDate').textContent =
+        data.snapshotDate || t('common.placeholders.notAvailable', undefined, 'N/A');
 }
 
 function showErrorSection(message) {
@@ -343,7 +428,8 @@ function resetToUpload() {
 }
 
 function showError(message) {
-    alert('Error: ' + message);
+    const errorMessage = t('common.alerts.error', { message }, `Error: ${message}`);
+    alert(errorMessage);
 }
 
 function escapeHtml(text) {
