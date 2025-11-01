@@ -35,6 +35,101 @@
       "singleYear": "{year}"
     }
   },
+  "landing": {
+    "login": {
+      "pageTitle": "Login - WarehouseWrangler",
+      "closeModal": "Close sign-in form",
+      "modalEyebrow": "Secure access",
+      "modalTitle": "Sign in to continue",
+      "modalDescription": "Use your WarehouseWrangler username and password to enter the dashboard.",
+      "usernameLabel": "Username",
+      "usernamePlaceholder": "Enter your username",
+      "passwordLabel": "Password",
+      "passwordPlaceholder": "Enter your password",
+      "rememberMe": "Remember me on this device",
+      "needHelp": "Need help?",
+      "submit": "Sign In",
+      "version": "WarehouseWrangler v1.0.0"
+    },
+    "header": {
+      "signInCta": "Existing user sign-in"
+    },
+    "hero": {
+      "eyebrow": "Fulfillment Control Center",
+      "description": "Bring inbound receipts, carton movements, and Marketplace reconciliation together in a single command center. WarehouseWrangler turns warehouse signals into clear actions so your team can focus on shipping instead of spreadsheets.",
+      "primaryCta": "Access control center",
+      "secondaryCta": "Book a walkthrough"
+    },
+    "metrics": {
+      "ariaLabel": "Operational highlights",
+      "carton": {
+        "title": "Realtime carton oversight",
+        "copy": "Follow every carton from Incoming to your warehouse locations without losing track of box counts."
+      },
+      "reconciliation": {
+        "title": "Marketplace reconciliation",
+        "copy": "Upload marketplace snapshots or connect, compare deltas, and keep shipment records audit ready."
+      },
+      "planning": {
+        "title": "Planning intelligence",
+        "copy": "Blend planned stock, simulations, and product sales factors to protect coverage."
+      },
+      "integrations": {
+        "title": "Connect to other platforms",
+        "copy": "Secure APIs enable integration with WMS, ERP, and 3PL systems for seamless data flow."
+      }
+    },
+    "highlights": {
+      "ariaLabel": "Platform modules",
+      "inventory": {
+        "title": "Inventory guardrails",
+        "copy": "Carton checks, movement logs, and secured APIs protect every stock move."
+      },
+      "outbound": {
+        "title": "Outbound confidence",
+        "copy": "Marketplace shipment summaries keep carton and product traceability crystal clear."
+      },
+      "forecast": {
+        "title": "Forecast clarity",
+        "copy": "Toggle LC uploads, additional stock, and sales factors to spot coverage gaps early."
+      }
+    },
+    "features": {
+      "eyebrow": "Why teams choose WarehouseWrangler",
+      "title": "All fulfillment signals, zero guesswork",
+      "description": "Purpose-built workflows replace ad-hoc spreadsheets so every stakeholder works from the same truth.",
+      "snapshot": {
+        "title": "Snapshot uploader",
+        "copy": "Validate Marketplace-reported stock by comparing historical snapshots with live carton data.",
+        "points": {
+          "status": "Automated status tracking per upload.",
+          "audit": "Audit-ready history of every product ID."
+        }
+      },
+      "cartons": {
+        "title": "Carton command",
+        "copy": "Search cartons, drill into contents, and initiate moves with transactional safeguards.",
+        "points": {
+          "filters": "Inline filters for location and status.",
+          "log": "Movement log for every box."
+        }
+      },
+      "planning": {
+        "title": "Planning canvas",
+        "copy": "Layer planned stock, simulations, and sales factors to forecast coverage by weeks and pairs.",
+        "points": {
+          "toggles": "Scope toggles for additional and future ETAs.",
+          "dashboards": "Instant bar and table dashboards."
+        }
+      }
+    },
+    "cta": {
+      "title": "Ready to wrangle your warehouse?",
+      "copy": "Sign in with your WarehouseWrangler credentials to join your team’s fulfillment hub.",
+      "primaryCta": "Sign in securely",
+      "secondaryCta": "Talk to support"
+    }
+  },
   "nav": {
     "dashboard": "Dashboard",
     "cartons": "Cartons",
