@@ -21,8 +21,17 @@
 | **Design Goal** | Immediate situational awareness of stock health |
 
 ---
+## 1.1 Special Requirements Naming Convention
 
-## 1.1 Localization Architecture Guide
+This section explains the hierarchy and naming convention for items, product-(group)s, boxes and cartons
+
+- The item on FNSKU Level or product_id level is called item in English and Artikel in German.
+- Boxes have a certain number of pairs of an item. Boxes never carry different items (Artikel, product_ids).
+- Cartons usually contain one item (Artikel) but can contain two or three items (in boxes).
+- The product is the product group (product_name), Produkt in German or Produktgruppe. Collections of items (Artikel) are members of a product (group).
+- Please follow those rules in localization and translate equivalents to other languages.
+
+## 1.2 Localization Architecture Guide
 
 This section explains how the `js/i18n.js` helper loads locale dictionaries, resolves keys with graceful fallbacks, and how upcoming HTML and JavaScript updates should consume the helper to present language-specific UI copy.
 
