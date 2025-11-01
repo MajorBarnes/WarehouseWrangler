@@ -47,13 +47,73 @@
       "notAvailable": "N/A"
     },
     "errors": {
-      "connection": "Connection error. Please try again."
+      "connection": "Connection error. Please try again.",
+      "missingAuthToken": "Missing authentication token",
+      "unauthorized": "Unauthorized"
     },
     "prompts": {
       "logoutConfirm": "Are you sure you want to log out?"
     },
     "user": {
       "anonymous": "User"
+    }
+  },
+  "dashboard": {
+    "product": {
+      "fallbackName": "Product {id}"
+    },
+    "aria": {
+      "productGroup": "Product {product}",
+      "minCoverage": "{weeks} week minimum coverage",
+      "targetCoverage": "Target coverage of {weeks} weeks"
+    },
+    "bars": {
+      "noDemand": "No demand recorded",
+      "weeklyDemand": "{demand} pairs/week",
+      "meta": {
+        "demand": "Demand",
+        "stockout": "Stockout",
+        "toOrder": "To-order"
+      },
+      "stockoutLabel": "{date} ({weeks}w)",
+      "toOrderValue": "{boxes} boxes",
+      "stock": {
+        "boxesUnknown": "— boxes",
+        "boxesValue": "{boxes} boxes",
+        "pairsValue": "{pairs} pairs",
+        "combined": "{boxes} / {pairs}"
+      }
+    },
+    "table": {
+      "empty": "No products to display.",
+      "stock": {
+        "boxesValue": "{boxes} boxes",
+        "pairsValue": "{pairs} pairs",
+        "combined": "{boxes} / {pairs}"
+      },
+      "additional": {
+        "pairs": "{pairs} pairs",
+        "withTags": "{base} ({tags})",
+        "tags": {
+          "sim": "Sim",
+          "future": "Future",
+          "separator": " · "
+        }
+      }
+    },
+    "totals": {
+      "summary": "{weeks}w / {pairs} pairs"
+    },
+    "errors": {
+      "loadFailure": "Unable to load dashboard data: {message}",
+      "requestFailed": "Request failed {status} for {url}. Body: {body}",
+      "invalidJson": "Invalid JSON from {url}: {error}. Body: {body}"
+    },
+    "tooltips": {
+      "pairs": "{pairs} pairs",
+      "basic": "{label}: {pairs}",
+      "detailed": "{label}: {pairs} · {weeks}",
+      "weeks": "{weeks}w"
     }
   },
   "products": {

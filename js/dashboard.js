@@ -38,11 +38,36 @@ const pairsFormatter = new Intl.NumberFormat(undefined, {
     maximumFractionDigits: 0
 });
 
+function formatTemplate(template, replacements) {
+    if (typeof template !== 'string' || !replacements) {
+        return template;
+    }
+
+    return template.replace(/\{(\w+)\}/g, (match, token) => {
+        return Object.prototype.hasOwnProperty.call(replacements, token)
+            ? replacements[token]
+            : match;
+    });
+}
+
+function translate(key, replacements, defaultValue) {
+    const hasI18n = typeof I18n !== 'undefined' && I18n && typeof I18n.t === 'function';
+    const fallback = defaultValue !== undefined ? defaultValue : key;
+
+    if (!hasI18n) {
+        return formatTemplate(fallback, replacements);
+    }
+
+    const options = defaultValue !== undefined ? { defaultValue } : undefined;
+    const result = I18n.t(key, replacements, options);
+    return formatTemplate(result, replacements);
+}
+
 export async function fetchJSON(url, opts = {}) {
   const token = localStorage.getItem('ww_auth_token');
   if (!token) {
     window.location.href = '/login.html';
-    throw new Error('Missing authentication token');
+    throw new Error(translate('common.errors.missingAuthToken', null, 'Missing authentication token'));
   }
 
   const options = { ...opts };
@@ -57,7 +82,7 @@ export async function fetchJSON(url, opts = {}) {
     localStorage.removeItem('ww_auth_token');
     localStorage.removeItem('ww_user_data');
     window.location.href = '/login.html';
-    throw new Error('Unauthorized');
+    throw new Error(translate('common.errors.unauthorized', null, 'Unauthorized'));
   }
 
   if (response.status === 204) {
@@ -67,7 +92,13 @@ export async function fetchJSON(url, opts = {}) {
 
   if (!response.ok) {
     const txt = await response.text().catch(() => '');
-    const err = new Error(`Request failed ${response.status} for ${url}. Body: ${txt.slice(0,200)}`);
+    const body = txt.slice(0, 200);
+    const message = translate(
+        'dashboard.errors.requestFailed',
+        { status: response.status, url, body },
+        `Request failed ${response.status} for ${url}. Body: ${body}`
+    );
+    const err = new Error(message);
     err.status = response.status;
     throw err;
   }
@@ -76,7 +107,13 @@ export async function fetchJSON(url, opts = {}) {
     return await response.json();
   } catch (e) {
     const txt = await response.text().catch(() => '');
-    throw new Error(`Invalid JSON from ${url}: ${e.message}. Body: ${txt.slice(0,200)}`);
+    const body = txt.slice(0, 200);
+    const message = translate(
+        'dashboard.errors.invalidJson',
+        { url, error: e.message, body },
+        `Invalid JSON from ${url}: ${e.message}. Body: ${body}`
+    );
+    throw new Error(message);
   }
 }
 
@@ -170,7 +207,8 @@ export function mergePlannedAdditional(products, plannedRows) {
 
 export function computeCoverage(productRow, plannedMap, cfg, month, toggles) {
     const productId = productRow.product_id != null ? productRow.product_id : productRow.id;
-    const name = productRow.name || productRow.product_name || `Product ${productId}`;
+    const fallbackName = translate('dashboard.product.fallbackName', { id: productId }, `Product ${productId}`);
+    const name = productRow.name || productRow.product_name || fallbackName;
     const artikel = productRow.artikel || name;
     const pairsPerBox = Number(productRow.pairs_per_box) || 0;
     const aws = Number(productRow.average_weekly_sales) || 0;
@@ -375,7 +413,8 @@ function renderDashboardBars(currentState) {
         const rowEl = document.createElement('div');
         rowEl.className = 'bar-row';
         rowEl.setAttribute('role', 'group');
-        rowEl.setAttribute('aria-label', `Product ${row.artikel || row.name}`);
+        const ariaLabel = translate('dashboard.aria.productGroup', { product: row.artikel || row.name }, 'Product {product}');
+        rowEl.setAttribute('aria-label', ariaLabel);
 
         const headerEl = document.createElement('div');
         headerEl.className = 'bar-row__header';
@@ -389,22 +428,38 @@ function renderDashboardBars(currentState) {
         metaEl.className = 'bar-row__meta';
 
         const demandText = row.noDemand
-            ? 'No demand recorded'
-            : `${numberFormatter.format(row.weeklyDemand)} pairs/week`;
-        metaEl.appendChild(createMetaChip('Demand', demandText));
+            ? translate('dashboard.bars.noDemand', null, 'No demand recorded')
+            : translate(
+                'dashboard.bars.weeklyDemand',
+                { demand: numberFormatter.format(row.weeklyDemand) },
+                '{demand} pairs/week'
+            );
+        metaEl.appendChild(createMetaChip(translate('dashboard.bars.meta.demand', null, 'Demand'), demandText));
 
         if (!row.noDemand && row.stockoutDate instanceof Date) {
-            const stockoutLabel = `${dateFormatter.format(row.stockoutDate)} (${numberFormatter.format(row.totalWeeks)}w)`;
-            metaEl.appendChild(createMetaChip('Stockout', stockoutLabel));
+            const stockoutLabel = translate(
+                'dashboard.bars.stockoutLabel',
+                {
+                    date: dateFormatter.format(row.stockoutDate),
+                    weeks: numberFormatter.format(row.totalWeeks)
+                },
+                '{date} ({weeks}w)'
+            );
+            metaEl.appendChild(createMetaChip(translate('dashboard.bars.meta.stockout', null, 'Stockout'), stockoutLabel));
         } else {
-            metaEl.appendChild(createMetaChip('Stockout', '—'));
+            metaEl.appendChild(createMetaChip(translate('dashboard.bars.meta.stockout', null, 'Stockout'), '—'));
         }
 
         if (!row.noDemand) {
             const boxesNeeded = row.toOrder.boxes > 0 ? numberFormatter.format(row.toOrder.boxes) : '0';
-            metaEl.appendChild(createMetaChip('To-order', `${boxesNeeded} boxes`));
+            const toOrderValue = translate(
+                'dashboard.bars.toOrderValue',
+                { boxes: boxesNeeded },
+                '{boxes} boxes'
+            );
+            metaEl.appendChild(createMetaChip(translate('dashboard.bars.meta.toOrder', null, 'To-order'), toOrderValue));
         } else {
-            metaEl.appendChild(createMetaChip('To-order', '—'));
+            metaEl.appendChild(createMetaChip(translate('dashboard.bars.meta.toOrder', null, 'To-order'), '—'));
         }
 
         const locationEntries = Array.isArray(row.locationBreakdown) ? row.locationBreakdown : [];
@@ -420,11 +475,26 @@ function renderDashboardBars(currentState) {
 
             const pairs = Number(location.pairs) || 0;
             const boxes = row.pairsPerBox > 0 ? pairs / row.pairsPerBox : null;
-            const boxesLabel = boxes == null ? '— boxes' : `${numberFormatter.format(boxes)} boxes`;
-            const pairsLabel = `${pairsFormatter.format(pairs)} pairs`;
+            const boxesLabel = boxes == null
+                ? translate('dashboard.bars.stock.boxesUnknown', null, '— boxes')
+                : translate(
+                    'dashboard.bars.stock.boxesValue',
+                    { boxes: numberFormatter.format(boxes) },
+                    '{boxes} boxes'
+                );
+            const pairsLabel = translate(
+                'dashboard.bars.stock.pairsValue',
+                { pairs: pairsFormatter.format(pairs) },
+                '{pairs} pairs'
+            );
 
             const variant = segmentKeySet.has(location.key) ? location.key : null;
-            metaEl.appendChild(createMetaChip(location.label, `${boxesLabel} / ${pairsLabel}`, { variant }));
+            const combinedLabel = translate(
+                'dashboard.bars.stock.combined',
+                { boxes: boxesLabel, pairs: pairsLabel },
+                '{boxes} / {pairs}'
+            );
+            metaEl.appendChild(createMetaChip(location.label, combinedLabel, { variant }));
         });
 
         headerEl.appendChild(metaEl);
@@ -474,7 +544,14 @@ function renderDashboardBars(currentState) {
         const guideMin = document.createElement('div');
         guideMin.className = 'guide guide--min';
         guideMin.setAttribute('role', 'separator');
-        guideMin.setAttribute('aria-label', `${leadTimeWeeks} week minimum coverage`);
+        guideMin.setAttribute(
+            'aria-label',
+            translate(
+                'dashboard.aria.minCoverage',
+                { weeks: numberFormatter.format(leadTimeWeeks) },
+                '{weeks} week minimum coverage'
+            )
+        );
         guideMin.style.setProperty('--pos', Math.min(100, (leadTimeWeeks / maxWeeks) * 100).toString());
         trackEl.appendChild(guideMin);
 
@@ -482,7 +559,14 @@ function renderDashboardBars(currentState) {
             const guideTarget = document.createElement('div');
             guideTarget.className = 'guide guide--target';
             guideTarget.setAttribute('role', 'separator');
-            guideTarget.setAttribute('aria-label', `Target coverage of ${numberFormatter.format(weekToTarget)} weeks`);
+            guideTarget.setAttribute(
+                'aria-label',
+                translate(
+                    'dashboard.aria.targetCoverage',
+                    { weeks: numberFormatter.format(weekToTarget) },
+                    'Target coverage of {weeks} weeks'
+                )
+            );
             guideTarget.style.setProperty('--pos', Math.min(100, (weekToTarget / maxWeeks) * 100).toString());
             trackEl.appendChild(guideTarget);
         }
@@ -535,10 +619,24 @@ function renderDashboardTable(currentState) {
         const safePairs = Math.max(0, pairs);
         if (pairsPerBox > 0) {
             const boxes = safePairs / pairsPerBox;
-            return `${formatValue(boxes, numberFormatter)} boxes / ${formatValue(safePairs, pairsFormatter)} pairs`;
+            const boxesText = translate(
+                'dashboard.table.stock.boxesValue',
+                { boxes: formatValue(boxes, numberFormatter) },
+                '{boxes} boxes'
+            );
+            const pairsText = translate(
+                'dashboard.table.stock.pairsValue',
+                { pairs: formatValue(safePairs, pairsFormatter) },
+                '{pairs} pairs'
+            );
+            return translate('dashboard.table.stock.combined', { boxes: boxesText, pairs: pairsText }, '{boxes} / {pairs}');
         }
 
-        return `${formatValue(safePairs, pairsFormatter)} pairs`;
+        return translate(
+            'dashboard.table.stock.pairsValue',
+            { pairs: formatValue(safePairs, pairsFormatter) },
+            '{pairs} pairs'
+        );
     };
 
     const appendCell = (rowEl, text, { numeric = false, muted = false } = {}) => {
@@ -559,7 +657,7 @@ function renderDashboardTable(currentState) {
         const emptyCell = document.createElement('td');
         emptyCell.colSpan = columnCount;
         emptyCell.className = 'dashboard-table__empty';
-        emptyCell.textContent = 'No products to display.';
+        emptyCell.textContent = translate('dashboard.table.empty', null, 'No products to display.');
         emptyRow.appendChild(emptyCell);
         tbody.appendChild(emptyRow);
         return;
@@ -603,16 +701,26 @@ function renderDashboardTable(currentState) {
 
         if (includeAdditional) {
             const additionalPairs = Number(row.additionalDetails?.pairs) || 0;
-            let additionalText = `${formatValue(additionalPairs, pairsFormatter)} pairs`;
+            let additionalText = translate(
+                'dashboard.table.additional.pairs',
+                { pairs: formatValue(additionalPairs, pairsFormatter) },
+                '{pairs} pairs'
+            );
             const tags = [];
             if (row.additionalDetails?.hasSimulation) {
-                tags.push('Sim');
+                tags.push(translate('dashboard.table.additional.tags.sim', null, 'Sim'));
             }
             if (row.additionalDetails?.hasFuture) {
-                tags.push('Future');
+                tags.push(translate('dashboard.table.additional.tags.future', null, 'Future'));
             }
             if (tags.length) {
-                additionalText += ` (${tags.join(' · ')})`;
+                const separator = translate('dashboard.table.additional.tags.separator', null, ' · ');
+                const tagsText = tags.join(separator);
+                additionalText = translate(
+                    'dashboard.table.additional.withTags',
+                    { base: additionalText, tags: tagsText },
+                    '{base} ({tags})'
+                );
             }
             appendCell(tr, additionalText, {
                 numeric: true,
@@ -956,13 +1064,27 @@ function updateTotalsDisplay(currentState) {
     if (totalsInternal) {
         const weeks = currentState.totals.internalWeeks;
         const pairs = currentState.totals.internalPairs;
-        totalsInternal.textContent = `${numberFormatter.format(weeks)}w / ${pairsFormatter.format(pairs)} pairs`;
+        totalsInternal.textContent = translate(
+            'dashboard.totals.summary',
+            {
+                weeks: numberFormatter.format(weeks),
+                pairs: pairsFormatter.format(pairs)
+            },
+            '{weeks}w / {pairs} pairs'
+        );
     }
 
     if (totalsAll) {
         const weeks = currentState.totals.allWeeks;
         const pairs = currentState.totals.allPairs;
-        totalsAll.textContent = `${numberFormatter.format(weeks)}w / ${pairsFormatter.format(pairs)} pairs`;
+        totalsAll.textContent = translate(
+            'dashboard.totals.summary',
+            {
+                weeks: numberFormatter.format(weeks),
+                pairs: pairsFormatter.format(pairs)
+            },
+            '{weeks}w / {pairs} pairs'
+        );
     }
 }
 
@@ -972,7 +1094,11 @@ function showDashboardError(error) {
         const message = document.createElement('div');
         message.className = 'dashboard-error';
         message.setAttribute('role', 'alert');
-        message.textContent = `Unable to load dashboard data: ${error.message}`;
+        message.textContent = translate(
+            'dashboard.errors.loadFailure',
+            { message: error.message },
+            'Unable to load dashboard data: {message}'
+        );
         container.innerHTML = '';
         container.appendChild(message);
     }
@@ -992,7 +1118,11 @@ function showDashboardError(error) {
         const cell = document.createElement('td');
         cell.colSpan = columnCount;
         cell.className = 'dashboard-table__empty';
-        cell.textContent = `Unable to load dashboard data: ${error.message}`;
+        cell.textContent = translate(
+            'dashboard.errors.loadFailure',
+            { message: error.message },
+            'Unable to load dashboard data: {message}'
+        );
         tr.appendChild(cell);
         tbody.appendChild(tr);
     }
@@ -1012,12 +1142,25 @@ function createMetaChip(label, value, options = {}) {
 
 function buildTooltipContent(segment, weeklyDemand) {
     const pairsValue = segment.plannedPairs || segment.pairs || 0;
-    const pairsText = `${pairsFormatter.format(pairsValue)} pairs`;
+    const pairsText = translate(
+        'dashboard.tooltips.pairs',
+        { pairs: pairsFormatter.format(pairsValue) },
+        '{pairs} pairs'
+    );
     if (!weeklyDemand || weeklyDemand <= 0) {
-        return `${segment.label}: ${pairsText}`;
+        return translate(
+            'dashboard.tooltips.basic',
+            { label: segment.label, pairs: pairsText },
+            '{label}: {pairs}'
+        );
     }
-    const weeks = segment.weeks || 0;
-    return `${segment.label}: ${pairsText} · ${numberFormatter.format(weeks)}w`;
+    const weeksValue = numberFormatter.format(segment.weeks || 0);
+    const weeksText = translate('dashboard.tooltips.weeks', { weeks: weeksValue }, '{weeks}w');
+    return translate(
+        'dashboard.tooltips.detailed',
+        { label: segment.label, pairs: pairsText, weeks: weeksText },
+        '{label}: {pairs} · {weeks}'
+    );
 }
 
 function updateUserDisplay() {
@@ -1033,7 +1176,7 @@ function updateUserDisplay() {
 
     const userDataStr = localStorage.getItem('ww_user_data');
     if (userDisplay) {
-        userDisplay.textContent = 'User';
+        userDisplay.textContent = translate('common.user.anonymous', null, 'User');
         if (userDataStr) {
             try {
                 const userData = JSON.parse(userDataStr);
@@ -1049,7 +1192,8 @@ function updateUserDisplay() {
     const logoutBtn = document.getElementById('logoutBtn');
     if (logoutBtn) {
         logoutBtn.addEventListener('click', () => {
-            if (confirm('Are you sure you want to logout?')) {
+            const promptMessage = translate('common.prompts.logoutConfirm', null, 'Are you sure you want to log out?');
+            if (confirm(promptMessage)) {
                 localStorage.removeItem('ww_auth_token');
                 localStorage.removeItem('ww_user_data');
                 window.location.href = '/login.html';
