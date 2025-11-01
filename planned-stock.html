@@ -37,7 +37,7 @@
     </script>
 </head>
 <body>
-    <header class="site-header">
+    <header class="site-header" data-site-header>
         <div class="branding">
             <img src="./assets/logo.png" alt="WarehouseWrangler Logo" class="brand-logo">
             <div class="brand-copy">
@@ -46,24 +46,51 @@
             </div>
         </div>
 
-        <nav class="primary-nav" aria-label="Main navigation">
+        <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="primaryNav" data-nav-toggle>
+            <span class="material-icons-outlined" aria-hidden="true">menu</span>
+            <span class="sr-only">Toggle navigation</span>
+        </button>
+
+        <nav class="primary-nav" aria-label="Main navigation" data-primary-nav id="primaryNav">
             <ul class="nav-list">
-                <li><a class="nav-link" href="index.html"><span class="material-icons-outlined" aria-hidden="true">dashboard</span><span>Dashboard</span></a></li>
-                <li><a class="nav-link" href="amazon-snapshot-upload.html"><span class="material-icons-outlined" aria-hidden="true">cloud_upload</span><span>Amazon Snapshot</span></a></li>
-                <li><a class="nav-link" href="cartons.html"><span class="material-icons-outlined" aria-hidden="true">inventory_2</span><span>Cartons</span></a></li>
-                <li><a class="nav-link is-active" href="planned-stock.html" aria-current="page"><span class="material-icons-outlined" aria-hidden="true">analytics</span><span>Planned Stock</span></a></li>
-                <li><a class="nav-link" href="lc-upload.html"><span class="material-icons-outlined" aria-hidden="true">upload_file</span><span>LC Upload</span></a></li>
-                <li><a class="nav-link" href="products.html"><span class="material-icons-outlined" aria-hidden="true">view_list</span><span>Products</span></a></li>
-                <li><a class="nav-link" href="shipments.html"><span class="material-icons-outlined" aria-hidden="true">local_shipping</span><span>Shipments</span></a></li>
-                <li><a class="nav-link" href="users.html"><span class="material-icons-outlined" aria-hidden="true">group</span><span>Users</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="index.html"><span class="material-icons-outlined" aria-hidden="true">dashboard</span><span>Dashboard</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="cartons.html"><span class="material-icons-outlined" aria-hidden="true">inventory_2</span><span>Cartons</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="shipments.html"><span class="material-icons-outlined" aria-hidden="true">local_shipping</span><span>Shipments</span></a></li>
+                <li class="nav-item"><a class="nav-link is-active" href="planned-stock.html" aria-current="page"><span class="material-icons-outlined" aria-hidden="true">analytics</span><span>Planned Stock</span></a></li>
+                <li class="nav-item nav-item--has-children" data-imports>
+                    <button class="nav-link" type="button" data-imports-toggle aria-expanded="false">
+                        <span class="material-icons-outlined" aria-hidden="true">dataset</span>
+                        <span>Data Imports</span>
+                        <span class="material-icons-outlined nav-link__chevron" aria-hidden="true">expand_more</span>
+                    </button>
+                    <ul class="nav-submenu">
+                        <li><a class="nav-sublink" href="lc-upload.html"><span class="material-icons-outlined" aria-hidden="true">upload_file</span><span>LC Upload</span></a></li>
+                        <li><a class="nav-sublink" href="amazon-snapshot-upload.html"><span class="material-icons-outlined" aria-hidden="true">cloud_upload</span><span>Amazon Snapshot</span></a></li>
+                    </ul>
+                </li>
             </ul>
         </nav>
 
         <div class="header-actions">
-            <span class="user-display" aria-live="polite">
-                <span class="material-icons-outlined" aria-hidden="true">account_circle</span>
-                <span id="userDisplay" class="user-display-name">Loading…</span>
-            </span>
+            <div class="user-menu" data-user-menu>
+                <button class="user-menu__trigger" type="button" aria-expanded="false" data-user-menu-trigger>
+                    <span class="material-icons-outlined" aria-hidden="true">account_circle</span>
+                    <span class="user-display-name-wrapper" aria-live="polite">
+                        <span id="userDisplay" class="user-display-name">Loading…</span>
+                    </span>
+                    <span class="material-icons-outlined user-menu__chevron" aria-hidden="true">expand_more</span>
+                </button>
+                <div class="user-menu__dropdown" role="menu">
+                    <a class="user-menu__link" href="products.html" role="menuitem">
+                        <span class="material-icons-outlined" aria-hidden="true">view_list</span>
+                        <span>Products</span>
+                    </a>
+                    <a class="user-menu__link" href="users.html" role="menuitem">
+                        <span class="material-icons-outlined" aria-hidden="true">group</span>
+                        <span>Users</span>
+                    </a>
+                </div>
+            </div>
             <button id="logoutBtn" class="btn btn-logout" type="button">
                 <span class="material-icons-outlined" aria-hidden="true">logout</span>
                 <span>Logout</span>
@@ -278,6 +305,7 @@
         </div>
     </footer>
 
+    <script src="./js/header.js" defer></script>
     <script src="./js/planned-stock.js" defer></script>
     <script type="module" src="./js/footer.js"></script>
 </body>
