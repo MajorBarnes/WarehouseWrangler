@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - WarehouseWrangler</title>
+    <title data-i18n="landing.login.pageTitle">Login - WarehouseWrangler</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -17,16 +17,16 @@
 <body class="landing-body">
     <header class="site-header landing-header">
         <div class="branding">
-            <img src="./assets/logo.png" alt="WarehouseWrangler Logo" class="brand-logo">
+            <img src="./assets/logo.png" alt="WarehouseWrangler Logo" class="brand-logo" data-i18n="app.brand.logoAlt" data-i18n-attr="alt">
             <div class="brand-copy">
-                <span class="brand-name">WarehouseWrangler</span>
-                <span class="brand-tagline">Fulfillment Control Center</span>
+                <span class="brand-name" data-i18n="app.brand.name">WarehouseWrangler</span>
+                <span class="brand-tagline" data-i18n="app.brand.tagline">Fulfillment Control Center</span>
             </div>
         </div>
         <div class="landing-actions">
             <button type="button" class="btn btn-secondary" data-open-login>
                 <span class="material-icons-outlined" aria-hidden="true">key</span>
-                <span>Existing user sign-in</span>
+                <span data-i18n="landing.header.signInCta">Existing user sign-in</span>
             </button>
         </div>
     </header>
@@ -34,59 +34,59 @@
     <main class="app-main landing-main">
         <section class="hero landing-hero" aria-labelledby="landingTitle">
             <div class="hero-content">
-                <span class="landing-eyebrow">Fulfillment Control Center</span>
-                <h1 id="landingTitle">WarehouseWrangler</h1>
-                <p>Bring inbound receipts, carton movements, and Marketplace reconciliation together in a single command center. WarehouseWrangler turns warehouse signals into clear actions so your team can focus on shipping instead of spreadsheets.</p>
+                <span class="landing-eyebrow" data-i18n="landing.hero.eyebrow">Fulfillment Control Center</span>
+                <h1 id="landingTitle" data-i18n="app.brand.name">WarehouseWrangler</h1>
+                <p data-i18n="landing.hero.description">Bring inbound receipts, carton movements, and Marketplace reconciliation together in a single command center. WarehouseWrangler turns warehouse signals into clear actions so your team can focus on shipping instead of spreadsheets.</p>
                 <div class="hero-actions">
                     <button type="button" class="btn btn-primary" data-open-login>
                         <span class="material-icons-outlined" aria-hidden="true">login</span>
-                        <span>Access control center</span>
+                        <span data-i18n="landing.hero.primaryCta">Access control center</span>
                     </button>
                     <a class="btn btn-secondary" href="mailto:support@threegents.biz">
                         <span class="material-icons-outlined" aria-hidden="true">support_agent</span>
-                        <span>Book a walkthrough</span>
+                        <span data-i18n="landing.hero.secondaryCta">Book a walkthrough</span>
                     </a>
                 </div>
-                <dl class="landing-metrics" aria-label="Operational highlights">
+                <dl class="landing-metrics" aria-label="Operational highlights" data-i18n="landing.metrics.ariaLabel" data-i18n-attr="aria-label">
                     <div class="landing-metric">
-                        <dt>Realtime carton oversight</dt>
-                        <dd>Follow every carton from Incoming to your warehouse locations without losing track of box counts.</dd>
+                        <dt data-i18n="landing.metrics.carton.title">Realtime carton oversight</dt>
+                        <dd data-i18n="landing.metrics.carton.copy">Follow every carton from Incoming to your warehouse locations without losing track of box counts.</dd>
                     </div>
                     <div class="landing-metric">
-                        <dt>Marketplace reconciliation</dt>
-                        <dd>Upload marketplace snapshots or connect, compare deltas, and keep shipment records audit ready.</dd>
+                        <dt data-i18n="landing.metrics.reconciliation.title">Marketplace reconciliation</dt>
+                        <dd data-i18n="landing.metrics.reconciliation.copy">Upload marketplace snapshots or connect, compare deltas, and keep shipment records audit ready.</dd>
                     </div>
                     <div class="landing-metric">
-                        <dt>Planning intelligence</dt>
-                        <dd>Blend planned stock, simulations, and product sales factors to protect coverage.</dd>
+                        <dt data-i18n="landing.metrics.planning.title">Planning intelligence</dt>
+                        <dd data-i18n="landing.metrics.planning.copy">Blend planned stock, simulations, and product sales factors to protect coverage.</dd>
                     </div>
                     <div class="landing-metric">
                         <!-- promote connection to other platforms via api -->
-                        <dt>Connect to other platforms</dt>
-                        <dd>Secure APIs enable integration with WMS, ERP, and 3PL systems for seamless data flow.</dd>
+                        <dt data-i18n="landing.metrics.integrations.title">Connect to other platforms</dt>
+                        <dd data-i18n="landing.metrics.integrations.copy">Secure APIs enable integration with WMS, ERP, and 3PL systems for seamless data flow.</dd>
                     </div>
                 </dl>
             </div>
-            <div class="hero-highlights landing-highlights" aria-label="Platform modules">
+            <div class="hero-highlights landing-highlights" aria-label="Platform modules" data-i18n="landing.highlights.ariaLabel" data-i18n-attr="aria-label">
                 <article class="highlight-card">
                     <span class="material-icons-outlined highlight-icon success" aria-hidden="true">inventory_2</span>
                     <div class="highlight-copy">
-                        <h3>Inventory guardrails</h3>
-                        <p>Carton checks, movement logs, and secured APIs protect every stock move.</p>
+                        <h3 data-i18n="landing.highlights.inventory.title">Inventory guardrails</h3>
+                        <p data-i18n="landing.highlights.inventory.copy">Carton checks, movement logs, and secured APIs protect every stock move.</p>
                     </div>
                 </article>
                 <article class="highlight-card">
                     <span class="material-icons-outlined highlight-icon warning" aria-hidden="true">local_shipping</span>
                     <div class="highlight-copy">
-                        <h3>Outbound confidence</h3>
-                        <p>Marketplace shipment summaries keep carton and product traceability crystal clear.</p>
+                        <h3 data-i18n="landing.highlights.outbound.title">Outbound confidence</h3>
+                        <p data-i18n="landing.highlights.outbound.copy">Marketplace shipment summaries keep carton and product traceability crystal clear.</p>
                     </div>
                 </article>
                 <article class="highlight-card">
                     <span class="material-icons-outlined highlight-icon" aria-hidden="true">analytics</span>
                     <div class="highlight-copy">
-                        <h3>Forecast clarity</h3>
-                        <p>Toggle LC uploads, additional stock, and sales factors to spot coverage gaps early.</p>
+                        <h3 data-i18n="landing.highlights.forecast.title">Forecast clarity</h3>
+                        <p data-i18n="landing.highlights.forecast.copy">Toggle LC uploads, additional stock, and sales factors to spot coverage gaps early.</p>
                     </div>
                 </article>
             </div>
@@ -94,36 +94,36 @@
 
         <section class="landing-section" aria-labelledby="featureTitle">
             <div class="landing-section-header">
-                <span class="landing-eyebrow">Why teams choose WarehouseWrangler</span>
-                <h2 id="featureTitle">All fulfillment signals, zero guesswork</h2>
-                <p>Purpose-built workflows replace ad-hoc spreadsheets so every stakeholder works from the same truth.</p>
+                <span class="landing-eyebrow" data-i18n="landing.features.eyebrow">Why teams choose WarehouseWrangler</span>
+                <h2 id="featureTitle" data-i18n="landing.features.title">All fulfillment signals, zero guesswork</h2>
+                <p data-i18n="landing.features.description">Purpose-built workflows replace ad-hoc spreadsheets so every stakeholder works from the same truth.</p>
             </div>
             <div class="landing-feature-grid">
                 <article class="card landing-feature-card">
                     <span class="material-icons-outlined" aria-hidden="true">cloud_upload</span>
-                    <h3>Snapshot uploader</h3>
-                    <p>Validate Marketplace-reported stock by comparing historical snapshots with live carton data.</p>
+                    <h3 data-i18n="landing.features.snapshot.title">Snapshot uploader</h3>
+                    <p data-i18n="landing.features.snapshot.copy">Validate Marketplace-reported stock by comparing historical snapshots with live carton data.</p>
                     <ul>
-                        <li>Automated status tracking per upload.</li>
-                        <li>Audit-ready history of every product ID.</li>
+                        <li data-i18n="landing.features.snapshot.points.status">Automated status tracking per upload.</li>
+                        <li data-i18n="landing.features.snapshot.points.audit">Audit-ready history of every product ID.</li>
                     </ul>
                 </article>
                 <article class="card landing-feature-card">
                     <span class="material-icons-outlined" aria-hidden="true">qr_code_scanner</span>
-                    <h3>Carton command</h3>
-                    <p>Search cartons, drill into contents, and initiate moves with transactional safeguards.</p>
+                    <h3 data-i18n="landing.features.cartons.title">Carton command</h3>
+                    <p data-i18n="landing.features.cartons.copy">Search cartons, drill into contents, and initiate moves with transactional safeguards.</p>
                     <ul>
-                        <li>Inline filters for location and status.</li>
-                        <li>Movement log for every box.</li>
+                        <li data-i18n="landing.features.cartons.points.filters">Inline filters for location and status.</li>
+                        <li data-i18n="landing.features.cartons.points.log">Movement log for every box.</li>
                     </ul>
                 </article>
                 <article class="card landing-feature-card">
                     <span class="material-icons-outlined" aria-hidden="true">dataset</span>
-                    <h3>Planning canvas</h3>
-                    <p>Layer planned stock, simulations, and sales factors to forecast coverage by weeks and pairs.</p>
+                    <h3 data-i18n="landing.features.planning.title">Planning canvas</h3>
+                    <p data-i18n="landing.features.planning.copy">Layer planned stock, simulations, and sales factors to forecast coverage by weeks and pairs.</p>
                     <ul>
-                        <li>Scope toggles for additional and future ETAs.</li>
-                        <li>Instant bar and table dashboards.</li>
+                        <li data-i18n="landing.features.planning.points.toggles">Scope toggles for additional and future ETAs.</li>
+                        <li data-i18n="landing.features.planning.points.dashboards">Instant bar and table dashboards.</li>
                     </ul>
                 </article>
             </div>
@@ -131,17 +131,17 @@
 
         <section class="surface-card landing-cta" aria-labelledby="ctaTitle">
             <div class="landing-cta-copy">
-                <h2 id="ctaTitle">Ready to wrangle your warehouse?</h2>
-                <p>Sign in with your WarehouseWrangler credentials to join your team’s fulfillment hub.</p>
+                <h2 id="ctaTitle" data-i18n="landing.cta.title">Ready to wrangle your warehouse?</h2>
+                <p data-i18n="landing.cta.copy">Sign in with your WarehouseWrangler credentials to join your team’s fulfillment hub.</p>
             </div>
             <div class="landing-cta-actions">
                 <button type="button" class="btn btn-primary" data-open-login>
                     <span class="material-icons-outlined" aria-hidden="true">key</span>
-                    <span>Sign in securely</span>
+                    <span data-i18n="landing.cta.primaryCta">Sign in securely</span>
                 </button>
                 <a class="btn btn-secondary" href="mailto:support@threegents.biz">
                     <span class="material-icons-outlined" aria-hidden="true">help_outline</span>
-                    <span>Talk to support</span>
+                    <span data-i18n="landing.cta.secondaryCta">Talk to support</span>
                 </a>
             </div>
         </section>
@@ -150,17 +150,17 @@
     <footer class="site-footer">
         <div class="site-footer__inner">
             <div class="site-footer__section">
-                <span class="site-footer__copyright">© <span class="site-footer__year" data-footer-year data-current-year="2024">2024</span> WarehouseWrangler</span>
+                <span class="site-footer__copyright">© <span class="site-footer__year" data-footer-year data-current-year="2024">2024</span> <span data-i18n="app.brand.name">WarehouseWrangler</span></span>
             </div>
             <div class="site-footer__section site-footer__created-by">
-                <span class="site-footer__label">Created by</span>
+                <span class="site-footer__label" data-i18n="app.footer.createdBy">Created by</span>
                 <a href="https://threegents.eu" class="site-footer__link" target="_blank" rel="noopener">
-                    <img src="https://threegents.eu/images/logo_light.svg" alt="ThreeGents logo" class="site-footer__logo">
-                    <span>ThreeGents</span>
+                    <img src="https://threegents.eu/images/logo_light.svg" alt="ThreeGents logo" class="site-footer__logo" data-i18n="app.footer.partnerLogoAlt" data-i18n-attr="alt">
+                    <span data-i18n="app.footer.partner">ThreeGents</span>
                 </a>
             </div>
             <div class="site-footer__section">
-                <a href="mailto:support@threegents.biz" class="site-footer__link">Support</a>
+                <a href="mailto:support@threegents.biz" class="site-footer__link" data-i18n="app.footer.support">Support</a>
             </div>
         </div>
     </footer>
@@ -168,46 +168,55 @@
     <div id="loginModal" class="login-modal hidden" role="dialog" aria-modal="true" aria-labelledby="loginTitle" aria-describedby="loginDescription" aria-hidden="true">
         <div id="loginModalOverlay" class="login-modal__overlay" data-close-login></div>
         <div class="login-modal__content" role="document">
-            <button type="button" class="login-modal__close" data-close-login aria-label="Close sign-in form">
+            <button type="button" class="login-modal__close" data-close-login aria-label="Close sign-in form" data-i18n="landing.login.closeModal" data-i18n-attr="aria-label">
                 <span class="material-icons-outlined" aria-hidden="true">close</span>
             </button>
             <div class="login-card">
                 <div class="login-header">
-                    <img src="./assets/logo.png" alt="WarehouseWrangler logo" class="brand-logo">
+                    <img src="./assets/logo.png" alt="WarehouseWrangler logo" class="brand-logo" data-i18n="app.brand.logoAlt" data-i18n-attr="alt">
                     <div class="login-header__copy">
-                        <span class="landing-eyebrow">Secure access</span>
-                        <h2 id="loginTitle">Sign in to continue</h2>
-                        <p id="loginDescription">Use your WarehouseWrangler username and password to enter the dashboard.</p>
+                        <span class="landing-eyebrow" data-i18n="landing.login.modalEyebrow">Secure access</span>
+                        <h2 id="loginTitle" data-i18n="landing.login.modalTitle">Sign in to continue</h2>
+                        <p id="loginDescription" data-i18n="landing.login.modalDescription">Use your WarehouseWrangler username and password to enter the dashboard.</p>
                     </div>
                 </div>
                 <form id="loginForm" class="login-form" novalidate>
                     <div id="errorMessage" class="login-alert hidden" role="alert"></div>
                     <div class="form-group">
-                        <label for="username">Username</label>
-                        <input type="text" id="username" name="username" autocomplete="username" placeholder="Enter your username" required>
+                        <label for="username" data-i18n="landing.login.usernameLabel">Username</label>
+                        <input type="text" id="username" name="username" autocomplete="username" placeholder="Enter your username" required data-i18n="landing.login.usernamePlaceholder" data-i18n-attr="placeholder">
                     </div>
                     <div class="form-group">
-                        <label for="password">Password</label>
-                        <input type="password" id="password" name="password" autocomplete="current-password" placeholder="Enter your password" required>
+                        <label for="password" data-i18n="landing.login.passwordLabel">Password</label>
+                        <input type="password" id="password" name="password" autocomplete="current-password" placeholder="Enter your password" required data-i18n="landing.login.passwordPlaceholder" data-i18n-attr="placeholder">
                     </div>
                     <div class="form-options">
                         <label class="checkbox-label">
                             <input type="checkbox" id="rememberMe" name="rememberMe">
-                            <span>Remember me on this device</span>
+                            <span data-i18n="landing.login.rememberMe">Remember me on this device</span>
                         </label>
-                        <a href="mailto:support@threegents.biz" class="support-link">Need help?</a>
+                        <a href="mailto:support@threegents.biz" class="support-link" data-i18n="landing.login.needHelp">Need help?</a>
                     </div>
                     <button type="submit" id="loginButton" class="btn btn-primary login-submit">
                         <span class="material-icons-outlined" aria-hidden="true">lock_open</span>
-                        <span id="buttonText">Sign In</span>
+                        <span id="buttonText" data-i18n="landing.login.submit">Sign In</span>
                         <span id="buttonSpinner" class="spinner hidden" aria-hidden="true"></span>
                     </button>
                 </form>
-                <p class="login-version">WarehouseWrangler v1.0.0</p>
+                <p class="login-version" data-i18n="landing.login.version">WarehouseWrangler v1.0.0</p>
             </div>
         </div>
     </div>
 
+    <script src="js/i18n.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var storedLocale = localStorage.getItem('ww_locale') || I18n.DEFAULT_LOCALE;
+            I18n.init({ locale: storedLocale }).then(function () {
+                I18n.translateTree();
+            });
+        });
+    </script>
     <script src="js/auth.js"></script>
     <script type="module" src="js/footer.js"></script>
 </body>
