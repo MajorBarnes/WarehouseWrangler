@@ -67,6 +67,7 @@ The helper exposes convenience methods so modules avoid repetitive boilerplate:
 ### Dictionary authoring guidelines
 - Keep English (`en.json`) exhaustive—other locales inherit from it.
 - Organize keys by feature and context: `cartons.table.headers.location`, `shipments.filters.status`, etc.
+- Reuse existing keys when possible.
 - Avoid translating values that are IDs, API payloads, or database fields—translate only user-facing labels.
 - When a translation is pending, leave the value blank or copy the English string. Missing keys fall back to English automatically, so incomplete dictionaries do not break the UI.
 
