@@ -47,8 +47,17 @@ function getCurrentUser() {
 document.addEventListener('DOMContentLoaded', function() {
     // Setup header
     const userData = getCurrentUser();
-    if (userData) {
-        document.getElementById('userDisplay').textContent = userData.username;
+    const userDisplay = document.getElementById('userDisplay');
+    if (userDisplay && !userDisplay.dataset.userDisplayHydrated) {
+        userDisplay.textContent = translate('common.user.anonymous', null, 'User');
+    }
+
+    if (userData && userDisplay) {
+        userDisplay.textContent = userData.username;
+        userDisplay.removeAttribute('data-i18n');
+        userDisplay.removeAttribute('data-i18n-attr');
+        userDisplay.removeAttribute('data-i18n-args');
+        userDisplay.dataset.userDisplayHydrated = 'true';
     }
 
     // Setup logout

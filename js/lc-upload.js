@@ -55,12 +55,19 @@ function initializeHeader() {
     const userDataStr = localStorage.getItem('ww_user_data');
 
     if (userDisplay) {
-        userDisplay.textContent = t('common.user.anonymous', undefined, 'User');
+        if (!userDisplay.dataset.userDisplayHydrated) {
+            userDisplay.textContent = t('common.user.anonymous', undefined, 'User');
+        }
+
         if (userDataStr) {
             try {
                 const userData = JSON.parse(userDataStr);
                 if (userData?.username) {
                     userDisplay.textContent = userData.username;
+                    userDisplay.removeAttribute('data-i18n');
+                    userDisplay.removeAttribute('data-i18n-attr');
+                    userDisplay.removeAttribute('data-i18n-args');
+                    userDisplay.dataset.userDisplayHydrated = 'true';
                 }
             } catch (error) {
                 console.error('Error parsing user data:', error);

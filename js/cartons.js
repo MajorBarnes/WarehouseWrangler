@@ -200,7 +200,17 @@ function initializeHeader() {
     const user = getCurrentUser();
 
     if (userDisplay) {
-        userDisplay.textContent = user?.username || translate('common.user.anonymous', null, 'User');
+        if (!userDisplay.dataset.userDisplayHydrated) {
+            userDisplay.textContent = translate('common.user.anonymous', null, 'User');
+        }
+
+        if (user?.username) {
+            userDisplay.textContent = user.username;
+            userDisplay.removeAttribute('data-i18n');
+            userDisplay.removeAttribute('data-i18n-attr');
+            userDisplay.removeAttribute('data-i18n-args');
+            userDisplay.dataset.userDisplayHydrated = 'true';
+        }
     }
 
     const logoutBtn = document.getElementById('logoutBtn');
