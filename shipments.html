@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Shipment Management - WarehouseWrangler</title>
+    <title data-i18n="shipments.meta.title">Shipment Management - WarehouseWrangler</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -42,31 +42,31 @@
         <div class="branding">
             <img src="./assets/logo.png" alt="WarehouseWrangler Logo" class="brand-logo">
             <div class="brand-copy">
-                <span class="brand-name">WarehouseWrangler</span>
-                <span class="brand-tagline">Fulfillment Control Center</span>
+                <span class="brand-name" data-i18n="app.brand.name">WarehouseWrangler</span>
+                <span class="brand-tagline" data-i18n="app.brand.tagline">Fulfillment Control Center</span>
             </div>
         </div>
 
         <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="primaryNav" data-nav-toggle>
             <span class="material-icons-outlined" aria-hidden="true">menu</span>
-            <span class="sr-only">Toggle navigation</span>
+            <span class="sr-only" data-i18n="app.header.toggleNavigation">Toggle navigation</span>
         </button>
 
         <nav class="primary-nav" aria-label="Main navigation" data-primary-nav id="primaryNav">
             <ul class="nav-list">
-                <li class="nav-item"><a class="nav-link" href="index.html"><span class="material-icons-outlined" aria-hidden="true">dashboard</span><span>Dashboard</span></a></li>
-                <li class="nav-item"><a class="nav-link" href="cartons.html"><span class="material-icons-outlined" aria-hidden="true">inventory_2</span><span>Cartons</span></a></li>
-                <li class="nav-item"><a class="nav-link is-active" href="shipments.html" aria-current="page"><span class="material-icons-outlined" aria-hidden="true">local_shipping</span><span>Shipments</span></a></li>
-                <li class="nav-item"><a class="nav-link" href="planned-stock.html"><span class="material-icons-outlined" aria-hidden="true">analytics</span><span>Planned Stock</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="index.html"><span class="material-icons-outlined" aria-hidden="true">dashboard</span><span data-i18n="nav.dashboard">Dashboard</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="cartons.html"><span class="material-icons-outlined" aria-hidden="true">inventory_2</span><span data-i18n="nav.cartons">Cartons</span></a></li>
+                <li class="nav-item"><a class="nav-link is-active" href="shipments.html" aria-current="page"><span class="material-icons-outlined" aria-hidden="true">local_shipping</span><span data-i18n="nav.shipments">Shipments</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="planned-stock.html"><span class="material-icons-outlined" aria-hidden="true">analytics</span><span data-i18n="nav.plannedStock">Planned Stock</span></a></li>
                 <li class="nav-item nav-item--has-children" data-imports>
                     <button class="nav-link" type="button" data-imports-toggle aria-expanded="false">
                         <span class="material-icons-outlined" aria-hidden="true">dataset</span>
-                        <span>Data Imports</span>
+                        <span data-i18n="nav.dataImports.label">Data Imports</span>
                         <span class="material-icons-outlined nav-link__chevron" aria-hidden="true">expand_more</span>
                     </button>
                     <ul class="nav-submenu">
-                        <li><a class="nav-sublink" href="lc-upload.html"><span class="material-icons-outlined" aria-hidden="true">upload_file</span><span>LC Upload</span></a></li>
-                        <li><a class="nav-sublink" href="amazon-snapshot-upload.html"><span class="material-icons-outlined" aria-hidden="true">cloud_upload</span><span>Amazon Snapshot</span></a></li>
+                        <li><a class="nav-sublink" href="lc-upload.html"><span class="material-icons-outlined" aria-hidden="true">upload_file</span><span data-i18n="nav.dataImports.lcUpload">LC Upload</span></a></li>
+                        <li><a class="nav-sublink" href="amazon-snapshot-upload.html"><span class="material-icons-outlined" aria-hidden="true">cloud_upload</span><span data-i18n="nav.dataImports.amazonSnapshot">Amazon Snapshot</span></a></li>
                     </ul>
                 </li>
             </ul>
@@ -77,24 +77,24 @@
                 <button class="user-menu__trigger" type="button" aria-expanded="false" data-user-menu-trigger>
                     <span class="material-icons-outlined" aria-hidden="true">account_circle</span>
                     <span class="user-display-name-wrapper" aria-live="polite">
-                        <span id="userDisplay" class="user-display-name">Loading…</span>
+                        <span id="userDisplay" class="user-display-name" data-i18n="common.loading">Loading…</span>
                     </span>
                     <span class="material-icons-outlined user-menu__chevron" aria-hidden="true">expand_more</span>
                 </button>
                 <div class="user-menu__dropdown" role="menu">
                     <a class="user-menu__link" href="products.html" role="menuitem">
                         <span class="material-icons-outlined" aria-hidden="true">view_list</span>
-                        <span>Products</span>
+                        <span data-i18n="app.userMenu.products">Products</span>
                     </a>
                     <a class="user-menu__link" href="users.html" role="menuitem">
                         <span class="material-icons-outlined" aria-hidden="true">group</span>
-                        <span>Users</span>
+                        <span data-i18n="app.userMenu.users">Users</span>
                     </a>
                 </div>
             </div>
             <button id="logoutBtn" class="btn btn-logout" type="button">
                 <span class="material-icons-outlined" aria-hidden="true">logout</span>
-                <span>Logout</span>
+                <span data-i18n="app.userMenu.logout">Logout</span>
             </button>
         </div>
     </header>
@@ -104,114 +104,114 @@
             <div class="page-title">
                 <span class="material-icons-outlined" aria-hidden="true">local_shipping</span>
                 <div class="page-title-copy">
-                    <h2>Amazon Shipments</h2>
-                    <p>Coordinate outbound shipments, track carton allocations, and manage recall workflows.</p>
+                    <h2 data-i18n="shipments.header.title">Amazon Shipments</h2>
+                    <p data-i18n="shipments.header.subtitle">Coordinate outbound shipments, track carton allocations, and manage recall workflows.</p>
                 </div>
             </div>
             <div class="page-header-actions">
                 <button id="refreshBtn" class="btn btn-secondary" type="button">
                     <span class="material-icons-outlined" aria-hidden="true">refresh</span>
-                    <span>Aktualisieren</span>
+                    <span data-i18n="common.actions.refresh">Refresh</span>
                 </button>
                 <button id="createShipmentBtn" class="btn btn-primary" type="button">
                     <span class="material-icons-outlined" aria-hidden="true">add_circle</span>
-                    <span>Shipment anlegen</span>
+                    <span data-i18n="shipments.header.create">Create shipment</span>
                 </button>
             </div>
         </section>
 
-        <section class="surface-card metrics-panel" aria-label="Shipment overview">
+        <section class="surface-card metrics-panel" aria-label="Shipment overview" data-i18n-attr="aria-label" data-i18n="shipments.metrics.ariaLabel">
             <div class="metrics-grid">
                 <article class="metric-card">
                     <span class="material-icons-outlined metric-icon" aria-hidden="true">insights</span>
                     <div class="metric-content">
-                        <p class="metric-label">Total Shipments</p>
+                        <p class="metric-label" data-i18n="shipments.metrics.total.label">Total shipments</p>
                         <p class="metric-value" id="totalShipments">0</p>
-                        <p class="metric-subtext">Gesamter Zeitraum</p>
+                        <p class="metric-subtext" data-i18n="shipments.metrics.total.subtext">All time</p>
                     </div>
                 </article>
 
                 <button class="metric-card status-card" type="button" data-status="prepared" aria-pressed="false" data-action="filter-status">
                     <span class="material-icons-outlined metric-icon" aria-hidden="true">assignment_turned_in</span>
                     <div class="metric-content">
-                        <p class="metric-label">Prepared</p>
+                        <p class="metric-label" data-i18n="shipments.metrics.prepared.label">Prepared</p>
                         <p class="metric-value" id="preparedShipments">0</p>
-                        <p class="metric-subtext">Bereit zum Versand</p>
+                        <p class="metric-subtext" data-i18n="shipments.metrics.prepared.subtext">Ready to send</p>
                     </div>
                 </button>
 
                 <button class="metric-card status-card" type="button" data-status="sent" aria-pressed="false" data-action="filter-status">
                     <span class="material-icons-outlined metric-icon" aria-hidden="true">local_shipping</span>
                     <div class="metric-content">
-                        <p class="metric-label">Sent</p>
+                        <p class="metric-label" data-i18n="shipments.metrics.sent.label">Sent</p>
                         <p class="metric-value" id="sentShipments">0</p>
-                        <p class="metric-subtext">An Amazon übergeben</p>
+                        <p class="metric-subtext" data-i18n="shipments.metrics.sent.subtext">Handed over to Amazon</p>
                     </div>
                 </button>
 
                 <button class="metric-card status-card" type="button" data-status="recalled" aria-pressed="false" data-action="filter-status">
                     <span class="material-icons-outlined metric-icon" aria-hidden="true">undo</span>
                     <div class="metric-content">
-                        <p class="metric-label">Recalled</p>
+                        <p class="metric-label" data-i18n="shipments.metrics.recalled.label">Recalled</p>
                         <p class="metric-value" id="recalledShipments">0</p>
-                        <p class="metric-subtext">Zurückgerufen</p>
+                        <p class="metric-subtext" data-i18n="shipments.metrics.recalled.subtext">Returned to inventory</p>
                     </div>
                 </button>
             </div>
         </section>
 
-        <section class="surface-card filters-panel" aria-label="Shipments filter">
+        <section class="surface-card filters-panel" aria-label="Shipments filter" data-i18n-attr="aria-label" data-i18n="shipments.filters.ariaLabel">
             <form class="filters-form">
                 <div class="filters-grid">
                     <label class="filter-field" for="statusFilter">
-                        <span class="filter-label">Status</span>
+                        <span class="filter-label" data-i18n="shipments.filters.status.label">Status</span>
                         <select id="statusFilter" name="status">
-                            <option value="">Alle Status</option>
-                            <option value="prepared">Prepared</option>
-                            <option value="sent">Sent</option>
-                            <option value="recalled">Recalled</option>
+                            <option value="" data-i18n="shipments.filters.status.all">All statuses</option>
+                            <option value="prepared" data-i18n="shipments.metrics.prepared.label">Prepared</option>
+                            <option value="sent" data-i18n="shipments.metrics.sent.label">Sent</option>
+                            <option value="recalled" data-i18n="shipments.metrics.recalled.label">Recalled</option>
                         </select>
                     </label>
 
                     <label class="filter-field" for="fromDateFilter">
-                        <span class="filter-label">Von</span>
+                        <span class="filter-label" data-i18n="shipments.filters.from">From</span>
                         <input type="date" id="fromDateFilter" name="from_date">
                     </label>
 
                     <label class="filter-field" for="toDateFilter">
-                        <span class="filter-label">Bis</span>
+                        <span class="filter-label" data-i18n="shipments.filters.to">To</span>
                         <input type="date" id="toDateFilter" name="to_date">
                     </label>
                 </div>
                 <div class="filters-actions">
                     <button id="applyFiltersBtn" class="btn btn-primary" type="button">
                         <span class="material-icons-outlined" aria-hidden="true">filter_alt</span>
-                        <span>Filter anwenden</span>
+                        <span data-i18n="common.actions.applyFilters">Apply filters</span>
                     </button>
                     <button id="clearFiltersBtn" class="btn btn-secondary" type="button">
                         <span class="material-icons-outlined" aria-hidden="true">restart_alt</span>
-                        <span>Zurücksetzen</span>
+                        <span data-i18n="common.actions.reset">Reset</span>
                     </button>
                 </div>
             </form>
         </section>
 
-        <section class="surface-card table-card" aria-label="Shipments table">
-            <div id="shipmentsLoading" class="loading-indicator">Shipments werden geladen…</div>
+        <section class="surface-card table-card" aria-label="Shipments table" data-i18n-attr="aria-label" data-i18n="shipments.table.ariaLabel">
+            <div id="shipmentsLoading" class="loading-indicator" data-i18n="shipments.loading">Loading shipments...</div>
 
-            <div class="table-scroll" role="region" aria-live="polite" aria-label="Shipment Tabelle">
+            <div class="table-scroll" role="region" aria-live="polite" aria-label="Shipment data table" data-i18n-attr="aria-label" data-i18n="shipments.table.regionLabel">
                 <div class="table-scroll__viewport">
                     <table id="shipmentsTable" class="shipments-table table-sticky is-hidden">
                         <thead>
                         <tr>
-                            <th scope="col">Reference</th>
-                            <th scope="col">Datum</th>
-                            <th scope="col">Status</th>
-                            <th scope="col" class="numeric">Cartons</th>
-                            <th scope="col" class="numeric">Produkte</th>
-                            <th scope="col" class="numeric">Gesamtboxen</th>
-                            <th scope="col">Erstellt von</th>
-                            <th scope="col" class="actions-col">Aktionen</th>
+                            <th scope="col" data-i18n="shipments.table.headers.reference">Reference</th>
+                            <th scope="col" data-i18n="shipments.table.headers.date">Date</th>
+                            <th scope="col" data-i18n="shipments.table.headers.status">Status</th>
+                            <th scope="col" class="numeric" data-i18n="shipments.table.headers.cartons">Cartons</th>
+                            <th scope="col" class="numeric" data-i18n="shipments.table.headers.products">Products</th>
+                            <th scope="col" class="numeric" data-i18n="shipments.table.headers.totalBoxes">Total boxes</th>
+                            <th scope="col" data-i18n="shipments.table.headers.createdBy">Created by</th>
+                            <th scope="col" class="actions-col" data-i18n="shipments.table.headers.actions">Actions</th>
                         </tr>
                     </thead>
                         <tbody id="shipmentsTableBody"></tbody>
@@ -221,7 +221,7 @@
 
             <div id="shipmentsEmpty" class="empty-state is-hidden">
                 <span class="material-icons-outlined" aria-hidden="true">inventory_2</span>
-                <p>Keine Shipments gefunden. Passe die Filter an oder lege ein neues Shipment an.</p>
+                <p data-i18n="shipments.empty">No shipments found. Adjust the filters or create a new shipment.</p>
             </div>
         </section>
     </main>
@@ -232,40 +232,38 @@
             <div class="modal-header">
                 <div class="modal-title-group">
                     <span class="material-icons-outlined" aria-hidden="true">add_box</span>
-                    <h3 id="createShipmentTitle">Neues Shipment anlegen</h3>
+                    <h3 id="createShipmentTitle" data-i18n="shipments.create.title">Create shipment</h3>
                 </div>
-                <button class="modal-close" type="button" data-action="close-create-modal" aria-label="Schließen">
+                <button class="modal-close" type="button" data-action="close-create-modal" aria-label="Close dialog" data-i18n-attr="aria-label" data-i18n="shipments.create.closeAria">
                     <span class="material-icons-outlined" aria-hidden="true">close</span>
                 </button>
             </div>
             <form id="createShipmentForm">
                 <div class="modal-body">
                     <div class="form-group">
-                        <label for="shipmentReference">Shipment Reference *</label>
-                        <input type="text" id="shipmentReference" required 
-                               placeholder="e.g., AMZ-2025-10-001">
-                        <small>Unique identifier for this shipment</small>
+                        <label for="shipmentReference" data-i18n="shipments.create.referenceLabel">Shipment reference *</label>
+                        <input type="text" id="shipmentReference" required placeholder="e.g., AMZ-2025-10-001" data-i18n-attr="placeholder" data-i18n="shipments.create.referencePlaceholder">
+                        <small data-i18n="shipments.create.referenceHelp">Unique identifier for this shipment</small>
                     </div>
 
                     <div class="form-group">
-                        <label for="shipmentDate">Shipment Date *</label>
+                        <label for="shipmentDate" data-i18n="shipments.create.dateLabel">Shipment date *</label>
                         <input type="date" id="shipmentDate" required>
                     </div>
 
                     <div class="form-group">
-                        <label for="shipmentNotes">Notes (optional)</label>
-                        <textarea id="shipmentNotes" rows="3" 
-                                  placeholder="Add any notes about this shipment..."></textarea>
+                        <label for="shipmentNotes" data-i18n="shipments.create.notesLabel">Notes (optional)</label>
+                        <textarea id="shipmentNotes" rows="3" placeholder="Add any notes about this shipment..." data-i18n-attr="placeholder" data-i18n="shipments.create.notesPlaceholder"></textarea>
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-action="close-create-modal">
                         <span class="material-icons-outlined" aria-hidden="true">close</span>
-                        <span>Abbrechen</span>
+                        <span data-i18n="common.actions.cancel">Cancel</span>
                     </button>
                     <button type="submit" class="btn btn-primary">
                         <span class="material-icons-outlined" aria-hidden="true">inventory_2</span>
-                        <span>Anlegen &amp; Boxen hinzufügen</span>
+                        <span data-i18n="shipments.create.submit">Create &amp; add boxes</span>
                     </button>
                 </div>
             </form>
@@ -278,9 +276,9 @@
             <div class="modal-header">
                 <div class="modal-title-group">
                     <span class="material-icons-outlined" aria-hidden="true">inventory_2</span>
-                    <h3 id="addBoxesTitle">Boxen zum Shipment hinzufügen: <span id="currentShipmentRef"></span></h3>
+                    <h3 id="addBoxesTitle"><span data-i18n="shipments.addBoxes.titlePrefix">Add boxes to shipment:</span> <span id="currentShipmentRef"></span></h3>
                 </div>
-                <button class="modal-close" type="button" data-action="close-add-boxes" aria-label="Schließen">
+                <button class="modal-close" type="button" data-action="close-add-boxes" aria-label="Close dialog" data-i18n-attr="aria-label" data-i18n="shipments.addBoxes.closeAria">
                     <span class="material-icons-outlined" aria-hidden="true">close</span>
                 </button>
             </div>
@@ -288,56 +286,56 @@
                 <div class="shipment-progress">
                     <div class="progress-step active">
                         <div class="step-number">1</div>
-                        <div class="step-label">Created</div>
+                        <div class="step-label" data-i18n="shipments.steps.created">Created</div>
                     </div>
                     <div class="progress-line"></div>
                     <div class="progress-step active">
                         <div class="step-number">2</div>
-                        <div class="step-label">Add Boxes</div>
+                        <div class="step-label" data-i18n="shipments.steps.addBoxes">Add boxes</div>
                     </div>
                     <div class="progress-line"></div>
                     <div class="progress-step">
                         <div class="step-number">3</div>
-                        <div class="step-label">Send</div>
+                        <div class="step-label" data-i18n="shipments.steps.send">Send</div>
                     </div>
                 </div>
 
                 <!-- Current Shipment Summary -->
                 <div class="shipment-summary">
-                    <h4>Selected Boxes:</h4>
+                    <h4 data-i18n="shipments.addBoxes.summaryTitle">Selected boxes:</h4>
                     <div class="summary-grid">
                         <div class="summary-item">
-                            <span class="label">Total Boxes:</span>
+                            <span class="label" data-i18n="shipments.addBoxes.totalBoxes">Total boxes:</span>
                             <span class="value" id="totalBoxesSelected">0</span>
                         </div>
                         <div class="summary-item">
-                            <span class="label">Cartons:</span>
+                            <span class="label" data-i18n="shipments.addBoxes.cartons">Cartons:</span>
                             <span class="value" id="totalCartonsSelected">0</span>
                         </div>
                         <div class="summary-item">
-                            <span class="label">Products:</span>
+                            <span class="label" data-i18n="shipments.addBoxes.products">Products:</span>
                             <span class="value" id="totalProductsSelected">0</span>
                         </div>
                     </div>
                 </div>
 
                 <!-- Available Cartons -->
-                <h4>Available Cartons (WML & GMR):</h4>
+                <h4 data-i18n="shipments.addBoxes.availableTitle">Available cartons (WML &amp; GMR):</h4>
                 <div class="available-cartons" id="availableCartonsList">
-                    <div class="loading">Loading available cartons...</div>
+                    <div class="loading" data-i18n="shipments.addBoxes.loading">Loading available cartons...</div>
                 </div>
 
                 <!-- Selected Boxes List -->
                 <div id="selectedBoxesContainer" class="selected-boxes-container hidden">
-                    <h4>Boxes Added to Shipment:</h4>
+                    <h4 data-i18n="shipments.addBoxes.selectedTitle">Boxes added to shipment:</h4>
                     <table class="selected-boxes-table">
                         <thead>
                             <tr>
-                                <th>Carton</th>
-                                <th>Product</th>
-                                <th>Boxes</th>
-                                <th>Pairs</th>
-                                <th>Action</th>
+                                <th data-i18n="shipments.addBoxes.table.carton">Carton</th>
+                                <th data-i18n="shipments.addBoxes.table.product">Product</th>
+                                <th data-i18n="shipments.addBoxes.table.boxes">Boxes</th>
+                                <th data-i18n="shipments.addBoxes.table.pairs">Pairs</th>
+                                <th data-i18n="shipments.addBoxes.table.action">Action</th>
                             </tr>
                         </thead>
                         <tbody id="selectedBoxesBody">
@@ -348,11 +346,11 @@
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-action="close-add-boxes">
                     <span class="material-icons-outlined" aria-hidden="true">close</span>
-                    <span>Schließen</span>
+                    <span data-i18n="common.actions.close">Close</span>
                 </button>
                 <button type="button" class="btn btn-primary" id="proceedToSendBtn" data-action="proceed-to-send">
                     <span class="material-icons-outlined" aria-hidden="true">arrow_forward</span>
-                    <span class="btn-label">Prüfen &amp; senden</span>
+                    <span class="btn-label" data-i18n="shipments.addBoxes.proceed">Review &amp; send</span>
                 </button>
             </div>
         </div>
@@ -364,9 +362,9 @@
             <div class="modal-header">
                 <div class="modal-title-group">
                     <span class="material-icons-outlined" aria-hidden="true">local_shipping</span>
-                    <h3 id="confirmShipmentTitle">Shipment senden bestätigen</h3>
+                    <h3 id="confirmShipmentTitle" data-i18n="shipments.send.title">Confirm shipment send</h3>
                 </div>
-                <button class="modal-close" type="button" data-action="close-send-shipment" aria-label="Schließen">
+                <button class="modal-close" type="button" data-action="close-send-shipment" aria-label="Close dialog" data-i18n-attr="aria-label" data-i18n="shipments.send.closeAria">
                     <span class="material-icons-outlined" aria-hidden="true">close</span>
                 </button>
             </div>
@@ -376,19 +374,19 @@
                         <div class="step-number" aria-hidden="true">
                             <span class="material-icons-outlined">task_alt</span>
                         </div>
-                        <div class="step-label">Created</div>
+                        <div class="step-label" data-i18n="shipments.steps.created">Created</div>
                     </div>
                     <div class="progress-line completed"></div>
                     <div class="progress-step completed">
                         <div class="step-number" aria-hidden="true">
                             <span class="material-icons-outlined">task_alt</span>
                         </div>
-                        <div class="step-label">Boxes Added</div>
+                        <div class="step-label" data-i18n="shipments.steps.boxesAdded">Boxes added</div>
                     </div>
                     <div class="progress-line"></div>
                     <div class="progress-step active">
                         <div class="step-number">3</div>
-                        <div class="step-label">Send</div>
+                        <div class="step-label" data-i18n="shipments.steps.send">Send</div>
                     </div>
                 </div>
 
@@ -399,18 +397,18 @@
                 <div class="warning-box">
                     <span class="material-icons-outlined" aria-hidden="true">warning</span>
                     <div>
-                        <strong>Wichtig:</strong> Diese Aktion aktualisiert den Bestand. Boxen werden den Kartons entnommen und als an Amazon gesendet markiert. Du kannst den Vorgang über "Recall" rückgängig machen.
+                        <strong data-i18n="shipments.send.warningTitle">Important:</strong> <span data-i18n="shipments.send.warning">This action updates inventory. Boxes are removed from their cartons and marked as sent to Amazon. You can undo this via “Recall”.</span>
                     </div>
                 </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-action="close-send-shipment">
                     <span class="material-icons-outlined" aria-hidden="true">arrow_back</span>
-                    <span>Zurück</span>
+                    <span data-i18n="common.actions.back">Back</span>
                 </button>
                 <button type="button" class="btn btn-primary" id="confirmSendBtn" data-action="confirm-send-shipment">
                     <span class="material-icons-outlined" aria-hidden="true">local_shipping</span>
-                    <span class="btn-label">Shipment senden</span>
+                    <span class="btn-label" data-i18n="shipments.send.confirm">Send shipment</span>
                 </button>
             </div>
         </div>
@@ -422,19 +420,19 @@
             <div class="modal-header">
                 <div class="modal-title-group">
                     <span class="material-icons-outlined" aria-hidden="true">assignment</span>
-                    <h3 id="shipmentDetailsTitle">Shipment Details</h3>
+                    <h3 id="shipmentDetailsTitle" data-i18n="shipments.details.title">Shipment details</h3>
                 </div>
-                <button class="modal-close" type="button" data-action="close-details" aria-label="Schließen">
+                <button class="modal-close" type="button" data-action="close-details" aria-label="Close dialog" data-i18n-attr="aria-label" data-i18n="shipments.details.closeAria">
                     <span class="material-icons-outlined" aria-hidden="true">close</span>
                 </button>
             </div>
             <div class="modal-body" id="shipmentDetailsBody">
-                <div class="loading">Loading shipment details...</div>
+                <div class="loading" data-i18n="shipments.details.loading">Loading shipment details...</div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-action="close-details">
                     <span class="material-icons-outlined" aria-hidden="true">close</span>
-                    <span>Schließen</span>
+                    <span data-i18n="common.actions.close">Close</span>
                 </button>
             </div>
         </div>
@@ -446,42 +444,41 @@
             <div class="modal-header">
                 <div class="modal-title-group">
                     <span class="material-icons-outlined" aria-hidden="true">undo</span>
-                    <h3 id="recallShipmentTitle">Shipment zurückrufen</h3>
+                    <h3 id="recallShipmentTitle" data-i18n="shipments.recall.title">Recall shipment</h3>
                 </div>
-                <button class="modal-close" type="button" data-action="close-recall" aria-label="Schließen">
+                <button class="modal-close" type="button" data-action="close-recall" aria-label="Close dialog" data-i18n-attr="aria-label" data-i18n="shipments.recall.closeAria">
                     <span class="material-icons-outlined" aria-hidden="true">close</span>
                 </button>
             </div>
             <div class="modal-body">
-                <p>Are you sure you want to recall shipment <strong id="recallShipmentRef"></strong>?</p>
+                <p><span data-i18n="shipments.recall.confirmation">Are you sure you want to recall shipment</span> <strong id="recallShipmentRef"></strong>?</p>
 
                 <div class="warning-box">
                     <span class="material-icons-outlined" aria-hidden="true">warning</span>
                     <div>
-                        <strong>Folgende Schritte werden durchgeführt:</strong>
+                        <strong data-i18n="shipments.recall.warningTitle">The following steps will occur:</strong>
                         <ul>
-                            <li>Alle Boxen werden in ihre ursprünglichen Kartons zurückgebucht.</li>
-                            <li>Der Kartonbestand wird aktualisiert (boxes_current erhöht sich).</li>
-                            <li>Das Shipment wird als "recalled" markiert.</li>
-                            <li>Die Rückholung wird in der Bewegungshistorie protokolliert.</li>
+                            <li data-i18n="shipments.recall.steps.returnBoxes">All boxes are booked back into their original cartons.</li>
+                            <li data-i18n="shipments.recall.steps.updateInventory">Carton inventory is updated (boxes_current increases).</li>
+                            <li data-i18n="shipments.recall.steps.markRecalled">The shipment is marked as “recalled”.</li>
+                            <li data-i18n="shipments.recall.steps.logHistory">The recall is logged in the movement history.</li>
                         </ul>
                     </div>
                 </div>
 
                 <div class="form-group">
-                    <label for="recallNotes">Reason for Recall *</label>
-                    <textarea id="recallNotes" rows="3" required 
-                              placeholder="Why are you recalling this shipment?"></textarea>
+                    <label for="recallNotes" data-i18n="shipments.recall.notesLabel">Reason for recall *</label>
+                    <textarea id="recallNotes" rows="3" required placeholder="Why are you recalling this shipment?" data-i18n-attr="placeholder" data-i18n="shipments.recall.notesPlaceholder"></textarea>
                 </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-action="close-recall">
                     <span class="material-icons-outlined" aria-hidden="true">close</span>
-                    <span>Abbrechen</span>
+                    <span data-i18n="common.actions.cancel">Cancel</span>
                 </button>
                 <button type="button" class="btn btn-danger" data-action="confirm-recall">
                     <span class="material-icons-outlined" aria-hidden="true">undo</span>
-                    <span>Shipment zurückrufen</span>
+                    <span data-i18n="shipments.recall.confirm">Recall shipment</span>
                 </button>
             </div>
         </div>
@@ -491,21 +488,30 @@
     <footer class="site-footer">
         <div class="site-footer__inner">
             <div class="site-footer__section">
-                <span class="site-footer__copyright">© <span class="site-footer__year" data-footer-year data-current-year="2024">2024</span> WarehouseWrangler</span>
+                <span class="site-footer__copyright">© <span class="site-footer__year" data-footer-year data-current-year="2024">2024</span> <span data-i18n="app.brand.name">WarehouseWrangler</span></span>
             </div>
             <div class="site-footer__section site-footer__created-by">
-                <span class="site-footer__label">Created by</span>
+                <span class="site-footer__label" data-i18n="app.footer.createdBy">Created by</span>
                 <a href="https://threegents.eu" class="site-footer__link" target="_blank" rel="noopener">
                     <img src="https://threegents.eu/images/logo_light.svg" alt="ThreeGents logo" class="site-footer__logo">
-                    <span>ThreeGents</span>
+                    <span data-i18n="app.footer.partner">ThreeGents</span>
                 </a>
             </div>
             <div class="site-footer__section">
-                <a href="mailto:support@threegents.biz" class="site-footer__link">Support</a>
+                <a href="mailto:support@threegents.biz" class="site-footer__link" data-i18n="app.footer.support">Support</a>
             </div>
         </div>
     </footer>
 
+    <script src="./js/i18n.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var storedLocale = localStorage.getItem('ww_locale') || I18n.DEFAULT_LOCALE;
+            I18n.init({ locale: storedLocale }).then(function () {
+                I18n.translateTree();
+            });
+        });
+    </script>
     <script src="./js/header.js"></script>
     <script src="./js/shipments.js"></script>
     <script type="module" src="./js/footer.js"></script>

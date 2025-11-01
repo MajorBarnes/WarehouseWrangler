@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Planned Stock - WarehouseWrangler</title>
+    <title data-i18n="plannedStock.meta.title">Planned Stock - WarehouseWrangler</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -41,31 +41,31 @@
         <div class="branding">
             <img src="./assets/logo.png" alt="WarehouseWrangler Logo" class="brand-logo">
             <div class="brand-copy">
-                <span class="brand-name">WarehouseWrangler</span>
-                <span class="brand-tagline">Fulfillment Control Center</span>
+                <span class="brand-name" data-i18n="app.brand.name">WarehouseWrangler</span>
+                <span class="brand-tagline" data-i18n="app.brand.tagline">Fulfillment Control Center</span>
             </div>
         </div>
 
         <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="primaryNav" data-nav-toggle>
             <span class="material-icons-outlined" aria-hidden="true">menu</span>
-            <span class="sr-only">Toggle navigation</span>
+            <span class="sr-only" data-i18n="app.header.toggleNavigation">Toggle navigation</span>
         </button>
 
         <nav class="primary-nav" aria-label="Main navigation" data-primary-nav id="primaryNav">
             <ul class="nav-list">
-                <li class="nav-item"><a class="nav-link" href="index.html"><span class="material-icons-outlined" aria-hidden="true">dashboard</span><span>Dashboard</span></a></li>
-                <li class="nav-item"><a class="nav-link" href="cartons.html"><span class="material-icons-outlined" aria-hidden="true">inventory_2</span><span>Cartons</span></a></li>
-                <li class="nav-item"><a class="nav-link" href="shipments.html"><span class="material-icons-outlined" aria-hidden="true">local_shipping</span><span>Shipments</span></a></li>
-                <li class="nav-item"><a class="nav-link is-active" href="planned-stock.html" aria-current="page"><span class="material-icons-outlined" aria-hidden="true">analytics</span><span>Planned Stock</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="index.html"><span class="material-icons-outlined" aria-hidden="true">dashboard</span><span data-i18n="nav.dashboard">Dashboard</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="cartons.html"><span class="material-icons-outlined" aria-hidden="true">inventory_2</span><span data-i18n="nav.cartons">Cartons</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="shipments.html"><span class="material-icons-outlined" aria-hidden="true">local_shipping</span><span data-i18n="nav.shipments">Shipments</span></a></li>
+                <li class="nav-item"><a class="nav-link is-active" href="planned-stock.html" aria-current="page"><span class="material-icons-outlined" aria-hidden="true">analytics</span><span data-i18n="nav.plannedStock">Planned Stock</span></a></li>
                 <li class="nav-item nav-item--has-children" data-imports>
                     <button class="nav-link" type="button" data-imports-toggle aria-expanded="false">
                         <span class="material-icons-outlined" aria-hidden="true">dataset</span>
-                        <span>Data Imports</span>
+                        <span data-i18n="nav.dataImports.label">Data Imports</span>
                         <span class="material-icons-outlined nav-link__chevron" aria-hidden="true">expand_more</span>
                     </button>
                     <ul class="nav-submenu">
-                        <li><a class="nav-sublink" href="lc-upload.html"><span class="material-icons-outlined" aria-hidden="true">upload_file</span><span>LC Upload</span></a></li>
-                        <li><a class="nav-sublink" href="amazon-snapshot-upload.html"><span class="material-icons-outlined" aria-hidden="true">cloud_upload</span><span>Amazon Snapshot</span></a></li>
+                        <li><a class="nav-sublink" href="lc-upload.html"><span class="material-icons-outlined" aria-hidden="true">upload_file</span><span data-i18n="nav.dataImports.lcUpload">LC Upload</span></a></li>
+                        <li><a class="nav-sublink" href="amazon-snapshot-upload.html"><span class="material-icons-outlined" aria-hidden="true">cloud_upload</span><span data-i18n="nav.dataImports.amazonSnapshot">Amazon Snapshot</span></a></li>
                     </ul>
                 </li>
             </ul>
@@ -76,24 +76,24 @@
                 <button class="user-menu__trigger" type="button" aria-expanded="false" data-user-menu-trigger>
                     <span class="material-icons-outlined" aria-hidden="true">account_circle</span>
                     <span class="user-display-name-wrapper" aria-live="polite">
-                        <span id="userDisplay" class="user-display-name">Loading…</span>
+                        <span id="userDisplay" class="user-display-name" data-i18n="common.loading">Loading…</span>
                     </span>
                     <span class="material-icons-outlined user-menu__chevron" aria-hidden="true">expand_more</span>
                 </button>
                 <div class="user-menu__dropdown" role="menu">
                     <a class="user-menu__link" href="products.html" role="menuitem">
                         <span class="material-icons-outlined" aria-hidden="true">view_list</span>
-                        <span>Products</span>
+                        <span data-i18n="app.userMenu.products">Products</span>
                     </a>
                     <a class="user-menu__link" href="users.html" role="menuitem">
                         <span class="material-icons-outlined" aria-hidden="true">group</span>
-                        <span>Users</span>
+                        <span data-i18n="app.userMenu.users">Users</span>
                     </a>
                 </div>
             </div>
             <button id="logoutBtn" class="btn btn-logout" type="button">
                 <span class="material-icons-outlined" aria-hidden="true">logout</span>
-                <span>Logout</span>
+                <span data-i18n="app.userMenu.logout">Logout</span>
             </button>
         </div>
     </header>
@@ -103,110 +103,110 @@
             <div class="page-title">
                 <span class="material-icons-outlined" aria-hidden="true">analytics</span>
                 <div class="page-title-copy">
-                    <h2>Planned Stock</h2>
-                    <p>Steuere zusätzliche Bestände und Simulationen für jede Produkt-ID inklusive ETA und Aktivierungsstatus.</p>
+                    <h2 data-i18n="plannedStock.header.title">Planned Stock</h2>
+                    <p data-i18n="plannedStock.header.subtitle">Manage additional inventory and simulations for each product, including ETA and activation status.</p>
                 </div>
             </div>
             <div class="page-header-actions">
                 <button id="refreshBtn" class="btn btn-secondary" type="button">
                     <span class="material-icons-outlined" aria-hidden="true">refresh</span>
-                    <span>Aktualisieren</span>
+                    <span data-i18n="common.actions.refresh">Refresh</span>
                 </button>
                 <button id="addEntryBtn" class="btn btn-primary" type="button">
                     <span class="material-icons-outlined" aria-hidden="true">add_circle</span>
-                    <span>Planung anlegen</span>
+                    <span data-i18n="plannedStock.header.create">Create plan</span>
                 </button>
             </div>
         </section>
 
-        <section class="surface-card metrics-panel" aria-label="Planned stock overview">
+        <section class="surface-card metrics-panel" aria-label="Planned stock overview" data-i18n-attr="aria-label" data-i18n="plannedStock.metrics.ariaLabel">
             <div class="metrics-grid">
                 <article class="metric-card">
                     <span class="material-icons-outlined metric-icon" aria-hidden="true">inventory</span>
                     <div class="metric-content">
-                        <p class="metric-label">Aktive Planung</p>
-                        <p class="metric-value"><span id="activeBoxes">0</span> Boxen</p>
-                        <p class="metric-subtext"><span id="activePairs">0</span> Paare in Summe</p>
+                        <p class="metric-label" data-i18n="plannedStock.metrics.active.label">Active planning</p>
+                        <p class="metric-value"><span id="activeBoxes">0</span> <span data-i18n="common.units.boxes">Boxes</span></p>
+                        <p class="metric-subtext"><span id="activePairs">0</span> <span data-i18n="common.units.pairs">Pairs</span> <span data-i18n="plannedStock.metrics.active.totalSuffix">in total</span></p>
                     </div>
                 </article>
                 <article class="metric-card">
                     <span class="material-icons-outlined metric-icon" aria-hidden="true">fact_check</span>
                     <div class="metric-content">
-                        <p class="metric-label">Committed</p>
-                        <p class="metric-value"><span id="committedBoxes">0</span> Boxen</p>
-                        <p class="metric-subtext"><span id="committedPairs">0</span> Paare geplant</p>
+                        <p class="metric-label" data-i18n="plannedStock.metrics.committed.label">Committed</p>
+                        <p class="metric-value"><span id="committedBoxes">0</span> <span data-i18n="common.units.boxes">Boxes</span></p>
+                        <p class="metric-subtext"><span id="committedPairs">0</span> <span data-i18n="common.units.pairs">Pairs</span> <span data-i18n="plannedStock.metrics.committed.totalSuffix">planned</span></p>
                     </div>
                 </article>
                 <article class="metric-card">
                     <span class="material-icons-outlined metric-icon" aria-hidden="true">science</span>
                     <div class="metric-content">
-                        <p class="metric-label">Simulationen</p>
-                        <p class="metric-value"><span id="simulationBoxes">0</span> Boxen</p>
-                        <p class="metric-subtext"><span id="simulationPairs">0</span> Paare simuliert</p>
+                        <p class="metric-label" data-i18n="plannedStock.metrics.simulation.label">Simulations</p>
+                        <p class="metric-value"><span id="simulationBoxes">0</span> <span data-i18n="common.units.boxes">Boxes</span></p>
+                        <p class="metric-subtext"><span id="simulationPairs">0</span> <span data-i18n="common.units.pairs">Pairs</span> <span data-i18n="plannedStock.metrics.simulation.totalSuffix">simulated</span></p>
                     </div>
                 </article>
             </div>
         </section>
 
-        <section class="surface-card filters-panel" aria-label="Planned stock filter">
+        <section class="surface-card filters-panel" aria-label="Planned stock filter" data-i18n-attr="aria-label" data-i18n="plannedStock.filters.ariaLabel">
             <form id="filtersForm" class="filters-form" novalidate>
                 <div class="filters-grid">
                     <label class="filter-field" for="productFilter">
-                        <span class="filter-label">Produkt</span>
+                        <span class="filter-label" data-i18n="plannedStock.filters.product.label">Product</span>
                         <select id="productFilter" name="product">
-                            <option value="">Alle Produkte</option>
+                            <option value="" data-i18n="plannedStock.filters.product.all">All products</option>
                         </select>
                     </label>
                     <label class="filter-field search-field" for="searchInput">
-                        <span class="filter-label">Suche</span>
+                        <span class="filter-label" data-i18n="plannedStock.filters.search.label">Search</span>
                         <div class="search-input">
                             <span class="material-icons-outlined" aria-hidden="true">search</span>
-                            <input type="text" id="searchInput" name="search" placeholder="Nach Label, Produkt oder Scope suchen">
+                            <input type="text" id="searchInput" name="search" placeholder="Search by label, product, or scope" data-i18n-attr="placeholder" data-i18n="plannedStock.filters.search.placeholder">
                         </div>
                     </label>
                     <div class="filter-field checkbox-group">
-                        <span class="filter-label">Erweiterte Ansicht</span>
+                        <span class="filter-label" data-i18n="plannedStock.filters.advanced.label">Advanced view</span>
                         <label class="checkbox-inline">
                             <input type="checkbox" id="includeSimulations">
-                            <span>Simulationen anzeigen</span>
+                            <span data-i18n="plannedStock.filters.advanced.showSimulations">Show simulations</span>
                         </label>
                         <label class="checkbox-inline">
                             <input type="checkbox" id="includeFuture">
-                            <span>zukünftige ETAs</span>
+                            <span data-i18n="plannedStock.filters.advanced.includeFuture">Include future ETAs</span>
                         </label>
                         <label class="checkbox-inline">
                             <input type="checkbox" id="includeInactive">
-                            <span>inaktive Planung</span>
+                            <span data-i18n="plannedStock.filters.advanced.includeInactive">Include inactive plans</span>
                         </label>
                     </div>
                 </div>
                 <div class="filter-actions">
                     <button type="submit" class="btn btn-secondary" id="applyFiltersBtn">
                         <span class="material-icons-outlined" aria-hidden="true">tune</span>
-                        <span>Filter anwenden</span>
+                        <span data-i18n="common.actions.applyFilters">Apply filters</span>
                     </button>
                     <button type="button" class="btn btn-secondary" id="resetFiltersBtn">
                         <span class="material-icons-outlined" aria-hidden="true">backspace</span>
-                        <span>Zurücksetzen</span>
+                        <span data-i18n="common.actions.reset">Reset</span>
                     </button>
                 </div>
             </form>
         </section>
 
-        <section class="surface-card table-card" aria-label="Planned stock table">
-            <div id="plannedStockLoading" class="loading-indicator">Lade geplante Bestände…</div>
-            <div class="table-scroll" role="region" aria-live="polite" aria-label="Geplante Bestände">
+        <section class="surface-card table-card" aria-label="Planned stock table" data-i18n-attr="aria-label" data-i18n="plannedStock.table.ariaLabel">
+            <div id="plannedStockLoading" class="loading-indicator" data-i18n="plannedStock.loading">Loading planned stock...</div>
+            <div class="table-scroll" role="region" aria-live="polite" aria-label="Planned stock data table" data-i18n-attr="aria-label" data-i18n="plannedStock.table.regionLabel">
                 <table id="plannedStockTable" class="planned-stock-table table-sticky is-hidden">
                     <thead>
                         <tr>
-                            <th scope="col">Produkt<br><small>Artikel</small></th>
-                            <th scope="col">Scope</th>
-                            <th scope="col">Label</th>
-                            <th scope="col" class="numeric">Boxen</th>
-                            <th scope="col" class="numeric">Paare</th>
-                            <th scope="col">ETA</th>
-                            <th scope="col">Status</th>
-                            <th scope="col" class="actions-col">Aktionen</th>
+                            <th scope="col" data-i18n="plannedStock.table.headers.product">Product<br><small data-i18n="plannedStock.table.headers.article">Article</small></th>
+                            <th scope="col" data-i18n="plannedStock.table.headers.scope">Scope</th>
+                            <th scope="col" data-i18n="plannedStock.table.headers.label">Label</th>
+                            <th scope="col" class="numeric" data-i18n="plannedStock.table.headers.boxes">Boxes</th>
+                            <th scope="col" class="numeric" data-i18n="plannedStock.table.headers.pairs">Pairs</th>
+                            <th scope="col" data-i18n="plannedStock.table.headers.eta">ETA</th>
+                            <th scope="col" data-i18n="plannedStock.table.headers.status">Status</th>
+                            <th scope="col" class="actions-col" data-i18n="plannedStock.table.headers.actions">Actions</th>
                         </tr>
                     </thead>
                     <tbody id="plannedStockTableBody"></tbody>
@@ -214,7 +214,7 @@
             </div>
             <div id="plannedStockEmpty" class="empty-state is-hidden">
                 <span class="material-icons-outlined" aria-hidden="true">inventory_2</span>
-                <p>Keine geplanten Bestände gefunden</p>
+                <p data-i18n="plannedStock.empty">No planned stock entries found.</p>
             </div>
         </section>
     </main>
@@ -225,11 +225,11 @@
                 <div class="modal-title-group">
                     <span class="material-icons-outlined" aria-hidden="true">addchart</span>
                     <div>
-                        <h3 id="plannedStockModalTitle">Neue Planung</h3>
-                        <p id="plannedStockModalSubtitle" class="modal-subtitle">Zusätzliche Boxen für ein Produkt definieren.</p>
+                        <h3 id="plannedStockModalTitle" data-i18n="plannedStock.modal.title">New plan</h3>
+                        <p id="plannedStockModalSubtitle" class="modal-subtitle" data-i18n="plannedStock.modal.subtitle">Define additional boxes for a product.</p>
                     </div>
                 </div>
-                <button class="modal-close" type="button" id="plannedStockModalClose" aria-label="Dialog schließen">
+                <button class="modal-close" type="button" id="plannedStockModalClose" aria-label="Close dialog" data-i18n-attr="aria-label" data-i18n="plannedStock.modal.closeAria">
                     <span class="material-icons-outlined" aria-hidden="true">close</span>
                 </button>
             </div>
@@ -238,49 +238,49 @@
                 <div class="modal-body">
                     <div class="form-grid form-grid--two">
                         <div class="form-group">
-                            <label for="entryProduct">Produkt *</label>
+                            <label for="entryProduct" data-i18n="plannedStock.modal.productLabel">Product *</label>
                             <select id="entryProduct" required>
-                                <option value="">Produkt wählen</option>
+                                <option value="" data-i18n="plannedStock.modal.productPlaceholder">Select product</option>
                             </select>
                         </div>
                         <div class="form-group">
-                            <label for="entryScope">Scope *</label>
+                            <label for="entryScope" data-i18n="plannedStock.modal.scopeLabel">Scope *</label>
                             <select id="entryScope" required>
-                                <option value="committed">Committed</option>
-                                <option value="simulation">Simulation</option>
+                                <option value="committed" data-i18n="plannedStock.scope.committed">Committed</option>
+                                <option value="simulation" data-i18n="plannedStock.scope.simulation">Simulation</option>
                             </select>
                         </div>
                         <div class="form-group">
-                            <label for="entryBoxes">Boxen *</label>
+                            <label for="entryBoxes" data-i18n="plannedStock.modal.boxesLabel">Boxes *</label>
                             <input type="number" id="entryBoxes" min="1" step="1" required>
-                            <small>Ganze Boxen, mindestens 1</small>
+                            <small data-i18n="plannedStock.modal.boxesHelp">Whole boxes, minimum 1</small>
                         </div>
                         <div class="form-group">
-                            <label for="entryEta">ETA</label>
+                            <label for="entryEta" data-i18n="plannedStock.modal.etaLabel">ETA</label>
                             <input type="date" id="entryEta">
-                            <small>Optionales Lieferdatum</small>
+                            <small data-i18n="plannedStock.modal.etaHelp">Optional delivery date</small>
                         </div>
                         <div class="form-group">
-                            <label for="entryLabel">Label</label>
-                            <input type="text" id="entryLabel" maxlength="120" placeholder="z.B. Order #4711">
+                            <label for="entryLabel" data-i18n="plannedStock.modal.labelLabel">Label</label>
+                            <input type="text" id="entryLabel" maxlength="120" placeholder="e.g., Order #4711" data-i18n-attr="placeholder" data-i18n="plannedStock.modal.labelPlaceholder">
                         </div>
                         <div class="form-group form-group--checkbox">
                             <label class="checkbox-inline">
                                 <input type="checkbox" id="entryIsActive" checked>
-                                <span>Aktiv</span>
+                                <span data-i18n="plannedStock.modal.activeLabel">Active</span>
                             </label>
-                            <small>Inaktive Einträge zählen nicht in die Summe</small>
+                            <small data-i18n="plannedStock.modal.activeHelp">Inactive entries do not count toward totals</small>
                         </div>
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" id="modalCancelBtn">
                         <span class="material-icons-outlined" aria-hidden="true">close</span>
-                        <span>Abbrechen</span>
+                        <span data-i18n="common.actions.cancel">Cancel</span>
                     </button>
                     <button type="submit" class="btn btn-primary" id="modalSubmitBtn">
                         <span class="material-icons-outlined" aria-hidden="true">save</span>
-                        <span id="modalSubmitText">Speichern</span>
+                        <span id="modalSubmitText" data-i18n="plannedStock.modal.save">Save</span>
                     </button>
                 </div>
             </form>
@@ -290,21 +290,30 @@
     <footer class="site-footer">
         <div class="site-footer__inner">
             <div class="site-footer__section">
-                <span class="site-footer__copyright">© <span class="site-footer__year" data-footer-year data-current-year="2024">2024</span> WarehouseWrangler</span>
+                <span class="site-footer__copyright">© <span class="site-footer__year" data-footer-year data-current-year="2024">2024</span> <span data-i18n="app.brand.name">WarehouseWrangler</span></span>
             </div>
             <div class="site-footer__section site-footer__created-by">
-                <span class="site-footer__label">Created by</span>
+                <span class="site-footer__label" data-i18n="app.footer.createdBy">Created by</span>
                 <a href="https://threegents.eu" class="site-footer__link" target="_blank" rel="noopener">
                     <img src="https://threegents.eu/images/logo_light.svg" alt="ThreeGents logo" class="site-footer__logo">
-                    <span>ThreeGents</span>
+                    <span data-i18n="app.footer.partner">ThreeGents</span>
                 </a>
             </div>
             <div class="site-footer__section">
-                <a href="mailto:support@threegents.biz" class="site-footer__link">Support</a>
+                <a href="mailto:support@threegents.biz" class="site-footer__link" data-i18n="app.footer.support">Support</a>
             </div>
         </div>
     </footer>
 
+    <script src="./js/i18n.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var storedLocale = localStorage.getItem('ww_locale') || I18n.DEFAULT_LOCALE;
+            I18n.init({ locale: storedLocale }).then(function () {
+                I18n.translateTree();
+            });
+        });
+    </script>
     <script src="./js/header.js" defer></script>
     <script src="./js/planned-stock.js" defer></script>
     <script type="module" src="./js/footer.js"></script>
