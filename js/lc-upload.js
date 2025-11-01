@@ -27,6 +27,20 @@ function getToken() {
     return localStorage.getItem('ww_auth_token');
 }
 
+function t(key, replacements, defaultValue) {
+    const i18n = window.I18n;
+    if (i18n?.t) {
+        const hasDefault = defaultValue !== undefined;
+        if (replacements !== undefined) {
+            return hasDefault
+                ? i18n.t(key, replacements, { defaultValue })
+                : i18n.t(key, replacements);
+        }
+        return hasDefault ? i18n.t(key, undefined, { defaultValue }) : i18n.t(key);
+    }
+    return defaultValue ?? key;
+}
+
 // ============================================================================
 // INITIALIZATION
 // ============================================================================
@@ -41,7 +55,7 @@ function initializeHeader() {
     const userDataStr = localStorage.getItem('ww_user_data');
 
     if (userDisplay) {
-        userDisplay.textContent = 'Benutzer';
+        userDisplay.textContent = t('common.user.anonymous', undefined, 'User');
         if (userDataStr) {
             try {
                 const userData = JSON.parse(userDataStr);
@@ -57,7 +71,12 @@ function initializeHeader() {
     const logoutBtn = document.getElementById('logoutBtn');
     if (logoutBtn) {
         logoutBtn.addEventListener('click', () => {
-            if (confirm('Are you sure you want to logout?')) {
+            const promptMessage = t(
+                'common.prompts.logoutConfirm',
+                undefined,
+                'Are you sure you want to log out?'
+            );
+            if (confirm(promptMessage)) {
                 localStorage.removeItem('ww_auth_token');
                 localStorage.removeItem('ww_user_data');
                 window.location.href = 'login.html';
@@ -101,12 +120,21 @@ function handleFileSelect(event) {
     if (!file) return;
 
     if (!file.name.toLowerCase().endsWith('.csv')) {
-        showError('Please select a CSV file.');
+        showError(
+            t('lcUpload.errors.csvRequired', undefined, 'Please select a CSV file.')
+        );
         return;
     }
 
     if (file.size > MAX_FILE_SIZE) {
-        showError(`File is too large. Maximum size is ${MAX_FILE_SIZE / 1024 / 1024}MB.`);
+        const maxSize = `${MAX_FILE_SIZE / 1024 / 1024}MB`;
+        showError(
+            t(
+                'lcUpload.errors.fileTooLarge',
+                { size: maxSize },
+                `File is too large. Maximum size is ${maxSize}.`
+            )
+        );
         return;
     }
 
@@ -135,7 +163,9 @@ function clearFile() {
 
 async function handleUpload() {
     if (!selectedFile) {
-        showError('Please select a file first.');
+        showError(
+            t('lcUpload.errors.fileNotSelected', undefined, 'Please select a file first.')
+        );
         return;
     }
 
@@ -160,11 +190,20 @@ async function handleUpload() {
             parsedData = data.data;
             showPreview(data.data);
         } else {
-            showErrorSection(data.error || 'Failed to parse file. Please check the format.');
+            const errorMessage =
+                data.error ||
+                t(
+                    'lcUpload.errors.parseFailed',
+                    undefined,
+                    'Failed to parse file. Please check the format.'
+                );
+            showErrorSection(errorMessage);
         }
     } catch (error) {
         console.error('Upload error:', error);
-        showErrorSection('Connection error. Please try again.');
+        showErrorSection(
+            t('common.errors.connection', undefined, 'Connection error. Please try again.')
+        );
     } finally {
         setUploadLoading(false);
     }
@@ -181,7 +220,8 @@ function showPreview(data) {
 
     document.getElementById('previewSection').classList.remove('hidden');
 
-    document.getElementById('summaryPrefix').textContent = data.cartonPrefix || 'N/A';
+    const notAvailableLabel = t('common.placeholders.notAvailable', undefined, 'N/A');
+    document.getElementById('summaryPrefix').textContent = data.cartonPrefix || notAvailableLabel;
     document.getElementById('summaryCartons').textContent = data.statistics.totalCartons || 0;
     document.getElementById('summaryProducts').textContent = data.statistics.uniqueProducts || 0;
     document.getElementById('summaryRows').textContent = data.statistics.rowsProcessed || 0;
@@ -192,15 +232,23 @@ function showPreview(data) {
 
     if (warningsCard && warningsList) {
         if (data.warnings.length > 0) {
-            warningsList.innerHTML = data.warnings.map((warning) => `
+            warningsList.innerHTML = data.warnings
+                .map((warning) => {
+                    const defaultLine = `Line ${warning.line}`;
+                    const lineLabel = escapeHtml(
+                        t('lcUpload.warnings.lineLabel', { line: warning.line }, defaultLine)
+                    );
+                    return `
                 <li>
                     <span class="material-icons-outlined" aria-hidden="true">report_problem</span>
                     <div>
-                        <p class="warning-title">Zeile ${escapeHtml(warning.line)}</p>
+                        <p class="warning-title">${lineLabel}</p>
                         <p>${escapeHtml(warning.message)}</p>
                     </div>
                 </li>
-            `).join('');
+            `;
+                })
+                .join('');
             warningsCard.classList.remove('hidden');
         } else {
             warningsList.innerHTML = '';
@@ -250,9 +298,16 @@ function renderPreviewTable(data) {
     }
 
     if (filtered.length === 0) {
+        const emptyMessage = escapeHtml(
+            t(
+                'lcUpload.preview.table.empty',
+                undefined,
+                'No entries match the current filters.'
+            )
+        );
         tbody.innerHTML = `
             <tr>
-                <td colspan="5" class="table-footnote">Keine Einträge für die aktuellen Filter.</td>
+                <td colspan="5" class="table-footnote">${emptyMessage}</td>
             </tr>
         `;
         return;
@@ -261,15 +316,29 @@ function renderPreviewTable(data) {
     const rowsMarkup = filtered.slice(0, limit).map((item) => {
         const badgeClass = item.isMixed ? 'type-badge type-badge--mixed' : 'type-badge type-badge--single';
         const badgeIcon = item.isMixed ? 'call_split' : 'inventory_2';
-        const badgeLabel = item.isMixed ? 'Mischkarton' : 'Single';
+        const badgeKey = item.isMixed
+            ? 'lcUpload.preview.table.badges.mixed'
+            : 'lcUpload.preview.table.badges.single';
+        const badgeLabel = escapeHtml(
+            t(
+                badgeKey,
+                undefined,
+                item.isMixed ? 'Mixed carton' : 'Single carton'
+            )
+        );
         const rowClass = item.isMixed ? 'is-mixed' : '';
         const boxesValue = item.boxes ?? '';
+        const productDisplay = item.productName || item.sku || t(
+            'lcUpload.preview.productFallback',
+            undefined,
+            'Unknown product'
+        );
 
         return `
             <tr class="${rowClass}">
                 <td><span class="code-text">${escapeHtml(item.cartonNumber)}</span></td>
                 <td><span class="code-text">${escapeHtml(item.fnsku)}</span></td>
-                <td>${escapeHtml(item.productName || item.sku || 'Unknown')}</td>
+                <td>${escapeHtml(productDisplay)}</td>
                 <td class="numeric">${escapeHtml(boxesValue)}</td>
                 <td>
                     <span class="${badgeClass}">
@@ -282,10 +351,18 @@ function renderPreviewTable(data) {
     }).join('');
 
     const truncated = filtered.length > limit;
-    tbody.innerHTML = truncated ? `${rowsMarkup}
+    if (truncated) {
+        const defaultMessage = `Showing only the first ${limit} of ${filtered.length} entries.`;
+        const truncatedMessage = escapeHtml(
+            t('lcUpload.preview.table.truncated', { shown: limit, total: filtered.length }, defaultMessage)
+        );
+        tbody.innerHTML = `${rowsMarkup}
         <tr>
-            <td colspan="5" class="table-footnote">Es werden nur die ersten ${limit} von ${filtered.length} Einträgen angezeigt.</td>
-        </tr>` : rowsMarkup;
+            <td colspan="5" class="table-footnote">${truncatedMessage}</td>
+        </tr>`;
+    } else {
+        tbody.innerHTML = rowsMarkup;
+    }
 }
 
 function filterPreview() {
@@ -300,11 +377,17 @@ function filterPreview() {
 
 async function handleConfirm() {
     if (!parsedData) {
-        showError('No data to import.');
+        showError(t('lcUpload.errors.noData', undefined, 'No data to import.'));
         return;
     }
 
-    if (!confirm(`Are you sure you want to import ${parsedData.statistics.totalCartons} cartons to Incoming warehouse?`)) {
+    const confirmMessage = t(
+        'lcUpload.prompts.confirmImport',
+        { count: parsedData.statistics.totalCartons },
+        `Are you sure you want to import ${parsedData.statistics.totalCartons} cartons to Incoming warehouse?`
+    );
+
+    if (!confirm(confirmMessage)) {
         return;
     }
 
@@ -328,11 +411,16 @@ async function handleConfirm() {
         if (data.success) {
             showSuccess(data.data);
         } else {
-            showErrorSection(data.error || 'Import failed. Please try again.');
+            const errorMessage =
+                data.error ||
+                t('lcUpload.errors.importFailed', undefined, 'Import failed. Please try again.');
+            showErrorSection(errorMessage);
         }
     } catch (error) {
         console.error('Import error:', error);
-        showErrorSection('Connection error. Please try again.');
+        showErrorSection(
+            t('common.errors.connection', undefined, 'Connection error. Please try again.')
+        );
     } finally {
         setConfirmLoading(false);
     }
@@ -409,7 +497,12 @@ function resetToUpload() {
 }
 
 function showError(message) {
-    alert('Fehler: ' + message);
+    const alertText = t(
+        'common.alerts.error',
+        { message },
+        `Error: ${message}`
+    );
+    alert(alertText);
 }
 
 function escapeHtml(text) {
