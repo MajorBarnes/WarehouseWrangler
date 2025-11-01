@@ -62,7 +62,8 @@
       "pairs": "Pairs"
     },
     "placeholders": {
-      "notAvailable": "N/A"
+      "notAvailable": "N/A",
+      "emDash": "—"
     },
     "errors": {
       "connection": "Connection error. Please try again.",
@@ -961,6 +962,9 @@
         "includeInactive": "Include inactive plans"
       }
     },
+    "products": {
+      "unknownArtikel": "Unknown"
+    },
     "loading": "Loading planned stock...",
     "table": {
       "ariaLabel": "Planned stock table",
@@ -975,6 +979,22 @@
         "eta": "ETA",
         "status": "Status",
         "actions": "Actions"
+      },
+      "labels": {
+        "productUnknown": "Unknown product",
+        "articleValue": "Article {artikel}",
+        "articleUnknown": "Article unknown"
+      },
+      "status": {
+        "active": "Active",
+        "inactive": "Inactive"
+      },
+      "actions": {
+        "edit": "Edit",
+        "activate": "Activate",
+        "deactivate": "Deactivate",
+        "toggle": "Toggle status",
+        "delete": "Delete"
       }
     },
     "empty": "No planned stock entries found.",
@@ -993,11 +1013,45 @@
       "labelPlaceholder": "e.g., Order #4711",
       "activeLabel": "Active",
       "activeHelp": "Inactive entries do not count toward totals",
-      "save": "Save"
+      "save": "Save",
+      "editTitle": "Edit plan",
+      "editSubtitle": "Update scope, quantity, or ETA for the existing plan.",
+      "createAction": "Create",
+      "updateAction": "Update"
     },
     "scope": {
       "committed": "Committed",
       "simulation": "Simulation"
+    },
+    "alerts": {
+      "created": "Plan created.",
+      "updated": "Plan updated.",
+      "deleted": "Plan deleted.",
+      "statusChanged": "Status updated."
+    },
+    "errors": {
+      "loadProducts": "Failed to load products.",
+      "unknown": "Unknown error",
+      "loadFailed": "Failed to load planned stock.",
+      "saveFailed": "Unable to save plan.",
+      "createFailed": "Failed to create plan.",
+      "updateFailed": "Failed to update plan.",
+      "deleteFailed": "Failed to delete plan.",
+      "toggleFailed": "Failed to change status.",
+      "entryNotFound": "Entry could not be found.",
+      "unknownEntry": "Unable to identify the plan entry."
+    },
+    "prompts": {
+      "deactivate": "Deactivate plan? It will be removed from totals.",
+      "activate": "Activate plan? It will count toward totals again.",
+      "delete": "Delete plan? This marks the entry inactive."
+    },
+    "validation": {
+      "productRequired": "Please select a product.",
+      "boxesInvalid": "Please enter a valid number of boxes.",
+      "createMinimumBoxes": "New plans require at least one box.",
+      "scopeInvalid": "Invalid scope selected.",
+      "etaInvalid": "ETA must use YYYY-MM-DD format."
     }
   }
 }
