@@ -596,10 +596,16 @@ function renderAvailableCartons() {
                     ${escapeHtml(String(productCount))} Produkte • ${escapeHtml(String(totalBoxes))} Boxen verfügbar
                 </div>
                 ${productsMarkup}
-                <button class="btn btn-primary btn-small" type="button" data-action="select-carton" data-carton-id="${escapeHtml(String(cartonId))}">
-                    <span class="material-icons-outlined" aria-hidden="true">add_box</span>
-                    <span>Boxen auswählen</span>
-                </button>
+                <div class="carton-actions">
+                    <button class="btn btn-primary btn-small" type="button" data-action="select-carton" data-carton-id="${escapeHtml(String(cartonId))}">
+                        <span class="material-icons-outlined" aria-hidden="true">add_box</span>
+                        <span>Boxen auswählen</span>
+                    </button>
+                    <button class="btn btn-secondary btn-small" type="button" data-action="add-all-boxes" data-carton-id="${escapeHtml(String(cartonId))}">
+                        <span class="material-icons-outlined" aria-hidden="true">library_add</span>
+                        <span>Alle Boxen</span>
+                    </button>
+                </div>
             </div>
         `;
     }).join('');
@@ -612,6 +618,62 @@ async function selectBoxesFromCarton(cartonId) {
         return;
     }
     showBoxSelectionDialog(carton, carton.products);
+}
+
+async function addAllBoxesFromCarton(cartonId) {
+    if (!activeShipment || !activeShipment.shipment_id) {
+        showError('Bitte wählen oder erstellen Sie zuerst ein Shipment.');
+        return;
+    }
+
+    const carton = availableCartons.find(c => c.carton_id === cartonId);
+    if (!carton) {
+        showError('Carton not found');
+        return;
+    }
+
+    const products = Array.isArray(carton.products) ? carton.products : [];
+    const boxes = products
+        .map(product => {
+            const boxesAvailable = Number(product.boxes_available_for_shipment ?? product.boxes_current ?? 0);
+            if (boxesAvailable <= 0) {
+                return null;
+            }
+
+            return {
+                carton_id: carton.carton_id,
+                product_id: product.product_id,
+                boxes_to_send: boxesAvailable,
+                carton_number: carton.carton_number,
+                product_name: product.product_name,
+                pairs_per_box: Number(product.pairs_per_box ?? 0)
+            };
+        })
+        .filter(Boolean);
+
+    if (boxes.length === 0) {
+        showError('Keine verfügbaren Boxen in diesem Karton.');
+        return;
+    }
+
+    try {
+        const result = await addBoxesToShipment(activeShipment.shipment_id, boxes);
+
+        if (result.success) {
+            const totalBoxes = boxes.reduce((sum, box) => sum + box.boxes_to_send, 0);
+            showSuccess(`Alle verfügbaren Boxen (${totalBoxes}) wurden hinzugefügt.`);
+            await reloadShipmentContents();
+            await loadAvailableCartons();
+        } else {
+            showError(result.error || 'Failed to add boxes to shipment');
+            if (Array.isArray(result.warnings) && result.warnings.length > 0) {
+                alert('Warnings:\n' + result.warnings.join('\n'));
+            }
+        }
+    } catch (error) {
+        console.error('addAllBoxesFromCarton failed:', error);
+        showError('Connection error. Please try again.');
+    }
 }
 
 function showBoxSelectionDialog(carton, contents) {
@@ -1291,6 +1353,16 @@ function handleGlobalActionClick(event) {
                 const cartonId = Number(target.dataset.cartonId);
                 if (!Number.isNaN(cartonId)) {
                     selectBoxesFromCarton(cartonId);
+                }
+            }
+            break;
+        }
+        case 'add-all-boxes': {
+            event.preventDefault();
+            {
+                const cartonId = Number(target.dataset.cartonId);
+                if (!Number.isNaN(cartonId)) {
+                    addAllBoxesFromCarton(cartonId);
                 }
             }
             break;
