@@ -887,11 +887,13 @@
     },
     "warnings": {
       "title": "Warnings",
-      "description": "Review anomalies before confirming the import."
+      "description": "Review anomalies before confirming the import.",
+      "lineLabel": "Line {line}"
     },
     "preview": {
       "title": "Preview first 20 cartons",
       "description": "Use the filters to quickly spot mixed cartons.",
+      "productFallback": "Unknown product",
       "filters": {
         "mixedOnly": "Show mixed cartons only"
       },
@@ -903,11 +905,28 @@
           "product": "Product",
           "boxes": "Boxes",
           "type": "Type"
+        },
+        "empty": "No entries match the current filters.",
+        "truncated": "Showing only the first {shown} of {total} entries.",
+        "badges": {
+          "mixed": "Mixed carton",
+          "single": "Single carton"
         }
       }
     },
+    "errors": {
+      "csvRequired": "Please select a CSV file.",
+      "fileTooLarge": "File is too large. Maximum size is {size}.",
+      "fileNotSelected": "Please select a file first.",
+      "parseFailed": "Failed to parse file. Please check the format.",
+      "noData": "No data to import.",
+      "importFailed": "Import failed. Please try again."
+    },
     "actions": {
       "confirm": "Confirm import"
+    },
+    "prompts": {
+      "confirmImport": "Are you sure you want to import {count} cartons to the Incoming warehouse?"
     },
     "success": {
       "title": "Import successful",
