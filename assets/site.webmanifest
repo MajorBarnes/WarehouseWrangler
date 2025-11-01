@@ -1,1 +1,54 @@
-{"name":"","short_name":"","icons":[{"src":"/android-chrome-192x192.png","sizes":"192x192","type":"image/png"},{"src":"/android-chrome-512x512.png","sizes":"512x512","type":"image/png"}],"theme_color":"#ffffff","background_color":"#ffffff","display":"standalone"}
+{
+  "name": "WarehouseWrangler Fulfillment Control Center",
+  "short_name": "WarehouseWrangler",
+  "description": "Command center for carton tracking, shipment reconciliation, and coverage planning.",
+  "lang": "en-US",
+  "dir": "ltr",
+  "start_url": "/login.html",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#F7F7F7",
+  "theme_color": "#0056B3",
+  "icons": [
+    {
+      "src": "android-chrome-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "android-chrome-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "favicon.png",
+      "sizes": "32x32",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Open Carton Inventory",
+      "short_name": "Cartons",
+      "description": "Jump directly to the carton management workspace.",
+      "url": "/cartons.html"
+    },
+    {
+      "name": "Planned Stock Coverage",
+      "short_name": "Planned Stock",
+      "description": "Review planned stock scenarios and coverage targets.",
+      "url": "/planned-stock.html"
+    },
+    {
+      "name": "Amazon Snapshot Upload",
+      "short_name": "Snapshot Upload",
+      "description": "Upload the latest Amazon inventory snapshot for reconciliation.",
+      "url": "/amazon-snapshot-upload.html"
+    }
+  ],
+  "categories": ["business", "productivity"]
+}
