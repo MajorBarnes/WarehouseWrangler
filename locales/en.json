@@ -846,6 +846,80 @@
       }
     }
   },
+  "lcUpload": {
+    "meta": {
+      "title": "LC File Upload - WarehouseWrangler"
+    },
+    "header": {
+      "title": "LC Upload",
+      "subtitle": "Import delivery notes, review warnings, and create cartons with a structured control flow."
+    },
+    "uploadCard": {
+      "title": "Select LC file",
+      "description": "Upload the supplier CSV to prepare new cartons and validate data before importing.",
+      "selectFile": "Select file",
+      "clearFileAria": "Remove selected file",
+      "requirements": {
+        "title": "File requirements",
+        "format": "Format: CSV with semicolon delimiter",
+        "prefix": "Carton prefix present (e.g., 24SVS88)",
+        "columns": "Required columns: FNSKU, CTN NO, BOX/CARTON",
+        "size": "Maximum file size: 5 MB"
+      },
+      "parse": "Parse & Preview"
+    },
+    "summary": {
+      "title": "Upload summary",
+      "description": "Review key metrics before importing cartons.",
+      "metrics": {
+        "shipment": "Shipment",
+        "totalCartons": "Total cartons",
+        "products": "Products",
+        "rows": "Rows processed",
+        "warnings": "Warnings"
+      },
+      "location": {
+        "prefix": "All cartons will be imported into the ",
+        "badge": "Incoming",
+        "suffix": " area."
+      }
+    },
+    "warnings": {
+      "title": "Warnings",
+      "description": "Review anomalies before confirming the import."
+    },
+    "preview": {
+      "title": "Preview first 20 cartons",
+      "description": "Use the filters to quickly spot mixed cartons.",
+      "filters": {
+        "mixedOnly": "Show mixed cartons only"
+      },
+      "table": {
+        "ariaLabel": "Carton preview",
+        "headers": {
+          "carton": "Carton",
+          "fnsku": "FNSKU",
+          "product": "Product",
+          "boxes": "Boxes",
+          "type": "Type"
+        }
+      }
+    },
+    "actions": {
+      "confirm": "Confirm import"
+    },
+    "success": {
+      "title": "Import successful",
+      "cartons": "Cartons created",
+      "products": "Products updated",
+      "uploadAnother": "Upload another file",
+      "goToDashboard": "Go to dashboard"
+    },
+    "error": {
+      "title": "Upload failed",
+      "retry": "Try again"
+    }
+  },
   "plannedStock": {
     "meta": {
       "title": "Planned Stock - WarehouseWrangler"
