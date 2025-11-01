@@ -1,1 +1,337 @@
-{}
+{
+  "app": {
+    "brand": {
+      "name": "WarehouseWrangler",
+      "tagline": "Fulfillment Control Center"
+    },
+    "header": {
+      "toggleNavigation": "Toggle navigation"
+    },
+    "userMenu": {
+      "products": "Products",
+      "users": "Users",
+      "logout": "Logout"
+    },
+    "footer": {
+      "createdBy": "Created by",
+      "partner": "ThreeGents",
+      "support": "Support"
+    }
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "cartons": "Cartons",
+    "shipments": "Shipments",
+    "plannedStock": "Planned Stock",
+    "dataImports": {
+      "label": "Data Imports",
+      "lcUpload": "LC Upload",
+      "amazonSnapshot": "Amazon Snapshot"
+    }
+  },
+  "common": {
+    "loading": "Loading…",
+    "actions": {
+      "refresh": "Refresh",
+      "applyFilters": "Apply filters",
+      "reset": "Reset",
+      "cancel": "Cancel",
+      "close": "Close",
+      "back": "Back"
+    },
+    "units": {
+      "boxes": "Boxes",
+      "pairs": "Pairs"
+    }
+  },
+  "cartons": {
+    "meta": {
+      "title": "Carton Management - WarehouseWrangler"
+    },
+    "header": {
+      "title": "Carton Management",
+      "subtitle": "Monitor inventory, location changes, and shipping readiness for every carton ID."
+    },
+    "metrics": {
+      "ariaLabel": "Carton overview",
+      "total": {
+        "label": "Total"
+      },
+      "incoming": {
+        "label": "Incoming"
+      },
+      "wml": {
+        "label": "WML"
+      },
+      "gmr": {
+        "label": "GMR"
+      }
+    },
+    "filters": {
+      "ariaLabel": "Carton filter",
+      "location": {
+        "label": "Location",
+        "all": "All locations",
+        "incoming": "Incoming",
+        "wml": "WML",
+        "gmr": "GMR"
+      },
+      "status": {
+        "label": "Status",
+        "all": "All statuses",
+        "inStock": "In stock",
+        "empty": "Empty",
+        "archived": "Archived"
+      },
+      "search": {
+        "label": "Search",
+        "placeholder": "Search carton, product or FNSKU",
+        "clearAria": "Clear search"
+      }
+    },
+    "bulk": {
+      "summary": {
+        "noneSelected": "No cartons selected"
+      },
+      "actions": {
+        "moveSelection": "Move selection"
+      }
+    },
+    "loading": "Loading cartons...",
+    "table": {
+      "ariaLabel": "Carton table",
+      "regionLabel": "Carton data table",
+      "selectAll": "Select all cartons",
+      "headers": {
+        "carton": "Carton",
+        "location": "Location",
+        "status": "Status",
+        "products": "Products",
+        "boxesCurrent": "Boxes (current)",
+        "boxesInitial": "Boxes (initial)",
+        "sentToAmz": "Sent to AMZ",
+        "updated": "Updated",
+        "actions": "Actions"
+      }
+    },
+    "empty": "No cartons found. Adjust the filters or refresh the list.",
+    "move": {
+      "title": "Move carton",
+      "subtitle": "Choose a new location for this carton.",
+      "closeAria": "Close dialog",
+      "cartonLabel": "Carton",
+      "currentLocationLabel": "Current location",
+      "selectionLabel": "Selection",
+      "selectionSuffix": "cartons selected",
+      "selectionHint": "Archived or unchanged cartons are skipped automatically.",
+      "newLocationLabel": "New location *",
+      "newLocationPlaceholder": "Select location",
+      "notesLabel": "Note (optional)",
+      "notesPlaceholder": "Add reason for the move",
+      "confirm": "Move carton"
+    },
+    "details": {
+      "title": "Carton details",
+      "subtitle": "Overview of contents, movements, and stock changes.",
+      "closeAria": "Close dialog",
+      "loading": "Loading details..."
+    }
+  },
+  "shipments": {
+    "meta": {
+      "title": "Shipment Management - WarehouseWrangler"
+    },
+    "header": {
+      "title": "Amazon Shipments",
+      "subtitle": "Coordinate outbound shipments, track carton allocations, and manage recall workflows.",
+      "create": "Create shipment"
+    },
+    "metrics": {
+      "ariaLabel": "Shipment overview",
+      "total": {
+        "label": "Total shipments",
+        "subtext": "All time"
+      },
+      "prepared": {
+        "label": "Prepared",
+        "subtext": "Ready to send"
+      },
+      "sent": {
+        "label": "Sent",
+        "subtext": "Handed over to Amazon"
+      },
+      "recalled": {
+        "label": "Recalled",
+        "subtext": "Returned to inventory"
+      }
+    },
+    "filters": {
+      "ariaLabel": "Shipments filter",
+      "status": {
+        "label": "Status",
+        "all": "All statuses"
+      },
+      "from": "From",
+      "to": "To"
+    },
+    "loading": "Loading shipments...",
+    "table": {
+      "ariaLabel": "Shipments table",
+      "regionLabel": "Shipment data table",
+      "headers": {
+        "reference": "Reference",
+        "date": "Date",
+        "status": "Status",
+        "cartons": "Cartons",
+        "products": "Products",
+        "totalBoxes": "Total boxes",
+        "createdBy": "Created by",
+        "actions": "Actions"
+      }
+    },
+    "empty": "No shipments found. Adjust the filters or create a new shipment.",
+    "create": {
+      "title": "Create shipment",
+      "closeAria": "Close dialog",
+      "referenceLabel": "Shipment reference *",
+      "referencePlaceholder": "e.g., AMZ-2025-10-001",
+      "referenceHelp": "Unique identifier for this shipment",
+      "dateLabel": "Shipment date *",
+      "notesLabel": "Notes (optional)",
+      "notesPlaceholder": "Add any notes about this shipment...",
+      "submit": "Create & add boxes"
+    },
+    "addBoxes": {
+      "titlePrefix": "Add boxes to shipment:",
+      "closeAria": "Close dialog",
+      "summaryTitle": "Selected boxes:",
+      "totalBoxes": "Total boxes:",
+      "cartons": "Cartons:",
+      "products": "Products:",
+      "availableTitle": "Available cartons (WML & GMR):",
+      "loading": "Loading available cartons...",
+      "selectedTitle": "Boxes added to shipment:",
+      "table": {
+        "carton": "Carton",
+        "product": "Product",
+        "boxes": "Boxes",
+        "pairs": "Pairs",
+        "action": "Action"
+      },
+      "proceed": "Review & send"
+    },
+    "steps": {
+      "created": "Created",
+      "addBoxes": "Add boxes",
+      "boxesAdded": "Boxes added",
+      "send": "Send"
+    },
+    "send": {
+      "title": "Confirm shipment send",
+      "closeAria": "Close dialog",
+      "warningTitle": "Important:",
+      "warning": "This action updates inventory. Boxes are removed from their cartons and marked as sent to Amazon. You can undo this via \"Recall\".",
+      "confirm": "Send shipment"
+    },
+    "details": {
+      "title": "Shipment details",
+      "closeAria": "Close dialog",
+      "loading": "Loading shipment details..."
+    },
+    "recall": {
+      "title": "Recall shipment",
+      "closeAria": "Close dialog",
+      "confirmation": "Are you sure you want to recall shipment",
+      "warningTitle": "The following steps will occur:",
+      "steps": {
+        "returnBoxes": "All boxes are booked back into their original cartons.",
+        "updateInventory": "Carton inventory is updated (boxes_current increases).",
+        "markRecalled": "The shipment is marked as \"recalled\".",
+        "logHistory": "The recall is logged in the movement history."
+      },
+      "notesLabel": "Reason for recall *",
+      "notesPlaceholder": "Why are you recalling this shipment?",
+      "confirm": "Recall shipment"
+    }
+  },
+  "plannedStock": {
+    "meta": {
+      "title": "Planned Stock - WarehouseWrangler"
+    },
+    "header": {
+      "title": "Planned Stock",
+      "subtitle": "Manage additional inventory and simulations for each product, including ETA and activation status.",
+      "create": "Create plan"
+    },
+    "metrics": {
+      "ariaLabel": "Planned stock overview",
+      "active": {
+        "label": "Active planning",
+        "totalSuffix": "in total"
+      },
+      "committed": {
+        "label": "Committed",
+        "totalSuffix": "planned"
+      },
+      "simulation": {
+        "label": "Simulations",
+        "totalSuffix": "simulated"
+      }
+    },
+    "filters": {
+      "ariaLabel": "Planned stock filter",
+      "product": {
+        "label": "Product",
+        "all": "All products"
+      },
+      "search": {
+        "label": "Search",
+        "placeholder": "Search by label, product, or scope"
+      },
+      "advanced": {
+        "label": "Advanced view",
+        "showSimulations": "Show simulations",
+        "includeFuture": "Include future ETAs",
+        "includeInactive": "Include inactive plans"
+      }
+    },
+    "loading": "Loading planned stock...",
+    "table": {
+      "ariaLabel": "Planned stock table",
+      "regionLabel": "Planned stock data table",
+      "headers": {
+        "product": "Product",
+        "article": "Article",
+        "scope": "Scope",
+        "label": "Label",
+        "boxes": "Boxes",
+        "pairs": "Pairs",
+        "eta": "ETA",
+        "status": "Status",
+        "actions": "Actions"
+      }
+    },
+    "empty": "No planned stock entries found.",
+    "modal": {
+      "title": "New plan",
+      "subtitle": "Define additional boxes for a product.",
+      "closeAria": "Close dialog",
+      "productLabel": "Product *",
+      "productPlaceholder": "Select product",
+      "scopeLabel": "Scope *",
+      "boxesLabel": "Boxes *",
+      "boxesHelp": "Whole boxes, minimum 1",
+      "etaLabel": "ETA",
+      "etaHelp": "Optional delivery date",
+      "labelLabel": "Label",
+      "labelPlaceholder": "e.g., Order #4711",
+      "activeLabel": "Active",
+      "activeHelp": "Inactive entries do not count toward totals",
+      "save": "Save"
+    },
+    "scope": {
+      "committed": "Committed",
+      "simulation": "Simulation"
+    }
+  }
+}
