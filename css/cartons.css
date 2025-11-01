@@ -265,6 +265,34 @@ button.metric-card:is(:hover, :focus-visible) {
     gap: 1.5rem;
 }
 
+.bulk-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.5rem 0;
+}
+
+.bulk-toolbar .bulk-actions {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.bulk-toolbar .bulk-summary {
+    font-weight: 600;
+    color: var(--color-text);
+}
+
+.bulk-toolbar.is-disabled .bulk-summary {
+    color: var(--color-muted);
+    font-weight: 500;
+}
+
+.bulk-toolbar.is-disabled #bulkMoveBtn {
+    opacity: 0.65;
+}
+
 .loading-indicator {
     display: flex;
     align-items: center;
@@ -326,11 +354,22 @@ button.metric-card:is(:hover, :focus-visible) {
     padding: 0.75rem 1rem;
 }
 
+.cartons-table thead th.select-col {
+    text-align: center;
+    width: 54px;
+    padding: 0.65rem;
+}
+
 .cartons-table tbody td {
     padding: 1rem;
     border-bottom: 1px solid var(--color-border);
     vertical-align: middle;
     background: var(--color-surface);
+}
+
+.cartons-table tbody td.select-col {
+    padding: 0.75rem;
+    text-align: center;
 }
 
 .cartons-table tbody tr:nth-child(even) td {
@@ -402,6 +441,11 @@ button.metric-card:is(:hover, :focus-visible) {
 
 .cartons-table .numeric {
     text-align: right;
+}
+
+.cartons-table .select-col input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
 }
 
 .cartons-table .actions-col {
@@ -551,6 +595,17 @@ button.metric-card:is(:hover, :focus-visible) {
     gap: 0.35rem;
 }
 
+.selection-context {
+    display: grid;
+    gap: 1rem;
+}
+
+@media (min-width: 640px) {
+    .selection-context {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
 .info-label {
     font-size: 0.8rem;
     font-weight: 600;
@@ -562,6 +617,12 @@ button.metric-card:is(:hover, :focus-visible) {
 .info-value {
     font-weight: 600;
     color: var(--color-text);
+}
+
+.info-hint {
+    font-size: 0.85rem;
+    color: var(--color-muted);
+    line-height: 1.4;
 }
 
 .modal-subtitle {

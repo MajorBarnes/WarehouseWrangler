@@ -5,8 +5,8 @@
  * Updates carton location (moves between warehouses)
  * 
  * @method PUT
- * @body JSON: { "carton_id": int, "location": string, "notes": string (optional) }
- * @returns JSON: { "success": bool, "message": string }
+ * @body JSON: { "carton_ids": int[], "location": string, "notes": string (optional) }
+ * @returns JSON: { "success": bool, "message": string, "summary": array }
  */
 
 define('WAREHOUSEWRANGLER', true);
@@ -65,84 +65,119 @@ try {
     // Get PUT data
     $input = file_get_contents('php://input');
     $data = json_decode($input, true);
-    
-    if (!$data) {
+
+    if (!is_array($data)) {
         sendJSON(['success' => false, 'error' => 'Invalid JSON data'], 400);
     }
-    
-    // Validate required fields
-    if (!isset($data['carton_id']) || empty($data['carton_id'])) {
-        sendJSON(['success' => false, 'error' => 'Carton ID is required'], 400);
+
+    if (!isset($data['carton_ids']) || !is_array($data['carton_ids']) || count($data['carton_ids']) === 0) {
+        sendJSON(['success' => false, 'error' => 'carton_ids array is required'], 400);
     }
-    
+
     if (!isset($data['location']) || empty($data['location'])) {
         sendJSON(['success' => false, 'error' => 'Location is required'], 400);
     }
-    
-    $cartonId = (int)$data['carton_id'];
+
+    $rawCartonIds = array_map('intval', $data['carton_ids']);
+    $cartonIds = array_values(array_unique(array_filter($rawCartonIds, static function ($id) {
+        return $id > 0;
+    })));
+
+    if (empty($cartonIds)) {
+        sendJSON(['success' => false, 'error' => 'At least one valid carton ID is required'], 400);
+    }
+
     $newLocation = $data['location'];
-    $notes = $data['notes'] ?? '';
-    
+    $notes = trim((string)($data['notes'] ?? ''));
+
     // Validate location value
     $validLocations = ['Incoming', 'WML', 'GMR'];
-    if (!in_array($newLocation, $validLocations)) {
+    if (!in_array($newLocation, $validLocations, true)) {
         sendJSON(['success' => false, 'error' => 'Invalid location. Must be: Incoming, WML, or GMR'], 400);
     }
-    
+
     // Get database connection
     $db = getDBConnection();
-    
+
     // Start transaction
     $db->beginTransaction();
-    
+
     try {
-        // Check if carton exists and get current location
-        $checkSql = "SELECT carton_id, carton_number, location, status FROM cartons WHERE carton_id = ?";
-        $stmt = $db->prepare($checkSql);
-        $stmt->execute([$cartonId]);
-        $carton = $stmt->fetch();
-        
-        if (!$carton) {
-            $db->rollBack();
-            sendJSON(['success' => false, 'error' => 'Carton not found'], 404);
+        $checkStmt = $db->prepare('SELECT carton_id, carton_number, location, status FROM cartons WHERE carton_id = ?');
+        $updateStmt = $db->prepare('UPDATE cartons SET location = ?, updated_at = CURRENT_TIMESTAMP WHERE carton_id = ?');
+
+        $moved = [];
+        $skipped = [];
+
+        foreach ($cartonIds as $cartonId) {
+            $checkStmt->execute([$cartonId]);
+            $carton = $checkStmt->fetch(PDO::FETCH_ASSOC);
+
+            if (!$carton) {
+                $skipped[] = [
+                    'carton_id' => $cartonId,
+                    'reason' => 'not_found'
+                ];
+                continue;
+            }
+
+            if ($carton['status'] === 'archived') {
+                $skipped[] = [
+                    'carton_id' => (int)$carton['carton_id'],
+                    'carton_number' => $carton['carton_number'],
+                    'reason' => 'archived'
+                ];
+                continue;
+            }
+
+            if ($carton['location'] === $newLocation) {
+                $skipped[] = [
+                    'carton_id' => (int)$carton['carton_id'],
+                    'carton_number' => $carton['carton_number'],
+                    'reason' => 'unchanged'
+                ];
+                continue;
+            }
+
+            $updateStmt->execute([$newLocation, $cartonId]);
+
+            $moved[] = [
+                'carton_id' => (int)$carton['carton_id'],
+                'carton_number' => $carton['carton_number'],
+                'old_location' => $carton['location'],
+                'new_location' => $newLocation
+            ];
         }
-        
-        // Check if carton is archived
-        if ($carton['status'] === 'archived') {
-            $db->rollBack();
-            sendJSON(['success' => false, 'error' => 'Cannot move archived carton'], 400);
-        }
-        
-        // Check if location is actually changing
-        if ($carton['location'] === $newLocation) {
-            $db->rollBack();
-            sendJSON(['success' => false, 'error' => 'Carton is already in ' . $newLocation], 400);
-        }
-        
-        $oldLocation = $carton['location'];
-        
-        // Update carton location
-        $updateSql = "UPDATE cartons SET location = ?, updated_at = CURRENT_TIMESTAMP WHERE carton_id = ?";
-        $stmt = $db->prepare($updateSql);
-        $stmt->execute([$newLocation, $cartonId]);
-        
-        // Log the movement (we could add a carton_movement_log table later for audit trail)
-        // For now, we'll use the notes in the response
-        
-        // Commit transaction
+
         $db->commit();
-        
+
+        $requestedCount = count($cartonIds);
+        $movedCount = count($moved);
+        $skippedCount = count($skipped);
+
+        if ($movedCount === 0) {
+            $message = 'Keine Cartons wurden bewegt.';
+        } elseif ($movedCount === 1) {
+            $message = "1 Carton wurde nach {$newLocation} verschoben.";
+        } else {
+            $message = "{$movedCount} Cartons wurden nach {$newLocation} verschoben.";
+        }
+
         sendJSON([
             'success' => true,
-            'message' => "Carton {$carton['carton_number']} moved from {$oldLocation} to {$newLocation}",
-            'carton' => [
-                'carton_id' => $carton['carton_id'],
-                'carton_number' => $carton['carton_number'],
-                'old_location' => $oldLocation,
-                'new_location' => $newLocation
-            ]
+            'message' => $message,
+            'summary' => [
+                'requested' => $requestedCount,
+                'moved' => $movedCount,
+                'skipped_count' => $skippedCount,
+                'skipped' => $skipped,
+                'target_location' => $newLocation,
+                'notes' => $notes,
+                'processed_by' => $userId
+            ],
+            'moved_cartons' => $moved
         ]);
-        
+
     } catch (Exception $e) {
         $db->rollBack();
         throw $e;
