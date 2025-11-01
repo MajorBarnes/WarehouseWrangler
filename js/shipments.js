@@ -532,9 +532,10 @@ async function handleCreateShipment(e) {
 function openAddBoxesModal() {
     document.getElementById('currentShipmentRef').textContent = activeShipment.shipment_reference;
     document.getElementById('addBoxesModal').classList.remove('hidden');
-    
+
     loadAvailableCartons();
     updateSelectedBoxesSummary();
+    renderSelectedBoxesList();
 }
 
 function closeAddBoxesModal() {
