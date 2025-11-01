@@ -6,17 +6,17 @@ newFiles/
 backup/
 temp/
 helpers/
-assets/
 
 # Files
 ###################
 zzzz*
 desktop.ini
 githelp.txt
+.gitignore
 *.log*
 *implementation*
-*.ico
 FRONTEND_UPDATES_NEEDED*
+.sql
 
 # Compiled source #
 ###################
