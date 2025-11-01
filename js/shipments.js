@@ -31,6 +31,39 @@ function escapeHtml(s) {
         .replace(/'/g, '&#39;');
 }
 
+function formatTemplate(template, replacements) {
+    if (typeof template !== 'string' || !replacements) {
+        return template;
+    }
+
+    return template.replace(/\{(\w+)\}/g, (match, token) => {
+        return Object.prototype.hasOwnProperty.call(replacements, token)
+            ? replacements[token]
+            : match;
+    });
+}
+
+function translate(key, replacements, defaultValue) {
+    const hasI18n = typeof I18n !== 'undefined' && I18n && typeof I18n.t === 'function';
+    const fallback = defaultValue !== undefined ? defaultValue : key;
+
+    if (!hasI18n) {
+        return formatTemplate(fallback, replacements);
+    }
+
+    const options = defaultValue !== undefined ? { defaultValue } : undefined;
+    const result = I18n.t(key, replacements, options);
+    return formatTemplate(result, replacements);
+}
+
+function formatStatusText(status) {
+    return String(status || '')
+        .split(/\s+/)
+        .filter(Boolean)
+        .map(part => part.charAt(0).toUpperCase() + part.slice(1))
+        .join(' ');
+}
+
 function isValidDateInput(v) {
     return typeof v === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(v);
 }
@@ -66,7 +99,7 @@ function initializeHeader() {
     const userDataStr = localStorage.getItem('ww_user_data');
 
     if (userDisplay) {
-        userDisplay.textContent = 'Benutzer';
+        userDisplay.textContent = translate('common.user.anonymous', null, 'User');
 
         if (userDataStr) {
             try {
@@ -83,7 +116,8 @@ function initializeHeader() {
     const logoutBtn = document.getElementById('logoutBtn');
     if (logoutBtn) {
         logoutBtn.addEventListener('click', () => {
-            if (confirm('Are you sure you want to logout?')) {
+            const message = translate('common.prompts.logoutConfirm', null, 'Are you sure you want to log out?');
+            if (confirm(message)) {
                 localStorage.removeItem('ww_auth_token');
                 localStorage.removeItem('ww_user_data');
                 window.location.href = 'login.html';
@@ -169,12 +203,13 @@ async function loadShipments(status = currentFilters.status, fromDate = currentF
             updateSummaryCards(data.summary || {});
             renderShipmentsTable(data.shipments);
         } else {
-            showError('Failed to load shipments: ' + data.error);
+            const message = translate('shipments.errors.loadFailed', { error: data.error || '' }, 'Failed to load shipments: {error}');
+            showError(message);
             renderShipmentsTable([]);
         }
     } catch (error) {
         console.error('Load shipments error:', error);
-        showError('Connection error. Please try again.');
+        showError(translate('common.errors.connection', null, 'Connection error. Please try again.'));
         renderShipmentsTable([]);
     } finally {
         setTableLoading(false);
@@ -324,21 +359,25 @@ async function removeBoxesFromShipment(shipmentId, shipmentContentId) {
 
 // Confirm delete function:
 async function confirmDeleteShipment(shipmentId, shipmentReference) {
-    if (!confirm(`Delete prepared shipment "${shipmentReference}"?\n\nThis will remove the shipment and free up all reserved boxes.`)) {
+    const prompt = translate('shipments.prompts.deletePrepared', { reference: shipmentReference }, 'Delete prepared shipment "{reference}"?\n\nThis will remove the shipment and free up all reserved boxes.');
+    if (!confirm(prompt)) {
         return;
     }
 
     try {
         const result = await deleteShipment(shipmentId);
-        
+
         if (result.success) {
-            showSuccess(result.message);
+            const successMessage = translate('shipments.delete.success', { reference: shipmentReference }, result.message || 'Shipment deleted successfully.');
+            showSuccess(successMessage);
             loadShipments();
         } else {
-            showError(result.error || 'Failed to delete shipment');
+            const fallback = result.error ? `Failed to delete shipment: ${result.error}` : 'Failed to delete shipment';
+            const errorMessage = translate('shipments.delete.error', { error: result.error || '' }, fallback);
+            showError(errorMessage);
         }
     } catch (error) {
-        showError('Connection error. Please try again.');
+        showError(translate('common.errors.connection', null, 'Connection error. Please try again.'));
     }
 }
 
@@ -383,6 +422,7 @@ function renderShipmentsTable(shipments) {
     const table = document.getElementById('shipmentsTable');
     const tbody = document.getElementById('shipmentsTableBody');
     const emptyState = document.getElementById('shipmentsEmpty');
+    const notAvailable = escapeHtml(translate('common.placeholders.notAvailable', null, 'N/A'));
 
     if (!tbody || !table) return;
 
@@ -399,6 +439,7 @@ function renderShipmentsTable(shipments) {
     tbody.innerHTML = shipments.map(shipment => {
         const statusMarkup = renderStatusBadge(shipment.status);
         const actions = renderShipmentActions(shipment);
+        const createdBy = shipment.created_by_user ? escapeHtml(shipment.created_by_user) : notAvailable;
 
         return `
             <tr data-shipment-id="${shipment.shipment_id}">
@@ -408,7 +449,7 @@ function renderShipmentsTable(shipments) {
                 <td class="numeric">${shipment.carton_count || 0}</td>
                 <td class="numeric">${shipment.product_count || 0}</td>
                 <td class="numeric"><strong>${shipment.total_boxes || 0}</strong></td>
-                <td>${escapeHtml(shipment.created_by_user || 'N/A')}</td>
+                <td>${createdBy}</td>
                 <td class="actions-col">${actions}</td>
             </tr>
         `;
@@ -417,13 +458,14 @@ function renderShipmentsTable(shipments) {
 
 function renderShipmentActions(shipment) {
     const actions = [];
+    const viewLabel = translate('shipments.actions.view', null, 'View details');
 
     actions.push(`
         <button
             class="btn btn-surface icon-button"
             type="button"
-            title="Details ansehen"
-            aria-label="Details ansehen"
+            title="${escapeHtml(viewLabel)}"
+            aria-label="${escapeHtml(viewLabel)}"
             data-action="view-shipment"
             data-shipment-id="${shipment.shipment_id}"
         >
@@ -432,12 +474,13 @@ function renderShipmentActions(shipment) {
     `);
 
     if (shipment.status === 'prepared') {
+        const continueLabel = translate('shipments.actions.continue', null, 'Resume shipment');
         actions.push(`
             <button
                 class="btn btn-positive icon-button"
                 type="button"
-                aria-label="Shipment fortsetzen"
-                title="Shipment fortsetzen"
+                aria-label="${escapeHtml(continueLabel)}"
+                title="${escapeHtml(continueLabel)}"
                 data-action="continue-shipment"
                 data-shipment-id="${shipment.shipment_id}"
             >
@@ -447,12 +490,13 @@ function renderShipmentActions(shipment) {
     }
 
     if (shipment.status === 'sent') {
+        const recallLabel = translate('shipments.actions.recall', null, 'Recall shipment');
         actions.push(`
             <button
                 class="btn btn-danger icon-button"
                 type="button"
-                aria-label="Shipment zurückrufen"
-                title="Shipment zurückrufen"
+                aria-label="${escapeHtml(recallLabel)}"
+                title="${escapeHtml(recallLabel)}"
                 data-action="recall"
                 data-shipment-id="${shipment.shipment_id}"
                 data-shipment-ref="${escapeHtml(shipment.shipment_reference || '')}"
@@ -467,12 +511,19 @@ function renderShipmentActions(shipment) {
 
 function renderStatusBadge(status) {
     const map = {
-        'prepared': { icon: 'assignment_turned_in', label: 'Prepared' },
-        'sent': { icon: 'local_shipping', label: 'Sent' },
-        'recalled': { icon: 'undo', label: 'Recalled' }
+        'prepared': { icon: 'assignment_turned_in', key: 'shipments.statuses.prepared', defaultLabel: 'Prepared' },
+        'sent': { icon: 'local_shipping', key: 'shipments.statuses.sent', defaultLabel: 'Sent' },
+        'recalled': { icon: 'undo', key: 'shipments.statuses.recalled', defaultLabel: 'Recalled' }
     };
 
-    const { icon, label } = map[status] || { icon: 'inventory_2', label: status || 'Unknown' };
+    const entry = map[status] || {
+        icon: 'inventory_2',
+        key: 'shipments.statuses.unknown',
+        defaultLabel: status ? formatStatusText(status) : 'Unknown',
+        replacements: { status: formatStatusText(status) || 'Unknown' }
+    };
+    const label = translate(entry.key, entry.replacements, entry.defaultLabel);
+    const icon = entry.icon;
 
     return `
         <span class="status-badge status-${status}">
@@ -509,19 +560,22 @@ async function handleCreateShipment(e) {
         const result = await createShipment(shipmentData);
 
         if (result.success) {
-            showSuccess('Shipment created successfully!');
+            const successMessage = translate('shipments.create.success', null, 'Shipment created successfully!');
+            showSuccess(successMessage);
             closeCreateShipmentModal();
-            
+
             // Open add boxes modal
             activeShipment = result.shipment;
             selectedBoxes = [];
             openAddBoxesModal();
-            
+
         } else {
-            showError(result.error || 'Failed to create shipment');
+            const fallback = result.error ? `Failed to create shipment: ${result.error}` : 'Failed to create shipment';
+            const errorMessage = translate('shipments.errors.create', { error: result.error || '' }, fallback);
+            showError(errorMessage);
         }
     } catch (error) {
-        showError('Connection error. Please try again.');
+        showError(translate('common.errors.connection', null, 'Connection error. Please try again.'));
     }
 }
 
@@ -547,9 +601,19 @@ function closeAddBoxesModal() {
 
 function renderAvailableCartons() {
     const container = document.getElementById('availableCartonsList');
-    
+
+    if (!container) {
+        return;
+    }
+
+    const emptyMessage = translate('shipments.addBoxes.emptyCartons', null, 'No cartons with available inventory found.');
+    const productsAriaLabel = translate('shipments.addBoxes.cartonProductsAria', null, 'Products in this carton');
+    const emptyProductsLabel = translate('shipments.addBoxes.emptyProducts', null, 'No products with available inventory');
+    const selectActionLabel = translate('shipments.addBoxes.actions.select', null, 'Select boxes');
+    const addAllActionLabel = translate('shipments.addBoxes.actions.addAll', null, 'Add all boxes');
+
     if (availableCartons.length === 0) {
-        container.innerHTML = '<div class="no-data">Keine Kartons mit verfügbarem Bestand gefunden.</div>';
+        container.innerHTML = `<div class="no-data">${escapeHtml(emptyMessage)}</div>`;
         return;
     }
 
@@ -562,6 +626,8 @@ function renderAvailableCartons() {
         const totalBoxes = carton?.total_boxes_current ?? 0;
         const cartonId = carton?.carton_id ?? '';
         const locationClass = escapeHtml((carton.location || '').toLowerCase());
+        const locationLabel = translateLocationLabel(carton.location);
+        const summary = translate('shipments.addBoxes.cartonSummary', { count: productCount, boxes: totalBoxes }, '{count} products • {boxes} boxes available');
 
         const artikelBadges = products
             .map(product => {
@@ -580,8 +646,8 @@ function renderAvailableCartons() {
             .join('');
 
         const productsMarkup = artikelBadges
-            ? `<div class="carton-products" aria-label="Artikel in diesem Karton">${artikelBadges}</div>`
-            : '<div class="carton-products carton-products--empty">Keine Artikel mit verfügbarem Bestand</div>';
+            ? `<div class="carton-products" aria-label="${escapeHtml(productsAriaLabel)}">${artikelBadges}</div>`
+            : `<div class="carton-products carton-products--empty">${escapeHtml(emptyProductsLabel)}</div>`;
 
         return `
             <div class="carton-card" data-carton-id="${escapeHtml(String(cartonId))}">
@@ -589,21 +655,21 @@ function renderAvailableCartons() {
                     <strong>${escapeHtml(carton.carton_number)}</strong>
                     <span class="location-badge location-${locationClass}">
                         ${renderLocationIcon(carton.location)}
-                        ${escapeHtml(carton.location)}
+                        ${escapeHtml(locationLabel)}
                     </span>
                 </div>
                 <div class="carton-info">
-                    ${escapeHtml(String(productCount))} Produkte • ${escapeHtml(String(totalBoxes))} Boxen verfügbar
+                    ${escapeHtml(summary)}
                 </div>
                 ${productsMarkup}
                 <div class="carton-actions">
                     <button class="btn btn-primary btn-small" type="button" data-action="select-carton" data-carton-id="${escapeHtml(String(cartonId))}">
                         <span class="material-icons-outlined" aria-hidden="true">add_box</span>
-                        <span>Boxen auswählen</span>
+                        <span>${escapeHtml(selectActionLabel)}</span>
                     </button>
                     <button class="btn btn-secondary btn-small" type="button" data-action="add-all-boxes" data-carton-id="${escapeHtml(String(cartonId))}">
                         <span class="material-icons-outlined" aria-hidden="true">library_add</span>
-                        <span>Alle Boxen</span>
+                        <span>${escapeHtml(addAllActionLabel)}</span>
                     </button>
                 </div>
             </div>
@@ -614,7 +680,7 @@ function renderAvailableCartons() {
 async function selectBoxesFromCarton(cartonId) {
     const carton = availableCartons.find(c => c.carton_id === cartonId);
     if (!carton) {
-        showError('Carton not found');
+        showError(translate('shipments.errors.cartonNotFound', null, 'Carton not found'));
         return;
     }
     showBoxSelectionDialog(carton, carton.products);
@@ -622,13 +688,13 @@ async function selectBoxesFromCarton(cartonId) {
 
 async function addAllBoxesFromCarton(cartonId) {
     if (!activeShipment || !activeShipment.shipment_id) {
-        showError('Bitte wählen oder erstellen Sie zuerst ein Shipment.');
+        showError(translate('shipments.errors.shipmentRequired', null, 'Please select or create a shipment first.'));
         return;
     }
 
     const carton = availableCartons.find(c => c.carton_id === cartonId);
     if (!carton) {
-        showError('Carton not found');
+        showError(translate('shipments.errors.cartonNotFound', null, 'Carton not found'));
         return;
     }
 
@@ -652,7 +718,7 @@ async function addAllBoxesFromCarton(cartonId) {
         .filter(Boolean);
 
     if (boxes.length === 0) {
-        showError('Keine verfügbaren Boxen in diesem Karton.');
+        showError(translate('shipments.errors.noAvailableBoxes', null, 'No available boxes in this carton.'));
         return;
     }
 
@@ -661,35 +727,46 @@ async function addAllBoxesFromCarton(cartonId) {
 
         if (result.success) {
             const totalBoxes = boxes.reduce((sum, box) => sum + box.boxes_to_send, 0);
-            showSuccess(`Alle verfügbaren Boxen (${totalBoxes}) wurden hinzugefügt.`);
+            const message = translate('shipments.addBoxes.success.addAll', { count: totalBoxes }, 'Added all available boxes ({count}).');
+            showSuccess(message);
             await reloadShipmentContents();
             await loadAvailableCartons();
         } else {
-            showError(result.error || 'Failed to add boxes to shipment');
+            const fallback = result.error ? `Failed to add boxes to shipment: ${result.error}` : 'Failed to add boxes to shipment';
+            const errorMessage = translate('shipments.errors.addBoxes', { error: result.error || '' }, fallback);
+            showError(errorMessage);
             if (Array.isArray(result.warnings) && result.warnings.length > 0) {
-                alert('Warnings:\n' + result.warnings.join('\n'));
+                const warningTitle = translate('shipments.notifications.warningsTitle', null, 'Warnings:');
+                alert(`${warningTitle}\n${result.warnings.join('\n')}`);
             }
         }
     } catch (error) {
         console.error('addAllBoxesFromCarton failed:', error);
-        showError('Connection error. Please try again.');
+        showError(translate('common.errors.connection', null, 'Connection error. Please try again.'));
     }
 }
 
 function showBoxSelectionDialog(carton, contents) {
+    const title = translate('shipments.boxSelection.title', { carton: carton.carton_number }, 'Select boxes – {carton}');
+    const quantityLabel = translate('shipments.boxSelection.quantityLabel', null, 'Boxes to send:');
+    const cancelLabel = translate('common.actions.cancel', null, 'Cancel');
+    const confirmLabel = translate('shipments.boxSelection.confirm', null, 'Add to shipment');
+
     const html = `
         <div class="box-selection-dialog">
-            <h4>Boxen auswählen – ${escapeHtml(carton.carton_number)}</h4>
+            <h4>${escapeHtml(title)}</h4>
             ${contents.map(item => `
                 <div class="product-selection">
                     <div class="product-info">
                         <strong>${escapeHtml(item.product_name)}</strong>
-                        <div class="product-meta">
-                            FNSKU: ${escapeHtml(item.fnsku)} • Verfügbar: ${item.boxes_current} Boxen (${item.pairs_current} Paare)
-                        </div>
+                        <div class="product-meta">${escapeHtml(translate('shipments.boxSelection.meta', {
+                            fnsku: item.fnsku,
+                            boxes: item.boxes_current,
+                            pairs: item.pairs_current
+                        }, 'FNSKU: {fnsku} • Available: {boxes} boxes ({pairs} pairs)'))}</div>
                     </div>
                     <div class="quantity-input">
-                        <label>Boxen zum Versand:</label>
+                        <label>${escapeHtml(quantityLabel)}</label>
                         <input type="number"
                                id="boxes_${carton.carton_id}_${item.product_id}"
                                min="0"
@@ -707,11 +784,11 @@ function showBoxSelectionDialog(carton, contents) {
             <div class="dialog-actions">
                 <button class="btn btn-secondary" type="button" data-action="cancel-box-selection">
                     <span class="material-icons-outlined" aria-hidden="true">close</span>
-                    <span>Abbrechen</span>
+                    <span>${escapeHtml(cancelLabel)}</span>
                 </button>
                 <button class="btn btn-primary" type="button" data-action="confirm-box-selection">
                     <span class="material-icons-outlined" aria-hidden="true">add_circle</span>
-                    <span>Zum Shipment hinzufügen</span>
+                    <span>${escapeHtml(confirmLabel)}</span>
                 </button>
             </div>
         </div>
@@ -748,31 +825,35 @@ async function confirmBoxSelection() {
     });
 
     if (newBoxes.length === 0) {
-        showError('Please select at least one box');
+        showError(translate('shipments.errors.selectBoxes', null, 'Please select at least one box.'));
         return;
     }
 
     // IMMEDIATELY save to database
     try {
         const result = await addBoxesToShipment(activeShipment.shipment_id, newBoxes);
-        
+
         if (result.success) {
             closeBoxSelectionDialog();
-            showSuccess(`Added ${newBoxes.length} box selection(s) to shipment`);
-            
+            const message = translate('shipments.addBoxes.success.added', { count: newBoxes.length }, 'Added {count} box selection(s) to shipment.');
+            showSuccess(message);
+
             // Reload shipment details to get the saved content
             await reloadShipmentContents();
-            
+
             // Reload available cartons to update reserved quantities
             await loadAvailableCartons();
         } else {
-            showError(result.error || 'Failed to add boxes to shipment');
+            const fallback = result.error ? `Failed to add boxes to shipment: ${result.error}` : 'Failed to add boxes to shipment';
+            const errorMessage = translate('shipments.errors.addBoxes', { error: result.error || '' }, fallback);
+            showError(errorMessage);
             if (result.warnings && result.warnings.length > 0) {
-                alert('Warnings:\n' + result.warnings.join('\n'));
+                const warningTitle = translate('shipments.notifications.warningsTitle', null, 'Warnings:');
+                alert(`${warningTitle}\n${result.warnings.join('\n')}`);
             }
         }
     } catch (error) {
-        showError('Connection error. Please try again.');
+        showError(translate('common.errors.connection', null, 'Connection error. Please try again.'));
     }
 }
 
@@ -812,7 +893,7 @@ async function removeSelectedBox(index) {
 
     if (entry.shipment_content_id) {
         if (!activeShipment || !activeShipment.shipment_id) {
-            showError('Shipment context missing. Please reload and try again.');
+            showError(translate('shipments.errors.missingContext', null, 'Shipment context missing. Please reload and try again.'));
             return;
         }
 
@@ -820,7 +901,7 @@ async function removeSelectedBox(index) {
             await removeBoxFromShipment(entry.shipment_content_id);
         } catch (error) {
             console.error('removeBoxFromShipment failed:', error);
-            showError('Failed to remove boxes from shipment. Please try again.');
+            showError(translate('shipments.errors.removeBoxes', null, 'Failed to remove boxes from shipment. Please try again.'));
         }
         return;
     }
@@ -843,10 +924,10 @@ function updateSelectedBoxesSummary() {
     const proceedBtn = document.getElementById('proceedToSendBtn');
     if (totalBoxes > 0) {
         proceedBtn.disabled = false;
-        proceedBtn.querySelector('.btn-label').textContent = `Prüfen & senden (${totalBoxes})`;
+        proceedBtn.querySelector('.btn-label').textContent = translate('shipments.addBoxes.proceedWithCount', { count: totalBoxes }, 'Review & send ({count})');
     } else {
         proceedBtn.disabled = true;
-        proceedBtn.querySelector('.btn-label').textContent = 'Prüfen & senden';
+        proceedBtn.querySelector('.btn-label').textContent = translate('shipments.addBoxes.proceed', null, 'Review & send');
     }
 }
 
@@ -869,7 +950,7 @@ function renderSelectedBoxesList() {
             <td>
                 <button class="btn btn-danger btn-small" type="button" data-action="remove-selected-box" data-index="${index}">
                     <span class="material-icons-outlined" aria-hidden="true">delete</span>
-                    <span>Entfernen</span>
+                    <span>${escapeHtml(translate('shipments.addBoxes.actions.remove', null, 'Remove'))}</span>
                 </button>
             </td>
         </tr>
@@ -877,26 +958,30 @@ function renderSelectedBoxesList() {
 }
 
 async function removeBoxFromShipment(shipmentContentId) {
-    if (!confirm('Remove these boxes from shipment?')) {
+    const prompt = translate('shipments.prompts.removeBoxes', null, 'Remove these boxes from the shipment?');
+    if (!confirm(prompt)) {
         return;
     }
 
     try {
         const result = await removeBoxesFromShipment(activeShipment.shipment_id, shipmentContentId);
-        
+
         if (result.success) {
-            showSuccess('Boxes removed from shipment');
-            
+            const message = translate('shipments.addBoxes.success.removed', null, 'Boxes removed from shipment.');
+            showSuccess(message);
+
             // Reload shipment contents
             await reloadShipmentContents();
-            
+
             // Reload available cartons to update reserved quantities
             await loadAvailableCartons();
         } else {
-            showError(result.error || 'Failed to remove boxes');
+            const fallback = result.error ? `Failed to remove boxes: ${result.error}` : 'Failed to remove boxes';
+            const errorMessage = translate('shipments.errors.removeBoxesGeneric', { error: result.error || '' }, fallback);
+            showError(errorMessage);
         }
     } catch (error) {
-        showError('Connection error. Please try again.');
+        showError(translate('common.errors.connection', null, 'Connection error. Please try again.'));
     }
 }
 
@@ -906,7 +991,7 @@ async function removeBoxFromShipment(shipmentContentId) {
 
 async function proceedToSend() {
     if (selectedBoxes.length === 0) {
-        showError('Please select boxes before proceeding');
+        showError(translate('shipments.errors.selectBoxesBeforeSend', null, 'Please select boxes before proceeding.'));
         return;
     }
 
@@ -926,45 +1011,62 @@ function showSendConfirmation() {
         confirmBtn.disabled = false;
         const label = confirmBtn.querySelector('.btn-label');
         if (label) {
-            label.textContent = 'Shipment senden';
+            label.textContent = translate('shipments.send.confirm', null, 'Send shipment');
         }
     }
 
+    const shipmentHeading = translate('shipments.send.summary.heading', { reference: activeShipment.shipment_reference }, 'Shipment: {reference}');
+    const dateLine = translate('shipments.send.summary.date', { date: formatDate(activeShipment.shipment_date) }, 'Date: {date}');
+    const notesLine = activeShipment.notes
+        ? `<p>${escapeHtml(translate('shipments.send.summary.notes', { notes: activeShipment.notes }, 'Notes: {notes}'))}</p>`
+        : '';
+    const totalBoxesLabel = translate('shipments.send.summary.totalBoxes', null, 'Total boxes:');
+    const totalPairsLabel = translate('shipments.send.summary.totalPairs', null, 'Total pairs:');
+    const cartonsLabel = translate('shipments.send.summary.cartons', null, 'Cartons affected:');
+    const productsLabel = translate('shipments.send.summary.products', null, 'Products:');
+    const breakdownTitle = translate('shipments.send.summary.breakdown', null, 'Breakdown by carton:');
+    const tableHeaders = {
+        carton: translate('shipments.addBoxes.table.carton', null, 'Carton'),
+        product: translate('shipments.addBoxes.table.product', null, 'Product'),
+        boxes: translate('shipments.addBoxes.table.boxes', null, 'Boxes'),
+        pairs: translate('shipments.addBoxes.table.pairs', null, 'Pairs')
+    };
+
     const summaryHtml = `
         <div class="confirm-details">
-            <h4>Shipment: ${escapeHtml(activeShipment.shipment_reference)}</h4>
-            <p>Date: ${formatDate(activeShipment.shipment_date)}</p>
-            ${activeShipment.notes ? `<p>Notes: ${escapeHtml(activeShipment.notes)}</p>` : ''}
+            <h4>${escapeHtml(shipmentHeading)}</h4>
+            <p>${escapeHtml(dateLine)}</p>
+            ${notesLine}
         </div>
 
         <div class="confirm-totals">
             <div class="total-item">
-                <span class="label">Total Boxes:</span>
+                <span class="label">${escapeHtml(totalBoxesLabel)}</span>
                 <span class="value">${totalBoxes}</span>
             </div>
             <div class="total-item">
-                <span class="label">Total Pairs:</span>
+                <span class="label">${escapeHtml(totalPairsLabel)}</span>
                 <span class="value">${totalPairs}</span>
             </div>
             <div class="total-item">
-                <span class="label">Cartons Affected:</span>
+                <span class="label">${escapeHtml(cartonsLabel)}</span>
                 <span class="value">${uniqueCartons}</span>
             </div>
             <div class="total-item">
-                <span class="label">Products:</span>
+                <span class="label">${escapeHtml(productsLabel)}</span>
                 <span class="value">${uniqueProducts}</span>
             </div>
         </div>
 
         <div class="confirm-breakdown">
-            <h4>Breakdown by Carton:</h4>
+            <h4>${escapeHtml(breakdownTitle)}</h4>
             <table class="breakdown-table">
                 <thead>
                     <tr>
-                        <th>Carton</th>
-                        <th>Product</th>
-                        <th>Boxes</th>
-                        <th>Pairs</th>
+                        <th>${escapeHtml(tableHeaders.carton)}</th>
+                        <th>${escapeHtml(tableHeaders.product)}</th>
+                        <th>${escapeHtml(tableHeaders.boxes)}</th>
+                        <th>${escapeHtml(tableHeaders.pairs)}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -999,38 +1101,41 @@ async function confirmSendShipment() {
         confirmBtn.disabled = true;
     }
     if (label) {
-        label.textContent = 'Wird gesendet…';
+        label.textContent = translate('shipments.send.progress', null, 'Sending…');
     }
 
     try {
         const result = await sendShipment(activeShipment.shipment_id);
 
         if (result.success) {
-            showSuccess(result.message);
+            const successMessage = translate('shipments.send.success', null, result.message || 'Shipment sent successfully.');
+            showSuccess(successMessage);
 
             if (label) {
-                label.textContent = 'Shipment senden';
+                label.textContent = translate('shipments.send.confirm', null, 'Send shipment');
             }
 
             // Close all modals
             document.getElementById('sendShipmentModal').classList.add('hidden');
-            
+
             // Reset state
             activeShipment = null;
             selectedBoxes = [];
-            
+
             // Reload shipments
             loadShipments();
 
         } else {
-            showError(result.error || 'Failed to send shipment');
+            const fallback = result.error ? `Failed to send shipment: ${result.error}` : 'Failed to send shipment';
+            const errorMessage = translate('shipments.errors.send', { error: result.error || '' }, fallback);
+            showError(errorMessage);
             if (confirmBtn) confirmBtn.disabled = false;
-            if (label) label.textContent = 'Shipment senden';
+            if (label) label.textContent = translate('shipments.send.confirm', null, 'Send shipment');
         }
     } catch (error) {
-        showError('Connection error. Please try again.');
+        showError(translate('common.errors.connection', null, 'Connection error. Please try again.'));
         if (confirmBtn) confirmBtn.disabled = false;
-        if (label) label.textContent = 'Shipment senden';
+        if (label) label.textContent = translate('shipments.send.confirm', null, 'Send shipment');
     }
 }
 
@@ -1043,7 +1148,8 @@ async function continueShipment(shipmentId) {
         const details = await loadShipmentDetails(shipmentId);
 
         if (!details.success) {
-            showError('Failed to load shipment details');
+            const errorMessage = translate('shipments.errors.loadDetails', { error: details.error || '' }, 'Failed to load shipment details.');
+            showError(errorMessage);
             return;
         }
 
@@ -1061,9 +1167,9 @@ async function continueShipment(shipmentId) {
         }));
 
         openAddBoxesModal();
-        
+
     } catch (error) {
-        showError('Failed to load shipment');
+        showError(translate('shipments.errors.loadShipment', null, 'Failed to load shipment.'));
     }
 }
 
@@ -1074,16 +1180,17 @@ async function continueShipment(shipmentId) {
 async function viewShipmentDetails(shipmentId) {
     try {
         const details = await loadShipmentDetails(shipmentId);
-        
+
         if (!details.success) {
-            showError('Failed to load shipment details');
+            const errorMessage = translate('shipments.errors.loadDetails', { error: details.error || '' }, 'Failed to load shipment details.');
+            showError(errorMessage);
             return;
         }
 
         showShipmentDetailsModal(details);
-        
+
     } catch (error) {
-        showError('Failed to load shipment details');
+        showError(translate('shipments.errors.loadDetails', null, 'Failed to load shipment details.'));
     }
 }
 
@@ -1091,77 +1198,103 @@ function showShipmentDetailsModal(data) {
     const shipment = data.shipment;
     const contents = data.contents;
     const summary = data.summary;
+    const notAvailable = translate('common.placeholders.notAvailable', null, 'N/A');
+    const infoTitle = translate('shipments.details.sections.info.title', null, 'Shipment information');
+    const labels = {
+        reference: translate('shipments.details.sections.info.reference', null, 'Reference:'),
+        date: translate('shipments.details.sections.info.date', null, 'Date:'),
+        status: translate('shipments.details.sections.info.status', null, 'Status:'),
+        createdBy: translate('shipments.details.sections.info.createdBy', null, 'Created by:'),
+        created: translate('shipments.details.sections.info.createdAt', null, 'Created:'),
+        updated: translate('shipments.details.sections.info.updatedAt', null, 'Last updated:'),
+        notes: translate('shipments.details.sections.info.notes', null, 'Notes:')
+    };
+    const summaryTitle = translate('shipments.details.sections.summary.title', null, 'Summary');
+    const summaryLabels = {
+        boxes: translate('shipments.details.sections.summary.totalBoxes', null, 'Total boxes'),
+        pairs: translate('shipments.details.sections.summary.totalPairs', null, 'Total pairs'),
+        cartons: translate('shipments.details.sections.summary.cartons', null, 'Cartons'),
+        products: translate('shipments.details.sections.summary.products', null, 'Products')
+    };
+    const contentsTitle = translate('shipments.details.sections.contents.title', null, 'Contents');
+    const tableHeaders = {
+        carton: translate('shipments.details.table.headers.carton', null, 'Carton'),
+        product: translate('shipments.details.table.headers.product', null, 'Product'),
+        fnsku: translate('shipments.details.table.headers.fnsku', null, 'FNSKU'),
+        boxes: translate('shipments.details.table.headers.boxesSent', null, 'Boxes sent'),
+        pairs: translate('shipments.details.table.headers.pairsSent', null, 'Pairs sent')
+    };
 
     const html = `
         <div class="details-section">
-            <h4>Shipment Information</h4>
+            <h4>${escapeHtml(infoTitle)}</h4>
             <div class="details-grid">
                 <div class="detail-item">
-                    <label>Reference:</label>
+                    <label>${escapeHtml(labels.reference)}</label>
                     <strong>${escapeHtml(shipment.shipment_reference)}</strong>
                 </div>
                 <div class="detail-item">
-                    <label>Date:</label>
+                    <label>${escapeHtml(labels.date)}</label>
                     ${formatDate(shipment.shipment_date)}
                 </div>
                 <div class="detail-item">
-                    <label>Status:</label>
+                    <label>${escapeHtml(labels.status)}</label>
                     ${renderStatusBadge(shipment.status)}
                 </div>
                 <div class="detail-item">
-                    <label>Created By:</label>
-                    ${escapeHtml(shipment.created_by_username || 'N/A')}
+                    <label>${escapeHtml(labels.createdBy)}</label>
+                    ${escapeHtml(shipment.created_by_username || notAvailable)}
                 </div>
                 <div class="detail-item">
-                    <label>Created:</label>
+                    <label>${escapeHtml(labels.created)}</label>
                     ${formatDateTime(shipment.created_at)}
                 </div>
                 <div class="detail-item">
-                    <label>Last Updated:</label>
+                    <label>${escapeHtml(labels.updated)}</label>
                     ${formatDateTime(shipment.updated_at)}
                 </div>
             </div>
             ${shipment.notes ? `
                 <div class="detail-item full-width">
-                    <label>Notes:</label>
+                    <label>${escapeHtml(labels.notes)}</label>
                     <p>${escapeHtml(shipment.notes)}</p>
                 </div>
             ` : ''}
         </div>
 
         <div class="details-section">
-            <h4>Summary</h4>
+            <h4>${escapeHtml(summaryTitle)}</h4>
             <div class="totals-grid">
                 <div class="total-item">
-                    <div class="total-label">Total Boxes</div>
+                    <div class="total-label">${escapeHtml(summaryLabels.boxes)}</div>
                     <div class="total-value">${summary.total_boxes}</div>
                 </div>
                 <div class="total-item">
-                    <div class="total-label">Total Pairs</div>
+                    <div class="total-label">${escapeHtml(summaryLabels.pairs)}</div>
                     <div class="total-value">${summary.total_pairs}</div>
                 </div>
                 <div class="total-item">
-                    <div class="total-label">Cartons</div>
+                    <div class="total-label">${escapeHtml(summaryLabels.cartons)}</div>
                     <div class="total-value">${summary.unique_cartons}</div>
                 </div>
                 <div class="total-item">
-                    <div class="total-label">Products</div>
+                    <div class="total-label">${escapeHtml(summaryLabels.products)}</div>
                     <div class="total-value">${summary.unique_products}</div>
                 </div>
             </div>
         </div>
 
         <div class="details-section">
-            <h4>Contents</h4>
+            <h4>${escapeHtml(contentsTitle)}</h4>
             <div class="contents-table-wrapper">
                 <table class="contents-table">
                     <thead>
                         <tr>
-                            <th>Carton</th>
-                            <th>Product</th>
-                            <th>FNSKU</th>
-                            <th>Boxes Sent</th>
-                            <th>Pairs Sent</th>
+                            <th>${escapeHtml(tableHeaders.carton)}</th>
+                            <th>${escapeHtml(tableHeaders.product)}</th>
+                            <th>${escapeHtml(tableHeaders.fnsku)}</th>
+                            <th>${escapeHtml(tableHeaders.boxes)}</th>
+                            <th>${escapeHtml(tableHeaders.pairs)}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -1206,13 +1339,14 @@ function closeRecallModal() {
 
 async function confirmRecall() {
     const notes = document.getElementById('recallNotes').value.trim();
-    
+
     if (!notes) {
-        showError('Please provide a reason for recall');
+        showError(translate('shipments.recall.errors.notesRequired', null, 'Please provide a reason for recall.'));
         return;
     }
 
-    if (!confirm('Are you absolutely sure you want to recall this shipment?')) {
+    const prompt = translate('shipments.recall.confirmPrompt', null, 'Are you absolutely sure you want to recall this shipment?');
+    if (!confirm(prompt)) {
         return;
     }
 
@@ -1220,14 +1354,17 @@ async function confirmRecall() {
         const result = await recallShipment(shipmentToRecall, notes);
 
         if (result.success) {
-            showSuccess(result.message);
+            const successMessage = translate('shipments.recall.success', null, result.message || 'Shipment recalled successfully.');
+            showSuccess(successMessage);
             closeRecallModal();
             loadShipments();
         } else {
-            showError(result.error || 'Failed to recall shipment');
+            const fallback = result.error ? `Failed to recall shipment: ${result.error}` : 'Failed to recall shipment';
+            const errorMessage = translate('shipments.recall.error', { error: result.error || '' }, fallback);
+            showError(errorMessage);
         }
     } catch (error) {
-        showError('Connection error. Please try again.');
+        showError(translate('common.errors.connection', null, 'Connection error. Please try again.'));
     }
 }
 
@@ -1415,17 +1552,23 @@ function syncStatusCardsWithFilter() {
 // ============================================================================
 
 function showSuccess(message) {
-    alert('Erfolg: ' + message);
+    const translated = translate('shipments.notifications.success', { message }, 'Success: {message}');
+    alert(translated);
 }
 
 function showError(message) {
-    alert('Fehler: ' + message);
+    const translated = translate('shipments.notifications.error', { message }, 'Error: {message}');
+    alert(translated);
 }
 
 function formatDate(dateString) {
-    if (!dateString) return 'N/A';
+    const notAvailable = translate('common.placeholders.notAvailable', null, 'N/A');
+    if (!dateString) return notAvailable;
     const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', {
+    const locale = typeof I18n !== 'undefined' && I18n && typeof I18n.getLocale === 'function'
+        ? I18n.getLocale()
+        : undefined;
+    return date.toLocaleDateString(locale || undefined, {
         year: 'numeric',
         month: 'short',
         day: 'numeric'
@@ -1433,9 +1576,13 @@ function formatDate(dateString) {
 }
 
 function formatDateTime(dateString) {
-    if (!dateString) return 'N/A';
+    const notAvailable = translate('common.placeholders.notAvailable', null, 'N/A');
+    if (!dateString) return notAvailable;
     const date = new Date(dateString);
-    return date.toLocaleString('en-US', {
+    const locale = typeof I18n !== 'undefined' && I18n && typeof I18n.getLocale === 'function'
+        ? I18n.getLocale()
+        : undefined;
+    return date.toLocaleString(locale || undefined, {
         year: 'numeric',
         month: 'short',
         day: 'numeric',
@@ -1452,4 +1599,15 @@ function renderLocationIcon(location) {
     };
     const icon = icons[location] || 'inventory_2';
     return `<span class="material-icons-outlined" aria-hidden="true">${icon}</span>`;
+}
+
+function translateLocationLabel(location) {
+    const map = {
+        'Incoming': 'cartons.filters.location.incoming',
+        'WML': 'cartons.filters.location.wml',
+        'GMR': 'cartons.filters.location.gmr'
+    };
+
+    const key = map[location];
+    return key ? translate(key, null, location) : location;
 }
