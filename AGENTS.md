@@ -554,7 +554,28 @@ All icons from **Material Symbols**.
 All color tokens sourced from `main.css`.
 All animations from CSS transitions only — no JS `setInterval`.
 
----
+### **Styling for tables, cards and modals**
+ - **Cards**: Use .surface-card on each page for white surfaces with 16px radius, 1px neutral border, var(--shadow-card) shadow, and 1.75rem padding; widen .app-main.cartons-page/.app-main.products-page to 1520px so data cards span the grid while relying on shared color, radius, and button tokens from main.css.
+
+ - **Summary cards**: Follow the .metrics-panel grid in cartons.html, using .metric-card/.status-card button semantics with uppercase labels, 2rem numeric values, icon badges, and aria-pressed toggles for location filters; replicate this pattern for additional KPI cards.
+
+ - **Search/filter cards**: Build filter/search shells as .surface-card sections with heading copy and .search-field inputs, reusing the auto-fit grids and focus rings defined for cartons filters and the products search panel.
+
+ - **Table containers**: Nest tables inside .surface-card.table-card with optional .bulk-toolbar, wrapping them in .table-scroll > .table-scroll__viewport to provide sticky headers and 70vh scrolling, consistent with both cartons and products listings.
+
+ - **Header/body styling**: Keep header cells uppercase at ~0.85rem, sticky atop a white background, body rows padded 1rem with zebra strips on even rows, and respect numeric alignment/min-width rules when extending schemas.
+
+ - **State handling**: Expose loading, table, and empty placeholders with shared .is-hidden toggles so module scripts can switch visibility via setTableState/renderProducts; ensure new tables wire identical IDs for JS control.
+
+ - **Row actions**: Place action buttons inside .actions flex containers, using .icon-button with tooltip pseudo-elements and hover elevations defined per module for edit/move/delete affordances.
+
+ - **Modal shell**: Implement overlays with .modal (fixed, rgba(12,28,53,0.45) backdrop) and centered .modal-content (640px default, module-specific wide variants) while toggling visibility through the .hidden class controlled by the respective modal managers.
+
+ - **Modal layout**: Keep .modal-header split with .modal-title-group icons, .modal-body/.form-grid spacing around 1.25–1.75rem, and .modal-footer right-aligned buttons that reuse global .btn styling for primary/secondary emphasis.
+
+ - **Inputs & helpers**: Apply .form-control/.form-group or .form-grid structures with ~0.7rem padding, small-radius borders, and primary-colored focus rings, and compose helper blocks (e.g., .selection-context, (details like).factors-helper) with the documented grid spacing tokens.
+
+ - **Variant sizing**: Use .modal-large for detailed carton overlays (up to 1100px) or .modal-content--wide for details / factor editors, inheriting the same shell while expanding horizontal real estate.
 
 ---
 
