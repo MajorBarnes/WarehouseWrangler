@@ -553,24 +553,56 @@ function renderAvailableCartons() {
         return;
     }
 
-    container.innerHTML = availableCartons.map(carton => `
-        <div class="carton-card" data-carton-id="${carton.carton_id}">
-            <div class="carton-header">
-                <strong>${escapeHtml(carton.carton_number)}</strong>
-                <span class="location-badge location-${carton.location.toLowerCase()}">
-                    ${renderLocationIcon(carton.location)}
-                    ${escapeHtml(carton.location)}
-                </span>
+    container.innerHTML = availableCartons.map(carton => {
+        const products = Array.isArray(carton.products)
+            ? carton.products.filter(product => Number(product.boxes_available_for_shipment ?? product.boxes_current) > 0)
+            : [];
+
+        const productCount = carton?.product_count ?? 0;
+        const totalBoxes = carton?.total_boxes_current ?? 0;
+        const cartonId = carton?.carton_id ?? '';
+        const locationClass = escapeHtml((carton.location || '').toLowerCase());
+
+        const artikelBadges = products
+            .map(product => {
+                const displayLabel = product.artikel || product.product_name || '';
+                if (!displayLabel) {
+                    return '';
+                }
+
+                const titleAttr = product.product_name
+                    ? ` title="${escapeHtml(product.product_name)}"`
+                    : '';
+
+                return `<span class="carton-product-badge"${titleAttr}>${escapeHtml(displayLabel)}</span>`;
+            })
+            .filter(Boolean)
+            .join('');
+
+        const productsMarkup = artikelBadges
+            ? `<div class="carton-products" aria-label="Artikel in diesem Karton">${artikelBadges}</div>`
+            : '<div class="carton-products carton-products--empty">Keine Artikel mit verfügbarem Bestand</div>';
+
+        return `
+            <div class="carton-card" data-carton-id="${escapeHtml(String(cartonId))}">
+                <div class="carton-header">
+                    <strong>${escapeHtml(carton.carton_number)}</strong>
+                    <span class="location-badge location-${locationClass}">
+                        ${renderLocationIcon(carton.location)}
+                        ${escapeHtml(carton.location)}
+                    </span>
+                </div>
+                <div class="carton-info">
+                    ${escapeHtml(String(productCount))} Produkte • ${escapeHtml(String(totalBoxes))} Boxen verfügbar
+                </div>
+                ${productsMarkup}
+                <button class="btn btn-primary btn-small" type="button" data-action="select-carton" data-carton-id="${escapeHtml(String(cartonId))}">
+                    <span class="material-icons-outlined" aria-hidden="true">add_box</span>
+                    <span>Boxen auswählen</span>
+                </button>
             </div>
-            <div class="carton-info">
-                ${carton.product_count} Produkte • ${carton.total_boxes_current} Boxen verfügbar
-            </div>
-            <button class="btn btn-primary btn-small" type="button" data-action="select-carton" data-carton-id="${carton.carton_id}">
-                <span class="material-icons-outlined" aria-hidden="true">add_box</span>
-                <span>Boxen auswählen</span>
-            </button>
-        </div>
-    `).join('');
+        `;
+    }).join('');
 }
 
 async function selectBoxesFromCarton(cartonId) {

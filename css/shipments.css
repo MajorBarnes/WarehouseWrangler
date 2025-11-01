@@ -772,6 +772,29 @@ button.metric-card:is(:hover, :focus-visible) {
     font-size: 0.95rem;
 }
 
+.carton-products {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    font-size: 0.85rem;
+    line-height: 1.4;
+}
+
+.carton-product-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.25rem 0.6rem;
+    border-radius: 999px;
+    background: rgba(0, 86, 179, 0.12);
+    color: var(--color-primary);
+    font-weight: 600;
+}
+
+.carton-products--empty {
+    color: var(--color-muted);
+    font-style: italic;
+}
+
 .box-selection-dialog {
     display: flex;
     flex-direction: column;
