@@ -51,6 +51,10 @@
       "missingAuthToken": "Missing authentication token",
       "unauthorized": "Unauthorized"
     },
+    "alerts": {
+      "success": "Success: {message}",
+      "error": "Error: {message}"
+    },
     "prompts": {
       "logoutConfirm": "Are you sure you want to log out?"
     },
@@ -158,6 +162,48 @@
       "factorsUpdateFailure": "Failed to update seasonal factors.",
       "deleteSuccess": "Product deleted successfully!",
       "deleteFailure": "Failed to delete product."
+    }
+  },
+  "users": {
+    "table": {
+      "empty": "No users found",
+      "status": {
+        "active": "Active",
+        "inactive": "Inactive"
+      },
+      "lastLogin": {
+        "never": "Never"
+      },
+      "actions": {
+        "protected": "Protected account",
+        "edit": "Edit user",
+        "changePassword": "Change password",
+        "activate": "Activate user",
+        "deactivate": "Deactivate user"
+      }
+    },
+    "modals": {
+      "addTitle": "Add New User",
+      "editTitle": "Edit User"
+    },
+    "notifications": {
+      "loadFailed": "Failed to load users: {error}",
+      "loadFailedGeneric": "Failed to load users.",
+      "updateSuccess": "User updated successfully!",
+      "updateError": "Failed to update user.",
+      "createSuccess": "User created successfully!",
+      "createError": "Failed to create user.",
+      "passwordMismatch": "New passwords do not match!",
+      "passwordChangeSuccess": "Password changed successfully!",
+      "passwordChangeError": "Failed to change password.",
+      "activateSuccess": "User activated successfully!",
+      "deactivateSuccess": "User deactivated successfully!",
+      "activateError": "Failed to activate user.",
+      "deactivateError": "Failed to deactivate user."
+    },
+    "prompts": {
+      "activateConfirm": "Are you sure you want to activate this user?",
+      "deactivateConfirm": "Are you sure you want to deactivate this user?"
     }
   },
   "cartons": {
