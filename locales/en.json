@@ -988,11 +988,17 @@
     },
     "warnings": {
       "title": "Warnings",
-      "description": "Investigate potential data issues prior to confirming the import."
+      "description": "Investigate potential data issues prior to confirming the import.",
+      "lineLabel": "Line {line}"
     },
     "preview": {
       "title": "Preview first 20 products",
       "description": "Showing available inventory (boxes) at Amazon FBA.",
+      "productFallback": "Unknown",
+      "status": {
+        "inStock": "In Stock",
+        "outOfStock": "Out of Stock"
+      },
       "table": {
         "ariaLabel": "Amazon snapshot preview",
         "headers": {
@@ -1001,8 +1007,20 @@
           "name": "Product name",
           "available": "Available boxes",
           "status": "Status"
-        }
+        },
+        "truncated": "Showing first {shown} of {total} products…"
       }
+    },
+    "errors": {
+      "csvRequired": "Please select a CSV file.",
+      "fileTooLarge": "File is too large. Maximum size is {size}.",
+      "fileNotSelected": "Please select a file first.",
+      "parseFailed": "Failed to parse file. Please check the format.",
+      "importFailed": "Import failed. Please try again.",
+      "noData": "No data to import."
+    },
+    "prompts": {
+      "confirmImport": "Are you sure you want to import this snapshot?\n\nDate: {date}\nProducts: {products}\n\nThis will replace existing data for this date."
     },
     "actions": {
       "confirm": "Confirm & import"
