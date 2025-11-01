@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Artikel Verwaltung - WarehouseWrangler</title>
+    <title data-i18n="products.meta.title">Product Management - WarehouseWrangler</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -42,31 +42,31 @@
         <div class="branding">
             <img src="./assets/logo.png" alt="WarehouseWrangler Logo" class="brand-logo">
             <div class="brand-copy">
-                <span class="brand-name">WarehouseWrangler</span>
-                <span class="brand-tagline">Fulfillment Control Center</span>
+                <span class="brand-name" data-i18n="app.brand.name">WarehouseWrangler</span>
+                <span class="brand-tagline" data-i18n="app.brand.tagline">Fulfillment Control Center</span>
             </div>
         </div>
 
         <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="primaryNav" data-nav-toggle>
             <span class="material-icons-outlined" aria-hidden="true">menu</span>
-            <span class="sr-only">Toggle navigation</span>
+            <span class="sr-only" data-i18n="app.header.toggleNavigation">Toggle navigation</span>
         </button>
 
         <nav class="primary-nav" aria-label="Main navigation" data-primary-nav id="primaryNav">
             <ul class="nav-list">
-                <li class="nav-item"><a class="nav-link" href="index.html"><span class="material-icons-outlined" aria-hidden="true">dashboard</span><span>Dashboard</span></a></li>
-                <li class="nav-item"><a class="nav-link" href="cartons.html"><span class="material-icons-outlined" aria-hidden="true">inventory_2</span><span>Cartons</span></a></li>
-                <li class="nav-item"><a class="nav-link" href="shipments.html"><span class="material-icons-outlined" aria-hidden="true">local_shipping</span><span>Shipments</span></a></li>
-                <li class="nav-item"><a class="nav-link" href="planned-stock.html"><span class="material-icons-outlined" aria-hidden="true">analytics</span><span>Planned Stock</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="index.html"><span class="material-icons-outlined" aria-hidden="true">dashboard</span><span data-i18n="nav.dashboard">Dashboard</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="cartons.html"><span class="material-icons-outlined" aria-hidden="true">inventory_2</span><span data-i18n="nav.cartons">Cartons</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="shipments.html"><span class="material-icons-outlined" aria-hidden="true">local_shipping</span><span data-i18n="nav.shipments">Shipments</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="planned-stock.html"><span class="material-icons-outlined" aria-hidden="true">analytics</span><span data-i18n="nav.plannedStock">Planned Stock</span></a></li>
                 <li class="nav-item nav-item--has-children" data-imports>
                     <button class="nav-link" type="button" data-imports-toggle aria-expanded="false">
                         <span class="material-icons-outlined" aria-hidden="true">dataset</span>
-                        <span>Data Imports</span>
+                        <span data-i18n="nav.dataImports.label">Data Imports</span>
                         <span class="material-icons-outlined nav-link__chevron" aria-hidden="true">expand_more</span>
                     </button>
                     <ul class="nav-submenu">
-                        <li><a class="nav-sublink" href="lc-upload.html"><span class="material-icons-outlined" aria-hidden="true">upload_file</span><span>LC Upload</span></a></li>
-                        <li><a class="nav-sublink" href="amazon-snapshot-upload.html"><span class="material-icons-outlined" aria-hidden="true">cloud_upload</span><span>Amazon Snapshot</span></a></li>
+                        <li><a class="nav-sublink" href="lc-upload.html"><span class="material-icons-outlined" aria-hidden="true">upload_file</span><span data-i18n="nav.dataImports.lcUpload">LC Upload</span></a></li>
+                        <li><a class="nav-sublink" href="amazon-snapshot-upload.html"><span class="material-icons-outlined" aria-hidden="true">cloud_upload</span><span data-i18n="nav.dataImports.amazonSnapshot">Amazon Snapshot</span></a></li>
                     </ul>
                 </li>
             </ul>
@@ -77,24 +77,24 @@
                 <button class="user-menu__trigger" type="button" aria-expanded="false" data-user-menu-trigger>
                     <span class="material-icons-outlined" aria-hidden="true">account_circle</span>
                     <span class="user-display-name-wrapper" aria-live="polite">
-                        <span id="userDisplay" class="user-display-name">Loading…</span>
+                        <span id="userDisplay" class="user-display-name" data-i18n="common.loading">Loading…</span>
                     </span>
                     <span class="material-icons-outlined user-menu__chevron" aria-hidden="true">expand_more</span>
                 </button>
                 <div class="user-menu__dropdown" role="menu">
                     <a class="user-menu__link is-active" href="products.html" role="menuitem" aria-current="page">
                         <span class="material-icons-outlined" aria-hidden="true">view_list</span>
-                        <span>Products</span>
+                        <span data-i18n="app.userMenu.products">Products</span>
                     </a>
                     <a class="user-menu__link" href="users.html" role="menuitem">
                         <span class="material-icons-outlined" aria-hidden="true">group</span>
-                        <span>Users</span>
+                        <span data-i18n="app.userMenu.users">Users</span>
                     </a>
                 </div>
             </div>
             <button id="logoutBtn" class="btn btn-logout" type="button">
                 <span class="material-icons-outlined" aria-hidden="true">logout</span>
-                <span>Logout</span>
+                <span data-i18n="app.userMenu.logout">Logout</span>
             </button>
         </div>
     </header>
@@ -104,28 +104,31 @@
             <div class="page-title">
                 <span class="material-icons-outlined" aria-hidden="true">inventory_2</span>
                 <div class="page-title-copy">
-                    <h2>Artikel Verwaltung</h2>
-                    <p>Manage product catalog details, identification codes, and seasonal demand factors.</p>
+                    <h2 data-i18n="products.header.title">Product Management</h2>
+                    <p data-i18n="products.header.subtitle">Manage product catalog details, identification codes, and seasonal demand factors.</p>
                 </div>
             </div>
             <button id="addProductBtn" class="btn btn-primary" type="button" onclick="openAddProductModal()">
                 <span class="material-icons-outlined" aria-hidden="true">add_circle</span>
-                <span>Artikel anlegen</span>
+                <span data-i18n="products.header.primaryAction">Create product</span>
             </button>
         </section>
 
-        <section class="surface-card search-panel" aria-label="Search products">
+        <section class="surface-card search-panel" aria-label="Search products" data-i18n-attr="aria-label" data-i18n="products.search.sectionLabel">
             <div class="search-header">
-                <h3>Produktkatalog durchsuchen</h3>
-                <p>Filter by product name, article, or identification codes.</p>
+                <h3 data-i18n="products.search.title">Browse product catalog</h3>
+                <p data-i18n="products.search.description">Filter by product name, article, or identification codes.</p>
             </div>
             <div class="search-field">
                 <span class="material-icons-outlined" aria-hidden="true">search</span>
+                <label class="sr-only" for="searchInput" id="searchInputLabel" data-i18n="products.search.ariaLabel">Search products</label>
                 <input
                     type="text"
                     id="searchInput"
                     placeholder="Search by article, product, FNSKU, ASIN, SKU, or EAN"
-                    aria-label="Search products"
+                    aria-labelledby="searchInputLabel"
+                    data-i18n="products.search.placeholder"
+                    data-i18n-attr="placeholder"
                 >
             </div>
         </section>
@@ -133,23 +136,23 @@
         <div id="errorMessage" aria-live="polite"></div>
 
         <section class="surface-card table-card" aria-label="Products table">
-            <div id="loadingIndicator" class="loading-indicator">Loading products…</div>
+            <div id="loadingIndicator" class="loading-indicator" data-i18n="products.loading">Loading products…</div>
 
-            <div class="table-scroll" role="region" aria-live="polite" aria-label="Produktliste">
+            <div class="table-scroll" role="region" aria-live="polite" aria-label="Product list" data-i18n-attr="aria-label" data-i18n="products.table.regionLabel">
                 <div class="table-scroll__viewport">
                     <table id="productsTable" class="products-table table-sticky is-hidden">
                         <thead>
                         <tr>
-                            <th scope="col">Produkt (Gruppe)<br><small>Artikel</small></th>
-                            <th scope="col">Artikel</th>
-                            <th scope="col">FNSKU</th>
-                            <th scope="col">ASIN</th>
-                            <th scope="col">SKU</th>
-                            <th scope="col">EAN</th>
-                            <th scope="col" class="numeric">Paare/Box</th>
-                            <th scope="col">Farbe</th>
-                            <th scope="col">Saisonalität</th>
-                            <th scope="col" class="actions-col">Aktionen</th>
+                            <th scope="col"><span data-i18n="products.table.headers.productGroup">Product (Group)</span><br><small data-i18n="products.table.headers.articleNote">Article</small></th>
+                            <th scope="col" data-i18n="products.table.headers.article">Article</th>
+                            <th scope="col" data-i18n="products.table.headers.fnsku">FNSKU</th>
+                            <th scope="col" data-i18n="products.table.headers.asin">ASIN</th>
+                            <th scope="col" data-i18n="products.table.headers.sku">SKU</th>
+                            <th scope="col" data-i18n="products.table.headers.ean">EAN</th>
+                            <th scope="col" class="numeric" data-i18n="products.table.headers.pairsPerBox">Pairs/Box</th>
+                            <th scope="col" data-i18n="products.table.headers.color">Color</th>
+                            <th scope="col" data-i18n="products.table.headers.seasonality">Seasonality</th>
+                            <th scope="col" class="actions-col" data-i18n="products.table.headers.actions">Actions</th>
                         </tr>
                     </thead>
                         <tbody id="productsTableBody"></tbody>
@@ -158,7 +161,7 @@
             </div>
             <div id="noResults" class="empty-state is-hidden">
                 <span class="material-icons-outlined" aria-hidden="true">search_off</span>
-                <p>Keine Artikel gefunden</p>
+                <p data-i18n="products.table.empty">No products found</p>
             </div>
         </section>
     </main>
@@ -168,9 +171,9 @@
             <div class="modal-header">
                 <div class="modal-title-group">
                     <span class="material-icons-outlined" aria-hidden="true">inventory</span>
-                    <h3 id="modalTitle">Neuer Artikel</h3>
+                    <h3 id="modalTitle" data-i18n="products.modal.createTitle">New product</h3>
                 </div>
-                <button class="modal-close" type="button" onclick="closeProductModal()" aria-label="Close">
+                <button class="modal-close" type="button" onclick="closeProductModal()" aria-label="Close" data-i18n="common.actions.close" data-i18n-attr="aria-label">
                     <span class="material-icons-outlined" aria-hidden="true">close</span>
                 </button>
             </div>
@@ -179,65 +182,71 @@
 
                 <div class="form-grid">
                     <div class="form-group">
-                        <label for="artikel">Artikel * <small>(z.B. "Sneaker Black 43-46")</small></label>
+                        <label for="artikel">
+                            <span data-i18n="products.form.article.label">Article *</span>
+                            <small data-i18n="products.form.article.help">(e.g., "Sneaker Black 43-46")</small>
+                        </label>
                         <input type="text" id="artikel" required maxlength="100">
                     </div>
 
                     <div class="form-group">
-                        <label for="productName">Produkt (Gruppe) * <small>(z.B. "Sneaker Bambus")</small></label>
+                        <label for="productName">
+                            <span data-i18n="products.form.productName.label">Product (Group) *</span>
+                            <small data-i18n="products.form.productName.help">(e.g., "Sneaker Bamboo")</small>
+                        </label>
                         <input type="text" id="productName" required maxlength="200">
                     </div>
                 </div>
 
                 <div class="form-grid form-grid--two">
                     <div class="form-group">
-                        <label for="fnsku">FNSKU *</label>
+                        <label for="fnsku" data-i18n="products.form.fnsku.label">FNSKU *</label>
                         <input type="text" id="fnsku" required maxlength="50" class="input-code">
                     </div>
 
                     <div class="form-group">
-                        <label for="asin">ASIN</label>
+                        <label for="asin" data-i18n="products.form.asin.label">ASIN</label>
                         <input type="text" id="asin" maxlength="50" class="input-code">
                     </div>
                 </div>
 
                 <div class="form-grid form-grid--two">
                     <div class="form-group">
-                        <label for="sku">SKU</label>
+                        <label for="sku" data-i18n="products.form.sku.label">SKU</label>
                         <input type="text" id="sku" maxlength="50" class="input-code">
                     </div>
 
                     <div class="form-group">
-                        <label for="ean">EAN</label>
+                        <label for="ean" data-i18n="products.form.ean.label">EAN</label>
                         <input type="text" id="ean" maxlength="50" class="input-code">
                     </div>
                 </div>
 
                 <div class="form-grid form-grid--three">
                     <div class="form-group">
-                        <label for="pairsPerBox">Paare/Box *</label>
+                        <label for="pairsPerBox" data-i18n="products.form.pairsPerBox.label">Pairs/Box *</label>
                         <input type="number" id="pairsPerBox" required min="1" max="999">
                     </div>
 
                     <div class="form-group">
-                        <label for="color">Farbe</label>
-                        <input type="text" id="color" maxlength="50" placeholder="Black, White, ...">
+                        <label for="color" data-i18n="products.form.color.label">Color</label>
+                        <input type="text" id="color" maxlength="50" placeholder="Black, White, ..." data-i18n="products.form.color.placeholder" data-i18n-attr="placeholder">
                     </div>
 
                     <div class="form-group">
-                        <label for="avgWeeklySales">Ø Verkauf/Woche</label>
-                        <input type="number" id="avgWeeklySales" step="0.01" min="0" placeholder="0.00">
+                        <label for="avgWeeklySales" data-i18n="products.form.avgWeeklySales.label">Avg. weekly sales</label>
+                        <input type="number" id="avgWeeklySales" step="0.01" min="0" placeholder="0.00" data-i18n="products.form.avgWeeklySales.placeholder" data-i18n-attr="placeholder">
                     </div>
                 </div>
 
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" onclick="closeProductModal()">
                         <span class="material-icons-outlined" aria-hidden="true">close</span>
-                        <span>Abbrechen</span>
+                        <span data-i18n="common.actions.cancel">Cancel</span>
                     </button>
                     <button type="submit" class="btn btn-primary">
                         <span class="material-icons-outlined" aria-hidden="true">save</span>
-                        <span>Speichern</span>
+                        <span data-i18n="common.actions.save">Save</span>
                     </button>
                 </div>
             </form>
@@ -250,11 +259,11 @@
                 <div class="modal-title-group">
                     <span class="material-icons-outlined" aria-hidden="true">insights</span>
                     <div>
-                        <h3 id="factorsModalTitle">Saisonale Faktoren</h3>
+                        <h3 id="factorsModalTitle" data-i18n="products.factorsModal.heading">Seasonal factors</h3>
                         <p id="factorsProductName" class="modal-subtitle"></p>
                     </div>
                 </div>
-                <button class="modal-close" type="button" onclick="closeFactorsModal()" aria-label="Close">
+                <button class="modal-close" type="button" onclick="closeFactorsModal()" aria-label="Close" data-i18n="common.actions.close" data-i18n-attr="aria-label">
                     <span class="material-icons-outlined" aria-hidden="true">close</span>
                 </button>
             </div>
@@ -262,73 +271,77 @@
                 <div class="factors-helper">
                     <span class="material-icons-outlined" aria-hidden="true">info</span>
                     <div>
-                        <strong>Saisonale Faktoren</strong> beeinflussen die Verkaufsprognose.<br>
-                        <strong>1.0</strong> = Normal · <strong>&gt;1.0</strong> = Höher · <strong>&lt;1.0</strong> = Niedriger
+                        <p><span data-i18n="products.factors.helper.intro">Seasonal factors influence the sales forecast.</span></p>
+                        <p class="factors-helper__scale">
+                            <strong>1.0</strong> <span data-i18n="products.factors.helper.normal">= Normal</span> ·
+                            <strong>&gt;1.0</strong> <span data-i18n="products.factors.helper.higher">= Higher</span> ·
+                            <strong>&lt;1.0</strong> <span data-i18n="products.factors.helper.lower">= Lower</span>
+                        </p>
                     </div>
                 </div>
 
                 <div class="factors-actions">
                     <button type="button" class="btn btn-tertiary btn-compact" onclick="resetFactorsToDefault()">
                         <span class="material-icons-outlined" aria-hidden="true">restart_alt</span>
-                        <span>Alle auf 1.0</span>
+                        <span data-i18n="products.factors.actions.reset">Set all to 1.0</span>
                     </button>
                     <button type="button" class="btn btn-secondary btn-compact" onclick="setAllFactors(1.5)">
                         <span class="material-icons-outlined" aria-hidden="true">trending_up</span>
-                        <span>Alle auf 1.5</span>
+                        <span data-i18n="products.factors.actions.increase">Set all to 1.5</span>
                     </button>
                     <button type="button" class="btn btn-secondary btn-compact" onclick="setAllFactors(0.8)">
                         <span class="material-icons-outlined" aria-hidden="true">trending_down</span>
-                        <span>Alle auf 0.8</span>
+                        <span data-i18n="products.factors.actions.decrease">Set all to 0.8</span>
                     </button>
                 </div>
 
                 <div class="factors-form-grid">
                     <div class="factor-input-group">
-                        <label for="factor_jan">Januar</label>
+                        <label for="factor_jan" data-i18n="products.factors.months.jan">January</label>
                         <input type="number" id="factor_jan" step="0.01" min="0.01" max="10" value="1.0" required>
                     </div>
                     <div class="factor-input-group">
-                        <label for="factor_feb">Februar</label>
+                        <label for="factor_feb" data-i18n="products.factors.months.feb">February</label>
                         <input type="number" id="factor_feb" step="0.01" min="0.01" max="10" value="1.0" required>
                     </div>
                     <div class="factor-input-group">
-                        <label for="factor_mar">März</label>
+                        <label for="factor_mar" data-i18n="products.factors.months.mar">March</label>
                         <input type="number" id="factor_mar" step="0.01" min="0.01" max="10" value="1.0" required>
                     </div>
                     <div class="factor-input-group">
-                        <label for="factor_apr">April</label>
+                        <label for="factor_apr" data-i18n="products.factors.months.apr">April</label>
                         <input type="number" id="factor_apr" step="0.01" min="0.01" max="10" value="1.0" required>
                     </div>
                     <div class="factor-input-group">
-                        <label for="factor_may">Mai</label>
+                        <label for="factor_may" data-i18n="products.factors.months.may">May</label>
                         <input type="number" id="factor_may" step="0.01" min="0.01" max="10" value="1.0" required>
                     </div>
                     <div class="factor-input-group">
-                        <label for="factor_jun">Juni</label>
+                        <label for="factor_jun" data-i18n="products.factors.months.jun">June</label>
                         <input type="number" id="factor_jun" step="0.01" min="0.01" max="10" value="1.0" required>
                     </div>
                     <div class="factor-input-group">
-                        <label for="factor_jul">Juli</label>
+                        <label for="factor_jul" data-i18n="products.factors.months.jul">July</label>
                         <input type="number" id="factor_jul" step="0.01" min="0.01" max="10" value="1.0" required>
                     </div>
                     <div class="factor-input-group">
-                        <label for="factor_aug">August</label>
+                        <label for="factor_aug" data-i18n="products.factors.months.aug">August</label>
                         <input type="number" id="factor_aug" step="0.01" min="0.01" max="10" value="1.0" required>
                     </div>
                     <div class="factor-input-group">
-                        <label for="factor_sep">September</label>
+                        <label for="factor_sep" data-i18n="products.factors.months.sep">September</label>
                         <input type="number" id="factor_sep" step="0.01" min="0.01" max="10" value="1.0" required>
                     </div>
                     <div class="factor-input-group">
-                        <label for="factor_oct">Oktober</label>
+                        <label for="factor_oct" data-i18n="products.factors.months.oct">October</label>
                         <input type="number" id="factor_oct" step="0.01" min="0.01" max="10" value="1.0" required>
                     </div>
                     <div class="factor-input-group">
-                        <label for="factor_nov">November</label>
+                        <label for="factor_nov" data-i18n="products.factors.months.nov">November</label>
                         <input type="number" id="factor_nov" step="0.01" min="0.01" max="10" value="1.0" required>
                     </div>
                     <div class="factor-input-group">
-                        <label for="factor_dec">Dezember</label>
+                        <label for="factor_dec" data-i18n="products.factors.months.dec">December</label>
                         <input type="number" id="factor_dec" step="0.01" min="0.01" max="10" value="1.0" required>
                     </div>
                 </div>
@@ -336,11 +349,11 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" onclick="closeFactorsModal()">
                         <span class="material-icons-outlined" aria-hidden="true">close</span>
-                        <span>Abbrechen</span>
+                        <span data-i18n="common.actions.cancel">Cancel</span>
                     </button>
                     <button type="submit" class="btn btn-primary">
                         <span class="material-icons-outlined" aria-hidden="true">save</span>
-                        <span>Faktoren speichern</span>
+                        <span data-i18n="products.factors.actions.save">Save factors</span>
                     </button>
                 </div>
             </form>
@@ -350,21 +363,30 @@
     <footer class="site-footer">
         <div class="site-footer__inner">
             <div class="site-footer__section">
-                <span class="site-footer__copyright">© <span class="site-footer__year" data-footer-year data-current-year="2024">2024</span> WarehouseWrangler</span>
+                <span class="site-footer__copyright">© <span class="site-footer__year" data-footer-year data-current-year="2024">2024</span> <span data-i18n="app.brand.name">WarehouseWrangler</span></span>
             </div>
             <div class="site-footer__section site-footer__created-by">
-                <span class="site-footer__label">Created by</span>
+                <span class="site-footer__label" data-i18n="app.footer.createdBy">Created by</span>
                 <a href="https://threegents.eu" class="site-footer__link" target="_blank" rel="noopener">
                     <img src="https://threegents.eu/images/logo_light.svg" alt="ThreeGents logo" class="site-footer__logo">
-                    <span>ThreeGents</span>
+                    <span data-i18n="app.footer.partner">ThreeGents</span>
                 </a>
             </div>
             <div class="site-footer__section">
-                <a href="mailto:support@threegents.biz" class="site-footer__link">Support</a>
+                <a href="mailto:support@threegents.biz" class="site-footer__link" data-i18n="app.footer.support">Support</a>
             </div>
         </div>
     </footer>
 
+    <script src="./js/i18n.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var storedLocale = localStorage.getItem('ww_locale') || I18n.DEFAULT_LOCALE;
+            I18n.init({ locale: storedLocale }).then(function () {
+                I18n.translateTree();
+            });
+        });
+    </script>
     <script src="./js/header.js"></script>
     <script src="./js/products.js"></script>
     <script type="module" src="./js/footer.js"></script>
