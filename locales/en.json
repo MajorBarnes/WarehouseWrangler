@@ -37,7 +37,8 @@
       "reset": "Reset",
       "cancel": "Cancel",
       "close": "Close",
-      "back": "Back"
+      "back": "Back",
+      "save": "Save"
     },
     "units": {
       "boxes": "Boxes",
@@ -121,12 +122,43 @@
     }
   },
   "products": {
+    "meta": {
+      "title": "Product Management - WarehouseWrangler"
+    },
+    "header": {
+      "title": "Product Management",
+      "subtitle": "Manage product catalog details, identification codes, and seasonal demand factors.",
+      "primaryAction": "Create product"
+    },
+    "search": {
+      "sectionLabel": "Search products",
+      "title": "Browse product catalog",
+      "description": "Filter by product name, article, or identification codes.",
+      "placeholder": "Search by article, product, FNSKU, ASIN, SKU, or EAN",
+      "ariaLabel": "Search products"
+    },
+    "loading": "Loading products…",
     "modal": {
       "createTitle": "New product",
       "editTitle": "Edit product"
     },
     "table": {
-      "fallbackName": "Product"
+      "fallbackName": "Product",
+      "regionLabel": "Product list",
+      "headers": {
+        "productGroup": "Product (Group)",
+        "articleNote": "Article",
+        "article": "Article",
+        "fnsku": "FNSKU",
+        "asin": "ASIN",
+        "sku": "SKU",
+        "ean": "EAN",
+        "pairsPerBox": "Pairs/Box",
+        "color": "Color",
+        "seasonality": "Seasonality",
+        "actions": "Actions"
+      },
+      "empty": "No products found"
     },
     "tooltips": {
       "edit": "Edit",
@@ -137,10 +169,70 @@
       "editProduct": "Edit product {product}",
       "deleteProduct": "Delete product {product}"
     },
+    "form": {
+      "article": {
+        "label": "Article *",
+        "help": "(e.g., \"Sneaker Black 43-46\")"
+      },
+      "productName": {
+        "label": "Product (Group) *",
+        "help": "(e.g., \"Sneaker Bamboo\")"
+      },
+      "fnsku": {
+        "label": "FNSKU *"
+      },
+      "asin": {
+        "label": "ASIN"
+      },
+      "sku": {
+        "label": "SKU"
+      },
+      "ean": {
+        "label": "EAN"
+      },
+      "pairsPerBox": {
+        "label": "Pairs/Box *"
+      },
+      "color": {
+        "label": "Color",
+        "placeholder": "Black, White, ..."
+      },
+      "avgWeeklySales": {
+        "label": "Avg. weekly sales",
+        "placeholder": "0.00"
+      }
+    },
     "factors": {
-      "empty": "No factors"
+      "empty": "No factors",
+      "helper": {
+        "intro": "Seasonal factors influence the sales forecast.",
+        "normal": "= Normal",
+        "higher": "= Higher",
+        "lower": "= Lower"
+      },
+      "actions": {
+        "reset": "Set all to 1.0",
+        "increase": "Set all to 1.5",
+        "decrease": "Set all to 0.8",
+        "save": "Save factors"
+      },
+      "months": {
+        "jan": "January",
+        "feb": "February",
+        "mar": "March",
+        "apr": "April",
+        "may": "May",
+        "jun": "June",
+        "jul": "July",
+        "aug": "August",
+        "sep": "September",
+        "oct": "October",
+        "nov": "November",
+        "dec": "December"
+      }
     },
     "factorsModal": {
+      "heading": "Seasonal factors",
       "title": "Seasonal factors - {artikel}",
       "productLabel": "Product: {name}"
     },
