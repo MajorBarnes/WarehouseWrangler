@@ -24,7 +24,14 @@
     "userMenu": {
       "products": "Products",
       "users": "Users",
-      "logout": "Logout"
+      "logout": "Logout",
+      "languageLabel": "Language",
+      "languageDescription": "Choose how WarehouseWrangler appears.",
+      "languageOptions": {
+        "en": "English",
+        "de": "Deutsch",
+        "ru": "Русский"
+      }
     },
     "footer": {
       "createdBy": "Created by",
