@@ -940,6 +940,85 @@
       "retry": "Try again"
     }
   },
+  "amazonSnapshotUpload": {
+    "meta": {
+      "title": "Amazon Snapshot Upload - WarehouseWrangler"
+    },
+    "header": {
+      "title": "Amazon Snapshot Upload",
+      "subtitle": "Upload the latest Amazon inventory report to keep FBA stock levels accurate."
+    },
+    "uploadCard": {
+      "title": "Select Amazon snapshot file",
+      "description": "Import your \"Manage FBA Inventory\" CSV from Amazon Seller Central for processing.",
+      "selectFile": "Choose file",
+      "clearFileAria": "Remove selected file",
+      "parse": "Parse & Preview",
+      "requirements": {
+        "title": "File requirements",
+        "items": {
+          "format": "Format: CSV (comma-separated)",
+          "columns": "Includes columns:",
+          "size": "Maximum file size: 5 MB"
+        }
+      },
+      "important": {
+        "title": "Important",
+        "items": {
+          "replace": "Uploading replaces snapshot data for matching dates.",
+          "latest": "Confirm the file is the most recent export.",
+          "example": "Typical file name:"
+        }
+      }
+    },
+    "summary": {
+      "title": "Upload summary",
+      "description": "Review totals before importing the snapshot to the database.",
+      "metrics": {
+        "date": "Snapshot date",
+        "products": "Products found",
+        "boxes": "Total available boxes",
+        "rows": "Rows processed"
+      },
+      "location": {
+        "prefix": "This import will",
+        "badge": "replace",
+        "suffix": "existing snapshot data for the selected date."
+      }
+    },
+    "warnings": {
+      "title": "Warnings",
+      "description": "Investigate potential data issues prior to confirming the import."
+    },
+    "preview": {
+      "title": "Preview first 20 products",
+      "description": "Showing available inventory (boxes) at Amazon FBA.",
+      "table": {
+        "ariaLabel": "Amazon snapshot preview",
+        "headers": {
+          "fnsku": "FNSKU",
+          "sku": "SKU",
+          "name": "Product name",
+          "available": "Available boxes",
+          "status": "Status"
+        }
+      }
+    },
+    "actions": {
+      "confirm": "Confirm & import"
+    },
+    "success": {
+      "title": "Import successful",
+      "products": "Products updated",
+      "date": "Snapshot date",
+      "uploadAnother": "Upload another file",
+      "viewDashboard": "View dashboard"
+    },
+    "error": {
+      "title": "Upload failed",
+      "retry": "Try again"
+    }
+  },
   "plannedStock": {
     "meta": {
       "title": "Planned Stock - WarehouseWrangler"
