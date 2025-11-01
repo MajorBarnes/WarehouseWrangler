@@ -37,6 +37,10 @@
       "createdBy": "Created by",
       "partner": "ThreeGents",
       "support": "Support",
+      "supportEmail": "support@threegents.biz",
+      "copyEmail": "Copy email",
+      "copySuccess": "Support email copied to the clipboard.",
+      "copyFailure": "We couldn't copy the support email. Please copy it manually.",
       "partnerLogoAlt": "ThreeGents logo",
       "yearRange": "{startYear}\u2013{endYear}",
       "singleYear": "{year}"
