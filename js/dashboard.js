@@ -171,6 +171,7 @@ export function mergePlannedAdditional(products, plannedRows) {
 export function computeCoverage(productRow, plannedMap, cfg, month, toggles) {
     const productId = productRow.product_id != null ? productRow.product_id : productRow.id;
     const name = productRow.name || productRow.product_name || `Product ${productId}`;
+    const artikel = productRow.artikel || name;
     const pairsPerBox = Number(productRow.pairs_per_box) || 0;
     const aws = Number(productRow.average_weekly_sales) || 0;
     const seasonFactor = getSeasonFactor(productRow, month);
@@ -180,6 +181,7 @@ export function computeCoverage(productRow, plannedMap, cfg, month, toggles) {
     const result = {
         productId,
         name,
+        artikel,
         pairsPerBox,
         seasonFactor,
         weeklyDemand,
@@ -373,7 +375,7 @@ function renderDashboardBars(currentState) {
         const rowEl = document.createElement('div');
         rowEl.className = 'bar-row';
         rowEl.setAttribute('role', 'group');
-        rowEl.setAttribute('aria-label', `Product ${row.name}`);
+        rowEl.setAttribute('aria-label', `Product ${row.artikel || row.name}`);
 
         const headerEl = document.createElement('div');
         headerEl.className = 'bar-row__header';
@@ -568,7 +570,7 @@ function renderDashboardTable(currentState) {
 
         const productCell = document.createElement('th');
         productCell.scope = 'row';
-        productCell.textContent = row.name;
+        productCell.textContent = row.artikel || row.name;
         tr.appendChild(productCell);
 
         appendCell(tr, formatWeeks(leadTimeWeeks), { numeric: true });
