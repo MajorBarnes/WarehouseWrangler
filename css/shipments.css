@@ -795,6 +795,17 @@ button.metric-card:is(:hover, :focus-visible) {
     font-style: italic;
 }
 
+.carton-actions {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.carton-actions .btn {
+    flex: 1 1 120px;
+    justify-content: center;
+}
+
 .box-selection-dialog {
     display: flex;
     flex-direction: column;
