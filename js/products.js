@@ -13,6 +13,31 @@ let filteredProducts = [];
 let editingProductId = null;
 let currentProductForFactors = null;
 
+function formatTemplate(template, replacements) {
+    if (typeof template !== 'string' || !replacements) {
+        return template;
+    }
+
+    return template.replace(/\{(\w+)\}/g, (match, token) => {
+        return Object.prototype.hasOwnProperty.call(replacements, token)
+            ? replacements[token]
+            : match;
+    });
+}
+
+function translate(key, replacements, defaultValue) {
+    const hasI18n = typeof I18n !== 'undefined' && I18n && typeof I18n.t === 'function';
+    const fallback = defaultValue !== undefined ? defaultValue : key;
+
+    if (!hasI18n) {
+        return formatTemplate(fallback, replacements);
+    }
+
+    const options = defaultValue !== undefined ? { defaultValue } : undefined;
+    const result = I18n.t(key, replacements, options);
+    return formatTemplate(result, replacements);
+}
+
 // ============================================================================
 // INITIALIZATION
 // ============================================================================
@@ -36,7 +61,7 @@ function initializeHeader() {
     const userDataStr = localStorage.getItem('ww_user_data');
 
     if (userDisplay) {
-        userDisplay.textContent = 'Benutzer';
+        userDisplay.textContent = translate('common.user.anonymous', null, 'User');
 
         if (userDataStr) {
             try {
@@ -53,7 +78,8 @@ function initializeHeader() {
     const logoutBtn = document.getElementById('logoutBtn');
     if (logoutBtn) {
         logoutBtn.addEventListener('click', function() {
-            if (confirm('Are you sure you want to logout?')) {
+            const message = translate('common.prompts.logoutConfirm', null, 'Are you sure you want to log out?');
+            if (confirm(message)) {
                 localStorage.removeItem('ww_auth_token');
                 localStorage.removeItem('ww_user_data');
                 window.location.href = 'login.html';
@@ -71,7 +97,7 @@ function getToken() {
 }
 
 function showSuccess(message) {
-    alert('Success: ' + message);
+    alert(translate('products.alerts.success', { message }, 'Success: {message}'));
 }
 
 function showError(message) {
@@ -125,7 +151,8 @@ async function loadProducts() {
                 window.location.href = 'login.html';
                 return;
             }
-            throw new Error(data.error || 'Failed to load products');
+            const fallback = translate('products.messages.loadFailed', null, 'Failed to load products.');
+            throw new Error(data.error || fallback);
         }
 
         if (data.success) {
@@ -133,11 +160,13 @@ async function loadProducts() {
             filteredProducts = allProducts;
             renderProducts();
         } else {
-            throw new Error(data.error || 'Unknown error');
+            const fallback = translate('products.messages.unknown', null, 'Unknown error.');
+            throw new Error(data.error || fallback);
         }
 
     } catch (error) {
-        showError('Fehler beim Laden der Artikel: ' + error.message);
+        const message = translate('products.messages.loadError', { message: error.message }, 'Error loading products: {message}');
+        showError(message);
         console.error('Load products error:', error);
     } finally {
         document.getElementById('loadingIndicator').style.display = 'none';
@@ -253,7 +282,20 @@ function renderProducts() {
         const colorLabel = product.color ? escapeHtml(product.color) : '';
         const sanitizedColor = product.color ? sanitizeForClass(product.color) : '';
         const colorClass = sanitizedColor ? ` color-${sanitizedColor}` : '';
-        const productLabel = escapeHtml(product.product_name || product.artikel || 'Produkt');
+        const fallbackName = translate('products.table.fallbackName', null, 'Product');
+        const rawProductLabel = product.product_name || product.artikel || fallbackName;
+        const productLabel = escapeHtml(rawProductLabel);
+        const editTooltip = escapeHtml(translate('products.tooltips.edit', null, 'Edit'));
+        const deleteTooltip = escapeHtml(translate('products.tooltips.delete', null, 'Delete'));
+        const factorsAria = escapeHtml(
+            translate('products.aria.editFactors', { product: rawProductLabel }, 'Edit seasonal factors for {product}')
+        );
+        const editAria = escapeHtml(
+            translate('products.aria.editProduct', { product: rawProductLabel }, 'Edit product {product}')
+        );
+        const deleteAria = escapeHtml(
+            translate('products.aria.deleteProduct', { product: rawProductLabel }, 'Delete product {product}')
+        );
 
         return `
         <tr>
@@ -271,7 +313,7 @@ function renderProducts() {
                 ${product.color ? `<span class="color-badge${colorClass}">${colorLabel}</span>` : '-'}
             </td>
             <td class="factors-cell">
-                <button type="button" class="factors-trigger" onclick="openFactorsModal(${product.product_id})" aria-label="Saisonale Faktoren für ${productLabel} bearbeiten">
+                <button type="button" class="factors-trigger" onclick="openFactorsModal(${product.product_id})" aria-label="${factorsAria}">
                     ${renderFactorsPreview(product.seasonal_factors)}
                 </button>
             </td>
@@ -279,8 +321,8 @@ function renderProducts() {
                 <button
                     type="button"
                     class="btn btn-secondary icon-button"
-                    data-tooltip="Bearbeiten"
-                    aria-label="Produkt ${productLabel} bearbeiten"
+                    data-tooltip="${editTooltip}"
+                    aria-label="${editAria}"
                     onclick="openEditProductModal(${product.product_id})"
                 >
                     <span class="material-icons-outlined" aria-hidden="true">edit</span>
@@ -288,8 +330,8 @@ function renderProducts() {
                 <button
                     type="button"
                     class="btn btn-destructive icon-button"
-                    data-tooltip="Löschen"
-                    aria-label="Produkt ${productLabel} löschen"
+                    data-tooltip="${deleteTooltip}"
+                    aria-label="${deleteAria}"
                     onclick="handleDeleteProduct(${product.product_id})"
                 >
                     <span class="material-icons-outlined" aria-hidden="true">delete</span>
@@ -302,7 +344,8 @@ function renderProducts() {
 
 function renderFactorsPreview(factors) {
     if (!factors) {
-        return '<span class="factors-empty">Keine Faktoren</span>';
+        const label = escapeHtml(translate('products.factors.empty', null, 'No factors'));
+        return `<span class="factors-empty">${label}</span>`;
     }
 
     const months = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
@@ -345,7 +388,7 @@ function filterProducts() {
 
 function openAddProductModal() {
     editingProductId = null;
-    document.getElementById('modalTitle').textContent = 'Neuer Artikel';
+    document.getElementById('modalTitle').textContent = translate('products.modal.createTitle', null, 'New product');
     document.getElementById('productForm').reset();
     document.getElementById('productId').value = '';
     document.getElementById('fnsku').disabled = false;
@@ -357,7 +400,7 @@ function openEditProductModal(productId) {
     if (!product) return;
 
     editingProductId = productId;
-    document.getElementById('modalTitle').textContent = 'Artikel Bearbeiten';
+    document.getElementById('modalTitle').textContent = translate('products.modal.editTitle', null, 'Edit product');
     document.getElementById('productId').value = product.product_id;
     document.getElementById('artikel').value = product.artikel || '';
     document.getElementById('fnsku').value = product.fnsku || '';
@@ -388,11 +431,11 @@ function openFactorsModal(productId) {
     if (!product) return;
 
     currentProductForFactors = product;
-    
-    document.getElementById('factorsModalTitle').textContent = 
-        `Saisonale Faktoren - ${product.artikel}`;
-    document.getElementById('factorsProductName').textContent = 
-        `Produkt: ${product.product_name}`;
+
+    const factorsTitle = translate('products.factorsModal.title', { artikel: product.artikel || '' }, 'Seasonal factors - {artikel}');
+    const productName = translate('products.factorsModal.productLabel', { name: product.product_name || '' }, 'Product: {name}');
+    document.getElementById('factorsModalTitle').textContent = factorsTitle;
+    document.getElementById('factorsProductName').textContent = productName;
     
     // Fill in current factors
     const months = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
@@ -433,28 +476,31 @@ async function handleProductSubmit(e) {
             // Update existing product
             formData.product_id = editingProductId;
             const result = await updateProduct(formData);
-            
+
             if (result.success) {
-                showSuccess('Artikel erfolgreich aktualisiert!');
+                showSuccess(translate('products.messages.updateSuccess', null, 'Product updated successfully!'));
                 closeProductModal();
                 loadProducts();
             } else {
-                showError(result.error || 'Fehler beim Aktualisieren');
+                const fallback = translate('products.messages.updateFailure', null, 'Failed to update product.');
+                showError(result.error || fallback);
             }
         } else {
             // Create new product
             const result = await createProduct(formData);
-            
+
             if (result.success) {
-                showSuccess('Artikel erfolgreich angelegt!');
+                showSuccess(translate('products.messages.createSuccess', null, 'Product created successfully!'));
                 closeProductModal();
                 loadProducts();
             } else {
-                showError(result.error || 'Fehler beim Anlegen');
+                const fallback = translate('products.messages.createFailure', null, 'Failed to create product.');
+                showError(result.error || fallback);
             }
         }
     } catch (error) {
-        showError('Verbindungsfehler: ' + error.message);
+        const message = translate('products.messages.connectionError', { message: error.message }, 'Connection error: {message}');
+        showError(message);
     }
 }
 
@@ -475,14 +521,16 @@ async function handleFactorsSubmit(e) {
         const result = await updateSeasonalFactors(currentProductForFactors.product_id, factors);
         
         if (result.success) {
-            showSuccess('Saisonale Faktoren aktualisiert!');
+            showSuccess(translate('products.messages.factorsUpdateSuccess', null, 'Seasonal factors updated!'));
             closeFactorsModal();
             loadProducts();
         } else {
-            showError(result.error || 'Fehler beim Aktualisieren');
+            const fallback = translate('products.messages.factorsUpdateFailure', null, 'Failed to update seasonal factors.');
+            showError(result.error || fallback);
         }
     } catch (error) {
-        showError('Verbindungsfehler: ' + error.message);
+        const message = translate('products.messages.connectionError', { message: error.message }, 'Connection error: {message}');
+        showError(message);
     }
 }
 
@@ -490,22 +538,28 @@ async function handleDeleteProduct(productId) {
     const product = allProducts.find(p => p.product_id === productId);
     if (!product) return;
 
-    const confirmMsg = `Artikel "${product.artikel}" wirklich löschen?\n\nDies kann nicht rückgängig gemacht werden!`;
+    const confirmMsg = translate(
+        'products.alerts.deleteConfirm',
+        { artikel: product.artikel || '' },
+        'Delete article "{artikel}"?\n\nThis cannot be undone!'
+    );
     if (!confirm(confirmMsg)) {
         return;
     }
 
     try {
         const result = await deleteProduct(productId);
-        
+
         if (result.success) {
-            showSuccess('Artikel erfolgreich gelöscht!');
+            showSuccess(translate('products.messages.deleteSuccess', null, 'Product deleted successfully!'));
             loadProducts();
         } else {
-            showError(result.error || 'Fehler beim Löschen');
+            const fallback = translate('products.messages.deleteFailure', null, 'Failed to delete product.');
+            showError(result.error || fallback);
         }
     } catch (error) {
-        showError('Verbindungsfehler: ' + error.message);
+        const message = translate('products.messages.connectionError', { message: error.message }, 'Connection error: {message}');
+        showError(message);
     }
 }
 
@@ -521,7 +575,8 @@ function setAllFactors(value) {
 }
 
 function resetFactorsToDefault() {
-    if (confirm('Alle Faktoren auf 1.0 zurücksetzen?')) {
+    const message = translate('products.alerts.resetConfirm', null, 'Reset all factors to 1.0?');
+    if (confirm(message)) {
         setAllFactors(1.0);
     }
 }

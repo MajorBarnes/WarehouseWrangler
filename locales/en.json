@@ -56,6 +56,50 @@
       "anonymous": "User"
     }
   },
+  "products": {
+    "modal": {
+      "createTitle": "New product",
+      "editTitle": "Edit product"
+    },
+    "table": {
+      "fallbackName": "Product"
+    },
+    "tooltips": {
+      "edit": "Edit",
+      "delete": "Delete"
+    },
+    "aria": {
+      "editFactors": "Edit seasonal factors for {product}",
+      "editProduct": "Edit product {product}",
+      "deleteProduct": "Delete product {product}"
+    },
+    "factors": {
+      "empty": "No factors"
+    },
+    "factorsModal": {
+      "title": "Seasonal factors - {artikel}",
+      "productLabel": "Product: {name}"
+    },
+    "alerts": {
+      "success": "Success: {message}",
+      "deleteConfirm": "Delete article \"{artikel}\"?\n\nThis cannot be undone!",
+      "resetConfirm": "Reset all factors to 1.0?"
+    },
+    "messages": {
+      "loadFailed": "Failed to load products.",
+      "unknown": "Unknown error.",
+      "loadError": "Error loading products: {message}",
+      "updateSuccess": "Product updated successfully!",
+      "updateFailure": "Failed to update product.",
+      "createSuccess": "Product created successfully!",
+      "createFailure": "Failed to create product.",
+      "connectionError": "Connection error: {message}",
+      "factorsUpdateSuccess": "Seasonal factors updated!",
+      "factorsUpdateFailure": "Failed to update seasonal factors.",
+      "deleteSuccess": "Product deleted successfully!",
+      "deleteFailure": "Failed to delete product."
+    }
+  },
   "cartons": {
     "meta": {
       "title": "Carton Management - WarehouseWrangler"
