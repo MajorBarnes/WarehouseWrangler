@@ -30,7 +30,9 @@
       "createdBy": "Created by",
       "partner": "ThreeGents",
       "support": "Support",
-      "partnerLogoAlt": "ThreeGents logo"
+      "partnerLogoAlt": "ThreeGents logo",
+      "yearRange": "{startYear}\u2013{endYear}",
+      "singleYear": "{year}"
     }
   },
   "nav": {
